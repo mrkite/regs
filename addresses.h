@@ -371,6 +371,7 @@ static MemAddress addresses[] = {
   {0xe100bd, "OS Boot"},
   {0xe100be, "OS Busy"},
   {0xe100c0, "MsgPtr"},
+  {0xe100ca, "System Volume"},
   {0xe10180, "ToBusyStrip"},
   {0xe10184, "ToStrip"},
   {0xe101b2, "MidiInputPoll"},
