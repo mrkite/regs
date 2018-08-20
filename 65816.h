@@ -182,7 +182,7 @@ static Opcode opcodes[] = {
   {"eor", ABLX, NORMAL},  // 5f
   {"rts", IMP, RETURN},  // 60
   {"adc", INX, NORMAL},  // 61
-  {"per", IMP, NORMAL},  // 62
+  {"per", REL, NORMAL},  // 62
   {"adc", ZPS, NORMAL},  // 63
   {"stz", ZP, NORMAL},  // 64
   {"adc", ZP, NORMAL},  // 65
