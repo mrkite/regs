@@ -1,0 +1,7 @@
+*.o
+*.swp
+*.map
+seg*
+2mg
+omf
+regs
