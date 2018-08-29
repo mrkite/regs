@@ -8,11 +8,14 @@ This is a set of command-line tools designed specifically to reverse engineer Ap
 
 `2mg` extracts .2mg and .po prodos disk images.  You can also just list the contents of the disk image with the `-l` or `--list` command line argument.  Otherwise, it will create a folder with the name of the disk and extract all the files into that folder.
 
+Listing out the files will also give you the metadata associated with each
+file.  In particular, it will tell you the type and auxiliary type for
+the files.
 
 
 ## omf
 
-`omf` is a rather complicated tool which is designed to extract relocatable segments from OMF files.  Apple IIgs executables  (.sys16 files) and system tools (ex. SYSTEM/TOOLS/TOOL025) are in OMF format.
+`omf` is a rather complicated tool which is designed to extract relocatable segments from OMF files.  Apple IIgs executables  (.s16 files) and system tools (ex. SYSTEM/TOOLS/TOOL025) are in OMF format.
 
 You first run this tool and pass it an OMF file and it will generate a .map file.  This map file is a simple text file that you may edit.  Each line is in the format:
 
@@ -173,3 +176,31 @@ Look up the dword in that location and I find that the toolset is located at `$f
 At that location, we discover the offset to the tool entry point is `$ff/41a4` so we'll add `$ff/41a5`to the map file and rerun the disassembly.
 
 Boom, we have just disassembled a specific tool call from ram.
+
+
+### Disassembling a simple ProDOS executable
+
+ProDOS binaries aren't relocatable and don't have anything inside them that
+specifies where in RAM they should be loaded.  However, the filesystem
+itself does have that information.
+
+Using `2mg` with the `-l` or `--list` argument will give a list of the
+files along with metadata associated with the files.  Let's use `BASIC.SYSTEM`
+as an example.
+
+You'll see that `BASIC.SYSTEM` has a type of `$ff` and auxtype of
+`$2000`, and `2mg` identifies it as a "sys/ProDOS System File".  This is
+indeed a simple executable.
+
+The aux type specifies where in RAM to load this executable, in this
+case, it's `$2000`.
+
+It is also important to note that these executables should start with 8-bit
+registers.
+
+So we can use all of that information to disassemble this file.
+
+`$ regs --org=2000 -m -x BASIC.SYSTEM > basic.s`
+
+This tells regs to start with 8-bit accumulator and indices, and load the
+file starting at `$2000` before disassembling it.
