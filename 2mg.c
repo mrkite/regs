@@ -12,7 +12,9 @@
 #include <sys/stat.h>
 #include <argp.h>
 #include <stdbool.h>
+#include <locale.h>
 #include "handle.h"
+#include "prodos_types.h"
 
 static void doDirectory(uint16_t key, uint8_t *disk, uint32_t disklen,
     int depth);
@@ -20,8 +22,8 @@ static void doEntry(uint8_t *entry, uint8_t *disk, uint32_t disklen,
     int depth);
 static void doFile(uint16_t key, uint32_t len, char *name, uint8_t *disk,
     uint32_t disklen, int type);
-static void doGSOS(uint16_t key, char *name, uint8_t *disk, uint32_t disklen,
-    int depth);
+static void doGSOS(uint16_t key, char *name, uint8_t filetype, uint8_t *disk,
+    uint32_t disklen, int depth);
 
 const char *argp_program_version = "2mg 0.2";
 const char *argp_program_bug_address = "sean@seancode.com";
@@ -67,6 +69,8 @@ int main(int argc, char **argv) {
   arguments.list = false;
 
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
+
+  setlocale(LC_NUMERIC, "");
 
   FILE *f = fopen(arguments.diskimage, "rb");
   if (!f) {
@@ -184,8 +188,15 @@ static void doDirectory(uint16_t key, uint8_t *disk, uint32_t disklen,
   }
 }
 
+static void printDateTime(uint16_t date, uint16_t time) {
+  printf("%02d-%02d-%02d %02d:%02d",
+      (date >> 9) & 0x7f, (date >> 5) & 0xf, date & 0x1f,
+      (time >> 8) & 0x1f, time & 0x3f);
+}
+
 static void doEntry(uint8_t *entry, uint8_t *disk, uint32_t disklen,
     int depth) {
+  uint8_t filetype = entry[0x10];
   uint16_t key = r16(entry + 0x11);
   uint32_t eof = r24(entry + 0x15);
 
@@ -199,12 +210,33 @@ static void doEntry(uint8_t *entry, uint8_t *disk, uint32_t disklen,
       if (depth < 0) {
         doFile(key, eof, filename, disk, disklen, entry[0] >> 4);
       } else {
+        uint16_t createDate = r16(entry + 0x18);
+        uint16_t createTime = r16(entry + 0x1a);
+        uint16_t aux = r16(entry + 0x1f);
+        uint16_t modDate = r16(entry + 0x21);
+        uint16_t modTime = r16(entry + 0x23);
         indent(depth);
-        printf("%s   %d bytes\n", filename, eof);
+        printf("%s\n", filename);
+        indent(depth);
+        printf("  Size: %'d", eof);
+        printf(" Created: ");
+        printDateTime(createDate, createTime);
+        printf(" Modified: ");
+        printDateTime(modDate, modTime);
+        printf("\n");
+        indent(depth);
+        printf("  Type: $%02x Aux: $%04x ", filetype, aux);
+        uint32_t typeaux = filetype | (aux << 8);
+        for (int i = 0; i < numTypes; i++) {
+          if ((typeaux & fileTypes[i].mask) == fileTypes[i].id) {
+            printf("%s/%s\n", fileTypes[i].ext, fileTypes[i].desc);
+            break;
+          }
+        }
       }
       break;
     case 0x50:
-      doGSOS(key, filename, disk, disklen, depth);
+      doGSOS(key, filename, filetype, disk, disklen, depth);
       break;
     case 0xd0:
       doDirectory(key, disk, disklen, depth < 0 ? -1 : depth + 1);
@@ -263,7 +295,7 @@ static void dumpTree(uint8_t *index, uint32_t len, FILE *f, uint8_t *disk,
   }
 }
 
-static void doGSOS(uint16_t key, char *name, uint8_t *disk,
+static void doGSOS(uint16_t key, char *name, uint8_t filetype, uint8_t *disk,
     uint32_t disklen, int depth) {
   uint8_t *block = disk + key * 512;
   int type = *block;
