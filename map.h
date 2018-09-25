@@ -19,6 +19,7 @@ typedef enum {
 typedef struct Rule {
   uint32_t address;
   uint16_t flags;
+  char *symbol;
   struct Rule *next;
 } Rule;
 

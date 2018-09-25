@@ -17,7 +17,7 @@ static char doc[] = "Relocate and extract OMF segments"
 static char args_doc[] = "FILE";
 static struct argp_option options[] = {
   {"org", 'o', "ADDRESS", OPTION_ARG_OPTIONAL,
-    "Start mapping the segments at this address, default 20000"},
+    "Start mapping the segments at this address, default $20000"},
   {"map", 'm', "FILE", OPTION_ARG_OPTIONAL,
     "Use this map to extract the segments"},
   {"prefix", 'p', "PREFIX", OPTION_ARG_OPTIONAL,
@@ -37,16 +37,32 @@ static inline uint32_t parseNum(const char *s) {
   while (isspace(*s)) {
     s++;
   }
-  while (isxdigit(*s)) {
-    res <<= 4;
-    if (*s >= '0' && *s <= '9') {
-      res |= *s - '0';
-    } else if (*s >= 'a' && *s <= 'f') {
-      res |= *s - 'a' + 10;
-    } else if (*s >= 'A' && *s <= 'F') {
-      res |= *s - 'A' + 10;
-    }
+  bool ishex = false;
+  if (s[0] == '0' && s[1] == 'x') {
+    s += 2;
+    ishex = true;
+  } else if (s[0] == '$') {
     s++;
+    ishex = true;
+  }
+  if (ishex) {
+    while (isxdigit(*s)) {
+      res <<= 4;
+      if (*s >= '0' && *s <= '9') {
+        res |= *s - '0';
+      } else if (*s >= 'a' && *s <= 'f') {
+        res |= *s - 'a' + 10;
+      } else if (*s >= 'A' && *s <= 'F') {
+        res |= *s - 'A' + 10;
+      }
+      s++;
+    }
+  } else {
+    while (isdigit(*s)) {
+      res *= 10;
+      res += *s - '0';
+      s++;
+    }
   }
   return res;
 }

@@ -48,7 +48,27 @@ static Rule *parseRule(ConfigFile *f) {
       rule->flags |= IsX8;
       foundFlag = true;
     }
+    if (token(f, 'd')) {
+      rule->flags &= ~IsOpcode;
+      rule->flags |= IsData;
+      foundFlag = true;
+    }
   } while (foundFlag);
+  rule->symbol = NULL;
+  if (token(f, '<')) {
+    uint8_t *fnp = f->p;
+    while (fnp < f->end && *fnp != '>') {
+      fnp++;
+    }
+    if (fnp == f->end) {
+      fail(f, "Symbol has no closing '>'.");
+    }
+    int flen = fnp - f->p;
+    rule->symbol = malloc(flen);
+    memcpy(rule->symbol, f->p, flen);
+    rule->symbol[flen] = 0;
+    f->p = fnp + 1;
+  }
   return rule;
 }
 

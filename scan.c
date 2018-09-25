@@ -52,7 +52,9 @@ void scan(uint8_t *data, size_t len, Map *map) {
   map->mem = calloc(len, sizeof(MapFlags));
 
   for (Rule *rule = map->rules; rule != NULL; rule = rule->next) {
-    appendList(&toScan, rule->address, rule->flags);
+    if (rule->flags & IsOpcode) {
+      appendList(&toScan, rule->address, rule->flags);
+    }
   }
 
   while (toScan.num > 0) {

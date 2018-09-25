@@ -399,7 +399,7 @@ static MemAddress addresses[] = {
 
 #define numAddresses (sizeof(addresses) / sizeof(addresses[0]))
 
-static const char *addressLookup(uint32_t addr) {
+static const char *addressLookup(uint32_t addr, Map *map) {
   for (int i = 0; i < numAddresses; i++) {
     if (addresses[i].address >= addr) {
       if (addresses[i].address == addr)
@@ -407,7 +407,12 @@ static const char *addressLookup(uint32_t addr) {
       break;
     }
   }
+  for (Rule *rule = map->rules; rule != NULL; rule = rule->next) {
+    if (rule->address == addr && rule->symbol != NULL) {
+      return rule->symbol;
+    }
+  }
   if (addr & ~0xffff)
-    return addressLookup(addr & 0xffff);  // try pageless
+    return addressLookup(addr & 0xffff, map);  // try pageless
   return NULL;
 }

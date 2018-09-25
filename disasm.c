@@ -128,8 +128,10 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
             printf("#$%02x", *ptr++);
             oprlen = 4;
           } else {
-            printf("#$%04x", r16(ptr)); ptr += 2;
+            val = r16(ptr); ptr += 2;
+            printf("#$%04x", val);
             oprlen = 6;
+            comments = addressLookup(val, map);
           }
           break;
         case IMMX:
@@ -141,40 +143,50 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
             x = r16(ptr); ptr += 2;
             printf("#$%04x", x);
             oprlen = 6;
+            comments = addressLookup(x, map);
           }
           break;
         case IMMS:
-          printf("#$%04x", r16(ptr)); ptr += 2;
+          val = r16(ptr); ptr += 2;
+          printf("#$%04x", val);
           oprlen = 6;
+          comments = addressLookup(x, map);
           break;
         case ABS:
           val = r16(ptr); ptr += 2;
           printf("$%04x", val);
           oprlen = 5;
-          comments = addressLookup(val);
+          comments = addressLookup(val, map);
           break;
         case ABL:
           val = r24(ptr); ptr += 3;
           printf("$%02x/%04x", val >> 16, val & 0xffff);
           oprlen = 8;
-          comments = addressLookup(val);
+          comments = addressLookup(val, map);
           break;
         case ABX:
-          printf("$%04x, x", r16(ptr)); ptr += 2;
+          val = r16(ptr); ptr += 2;
+          printf("$%04x, x", val);
           oprlen = 8;
+          comments = addressLookup(val, map);
           break;
         case ABY:
-          printf("$%04x, y", r16(ptr)); ptr += 2;
+          val = r16(ptr); ptr += 2;
+          printf("$%04x, y", val);
           oprlen = 8;
+          comments = addressLookup(val, map);
           break;
         case ABLX:
           val = r24(ptr); ptr += 3;
           printf("$%02x/%04x, x", val >> 16, val & 0xffff);
           oprlen = 11;
+          comments = addressLookup(val, map);
           break;
         case AIX:
-          printf("($%04x, x)", r16(ptr)); ptr += 2;
+          val = r16(ptr); ptr += 2;
+          printf("($%04x, x)", val);
           oprlen = 10;
+          comments = addressLookup(val, map);
           break;
         case ZP:
           printf("$%02x", *ptr++);
@@ -193,8 +205,10 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
           oprlen = 6;
           break;
         case IND:
-          printf("($%04x)", r16(ptr)); ptr += 2;
+          val = r16(ptr); ptr += 2;
+          printf("($%04x)", val);
           oprlen = 7;
+          comments = addressLookup(val, map);
           break;
         case INZ:
           printf("($%02x)", *ptr++);
@@ -225,12 +239,14 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
           d6 = delta + addr;
           printf("$%02x/%04x", d6 >> 16, d6 & 0xffff);
           oprlen = 8;
+          comments = addressLookup(d6, map);
           break;
         case RELL:
           delta16 = r16(ptr); ptr += 2;
           d6 = delta16 + addr;
           printf("$%02x/%04x", d6 >> 16, d6 & 0xffff);
           oprlen = 8;
+          comments = addressLookup(d6, map);
           break;
         case BANK:
           val = *ptr++;

@@ -57,6 +57,7 @@ sORG $30000
 $30000:
 $30053:mx
 $31066:e
+$35440:d <myTable>
 ```
 
 The first line specifies the segment file that this map applies to.  The filename in the quotes should be relative to the current directory.
@@ -67,7 +68,14 @@ The next lines are a list of entry points to begin disassembly at.  If, when ana
 
 The flags after the colon are optional, and specify whether emulation mode should be enabled, or 16-bit or 8-bit accumulator and index registers should be used.  It defaults to native mode with 16-bit registers.
 
+After the flags, you may optionally give the address a symbol name.  Whenever
+this memory location is referenced in the code, the symbol name will appear as a
+comment.
+
 You can also use bank-separators if you wish.  `$3/1066` is the same as `$31066`.
+
+The `d` flag is unique in that it identifies the address as a data location and
+not an entry point.  This is used to give variables symbol names.
 
 
 
@@ -200,7 +208,7 @@ registers.
 
 So we can use all of that information to disassemble this file.
 
-`$ regs --org=2000 -m -x BASIC.SYSTEM > basic.s`
+`$ regs --org=0x2000 -m -x BASIC.SYSTEM > basic.s`
 
 This tells regs to start with 8-bit accumulator and indices, and load the
 file starting at `$2000` before disassembling it.
