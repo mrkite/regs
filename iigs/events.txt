@@ -1,0 +1,173 @@
+EventErr enum<int16> {
+  emDupStrtUpErr = $0601,
+  emResetErr = $0602,
+  emNotActErr = $0603,
+  emBadEvtCodeErr = $0604,
+  emBadBttnNoErr = $0605,
+  emQSiz2LrgErr = $0606,
+  emNoMemQueueErr = $0607,
+  emBadEvtQErr = $0681,
+  emBadQHndlErr = $0682,
+}
+
+EventCode enum<int16> {
+  nullEvt = $0000,
+  mouseDownEvt = $0001,
+  mouseUpEvt = $0002,
+  keyDownEvt = $0003,
+  autoKeyEvt = $0005,
+  updateEvt = $0006,
+  activateEvt = $0008,
+  switchEvt = $0009,
+  deskAccEvt = $000a,
+  driverEvt = $000b,
+  app1Evt = $000c,
+  app2Evt = $000d,
+  app3Evt = $000e,
+  app4Evt = $000f,
+}
+
+EventMask enum<uint16> {
+  mDownMask = $0002,
+  mUpMask = $0004,
+  keyDownMask = $0008,
+  autoKeyMask = $0020,
+  updateMask = $0040,
+  activeMask = $0100,
+  switchMask = $0200,
+  deskAccMask = $0400,
+  driverMask = $0800,
+  app1Mask = $1000,
+  app2Mask = $2000,
+  app3Mask = $4000,
+  app4Mask = $8000,
+  everyEvent = $ffff,
+}
+
+JournalCode enum<int8> {
+  jcTickCount = $00,
+  jcGetMouse = $01,
+  jcButton = $02,
+  jcEvent = $04,
+}
+
+Modifiers enum<uint16> {
+  activeFlag = $0001,
+  changeFlag = $0002,
+  btn1State = $0040,
+  btn0State = $0080,
+  appleKey = $0100,
+  shiftKey = $0200,
+  capsLock = $0400,
+  optionKey = $0800,
+  controlKey = $1000,
+  keyPad = $2000,
+}
+
+EventRecordHndl = ^EventRecordPtr;
+EventRecordPtr = ^EventRecord;
+EventRecord union {
+  struct {
+    what: EventCode;
+    message: int32;
+    when: int32;
+    where: Point;
+    modifiers: Modifiers;
+  };
+  struct {
+    wmWhat: EventCode;
+    wmMessage: int32;
+    wmWhen: int32;
+    wmWhere: Point;
+    wmModifiers: Modifiers;
+    wmTaskData: int32;
+    wmTaskMask: int32;
+    wmLastClickTick: int32;
+    wmClickCount: int16;
+    wmTaskData2: int32;
+    wmTaskData3: int32;
+    wmTaskData4: int32;
+    wmLastClickPt: Point;
+  };
+}
+
+EMBootInit() {
+  $06, $01
+}
+EMStartUp(dPageAddr: int16, queueSize: int16, xMinClamp: int16,
+  xMaxClamp: int16, yMinClamp: int16, yMaxClamp: int16, userID: int16) {
+  $06, $02
+}
+EMShutDown() {
+  $06, $03
+}
+EMVersion(): int16 {
+  $06, $04
+}
+EMReset() {
+  $06, $05
+}
+EMStatus(): bool {
+  $06, $06
+}
+Button(buttonNum: int16): bool {
+  $06, $0d
+}
+DoWindows(): int16 {
+  $06, $09
+}
+EventAvail(eventMask: EventMask, eventPtr: ^EventRecord): bool {
+  $06, $0b
+}
+FakeMouse(changedFlag: int16, modLatch: int16, xPos: int16, yPos: int16,
+  ButtonStatus: int16) {
+  $06, $19
+}
+FlushEvents(eventMask: EventMask, stopMask: EventMask): int16 {
+  $06, $15
+}
+GetCaretTime(): int32 {
+  $06, $12
+}
+GetDblTime(): int32 {
+  $06, $11
+}
+GetMouse(mouseLocPtr: ^Point) {
+  $06, $0c
+}
+GetNextEvent(eventMask: EventMask, eventPtr: ^EventRecord): bool {
+  $06, $0a
+}
+GetOSEvent(eventMask: EventMask, eventPtr: ^EventRecord): bool {
+  $06, $16
+}
+OSEventAvail(eventMask: EventMask, eventPtr: ^EventRecord): bool {
+  $06, $17
+}
+PostEvent(eventCode: EventCode, eventMsg: int32): int16 {
+  $06, $14
+}
+SetEventMask(sysEventMask: EventMask) {
+  $06, $18
+}
+SetSwitch() {
+  $06, $13
+}
+StillDown(buttonNum: int16): bool {
+  $06, $0e
+}
+WaitMouseUp(buttonNum: int16): bool {
+  $06, $0f
+}
+TickCount(): int32 {
+  $06, $10
+}
+GetKeyTranslation(): int16 {
+  $06, $1b
+}
+SetKeyTranslation(kTransID: int16) {
+  $06, $1c
+}
+SetAutoKeyLimit(newLimit: int16) {
+  $06, $1a
+}

@@ -1,0 +1,87 @@
+RefDescriptor enum<int16> {
+  refIsPointer = $0000,
+  refIsHandle = $0001,
+  refIsResource = $0002,
+  refIsNewHandle = $0003,
+}
+
+bool = int16;
+
+Double = int32;
+Single = int16;
+Extended = int32;
+Real = int32;
+
+Fixed = int32;
+Frac = int32;
+ExtendedPtr = ^Extended;
+
+PackedByte = int8[];
+Ptr = ^PackedByte;
+PointerPtr = ^Ptr;
+Handle = ^Ptr;
+
+HandlePtr = ^Handle;
+
+CStringPtr = Ptr;
+CStringHndl = ^CStringPtr;
+CStringHndlPtr = ^CStringHndl;
+ProcPtr = Ptr;
+VoidProcPtr = ProcPtr;
+WordProcPtr = ProcPtr;
+LongProcPtr = ProcPtr;
+
+IntPtr = ^int16;
+FPTPtr = Ptr;
+String255 = String[255];
+String = int8;
+String255Ptr = ^String255;
+String255Hndl = ^String255Ptr;
+String255HndlPtr = ^String255Hndl;
+Str255 = String255;
+StringPtr = String255Ptr;
+StringHandle = ^StringPtr;
+String32 = String[32];
+String32Ptr = ^String32;
+String32Handle = ^String32Ptr;
+Str32 = String32;
+
+PointPtr = ^Point;
+Point struct {
+  v: int16;
+  h: int16;
+}
+RectHndl = ^RectPtr;
+RectPtr = ^Rect;
+Rect union {
+  struct {
+    top: int16;
+    left: int16;
+    bottom: int16;
+    right: int16;
+  };
+  struct {
+    topLeft: Point;
+    botRight: Point;
+  };
+}
+
+TimeRecHndl = ^TimeRecPtr;
+TimeRecPtr = ^TimeRec;
+TimeRec struct {
+  second: uint8;
+  minute: uint8;
+  hour: uint8;
+  year: uint8;
+  day: uint8;
+  month: uint8;
+  extra: uint8;
+  weekDay: uint8;
+}
+
+Ref union {
+  refIsPointer: Ptr;
+  refIsHandle: Handle;
+  refIsResource: ResID;
+  refIsNewHandle: Handle;
+}

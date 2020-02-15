@@ -1,0 +1,127 @@
+ADBErr enum<uint16> {
+  cmndIncomplete = $910,
+  cantSync = $911,
+  adbBusy = $982,
+  devNotAtAddr = $983,
+  srqListFull = $984,
+}
+
+ADBCommand enum<int16> {
+  abort = $1,
+  resetKbd = $2,
+  flushKbd = $3,
+  setModes = $4,
+  clearModes = $5,
+  setConfig = $6,
+  synch = $7,
+  writeMicroMem = $8,
+  readMicroMem = $9,
+  readModes = $a,
+  readConfig = $b,
+  readADBError = $c,
+  readVersionNum = $d,
+  readAvailCharSet = $e,
+  readAvailLayout = $f,
+  resetSys = $10,
+  keyCode = $11,
+  resetADB = $40,
+  transmitADBBytes = $47,
+  enableSRQ = $50,
+  flushADBDevBuf = $60,
+  disableSRQ = $70,
+  listen = $80,
+  talk = $c0,
+}
+
+ReadConfigRecPtr = ^ReadConfigRec;
+ReadConfigRec struct {
+  rcRepeatDelay: uint8;
+  rcLayoutOrLang: uint8;
+  rcADBAddr: uint8;
+}
+SetConfigRecPtr = ^SetConfigRec;
+SetConfigRec struct {
+  scADBAddr: uint8;
+  scLayoutOrLang: uint8;
+  scRepeatDelay: uint8;
+}
+SynchRecPtr = ^SynchRec;
+SynchRec struct {
+  synchMode: uint8;
+  synchKybdMouseAddr: uint8;
+  synchLayoutOrLang: uint8;
+  synchRepeatDelay: uint8;
+}
+ADBData union {
+  readConfig: ReadConfigRec;
+  setConfig: SetConfigRec;
+  synch: SynchRec;
+  raw: uint8[];
+}
+ScaleRecPtr = ^ScaleRec;
+ScaleRec struct {
+  xDivide: int16;
+  yDivide: int16;
+  xOffset: int16;
+  yOffset: int16;
+  xMultiply: int16;
+  yMultiply: int16;
+}
+
+ADBBootInit() {
+  $09, $01
+}
+ADBStartUp() {
+  $09, $02
+}
+ADBShutDown() {
+  $09, $03
+}
+ADBVersion(): int16 {
+  $09, $04
+}
+ADBReset() {
+  $09, $05
+}
+ADBStatus(): bool {
+  $09, $06
+}
+AbsOff() {
+  $09, $10
+}
+AbsOn() {
+  $09, $0f
+}
+AsynchADBReceive(compPtr: Ptr) {
+  $09, $0d
+}
+ClearSRQTable() {
+  $09, $16
+}
+GetAbsScale(dataInPtr: ^ScaleRec) {
+  $09, $13
+}
+ReadAbs(): int16 {
+  $09, $11
+}
+ReadKeyMicroData(dataLength: int16, dataPtr: ^ADBData, adbCommand: ADBCommand) {
+  $09, $0a
+}
+ReadKeyMicroMem(dataLength: int16, dataPtr: ^ADBData, adbCommand: ADBCommand) {
+  $09, $0b
+}
+SendInfo(dataLength: int16, dataPtr: ^ADBData, adbCommand: ADBCommand) {
+  $09, $09
+}
+SetAbsScale(dataOutPtr: ^ScaleRec) {
+  $09, $12
+}
+SRQPoll(compPtr: Ptr, adbRegAddr: int16) {
+  $09, $14
+}
+SRQRemove(adbRegAddr: int16) {
+  $09, $15
+}
+SyncADBReceive(intputWord: int16, compPtr: Ptr, adbCommand: ADBCommand) {
+  $09, $0e
+}

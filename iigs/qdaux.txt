@@ -1,0 +1,135 @@
+Verb enum<int8> {
+  frameVerb = $00,
+  paintVerb = $01,
+  eraseVerb = $02,
+  invertVerb = $03,
+  fillVerb = $04,
+}
+
+PicVerb enum<uint8> {
+  picNop = $00,
+  picClipRgn = $01,
+  picBkPat = $02,
+  picTxFont = $03,
+  picTxFace = $04,
+  picTxMode = $05,
+  picSpExtra = $06,
+  picPnSize = $07,
+  picPnMode = $08,
+  picPnPat = $09,
+  picThePat = $0a,
+  picOvSize = $0b,
+  picOrigin = $0c,
+  picTxSize = $0d,
+  picFGColor = $0e,
+  picBGColor = $0f,
+  picTxRatio = $10,
+  picVersion = $11,
+  picLine = $20,
+  picLineFrom = $21,
+  picShortL = $22,
+  picShortLFrom = $23,
+  picLongText = $28,
+  picDHText = $29,
+  picDVText = $2a,
+  picDVDHText = $2b,
+  rectNoun = $30,
+  rRectNoun = $40,
+  ovalNoun = $50,
+  arcNoun = $60,
+  polyNoun = $70,
+  rgnNoun = $80,
+  picBitsRect = $90,
+  picBitsRgn = $91,
+  picPBitsRect = $98,
+  picPBitsRgn = $99,
+  picShortComment = $a0,
+  picLongComment = $a1,
+  picEnd = $ff,
+}
+
+ModeMask enum<int16> {
+  resMode640PMask = $00,
+  resMode640DMask = $01,
+  resMode320Mask = $02,
+  destModeCopyMask = $0000,
+  destModeLeaveMask = $1000,
+  destModeOnesMask = $2000,
+  destModeZerosMask = $3000,
+}
+
+QDIconRecordHndl = ^QDIconRecordPtr;
+QDIconRecordPtr = ^QDIconRecord;
+QDIconRecord struct {
+  iconType: int16;
+  iconSize: int16;
+  iconHeight: int16;
+  iconWidth: int16;
+  iconImage: uint8[];
+  iconMask: uint8[];
+}
+
+PicHndl = ^PicPtr;
+PicPtr = ^Picture;
+Picture struct {
+  picSCB: int16;
+  picFrame: Rect;
+  opcodes: PicVerb[];
+}
+
+QDAuxBootInit() {
+  $12, $01
+}
+QDAuxStartUp() {
+  $12, $02
+}
+QDAuxShutDown() {
+  $12, $03
+}
+QDAuxVersion(): int16 {
+  $12, $04
+}
+QDAuxReset() {
+  $12, $05
+}
+QDAuxStatus(): bool {
+  $12, $06
+}
+CopyPixels(srcLocPtr: ^LocInfo, destLocPtr: ^LocInfo, srcRect: ^Rect,
+  destRect: ^Rect, xferMode: Mode, makeRgn: RgnHandle) {
+  $12, $09
+}
+DrawIcon(iconPtr: ^QDIconRecord, displayMode: Mode, xPos: int16, yPos: int16) {
+  $12, $0b
+}
+SpecialRect(rectPtr: ^Rect, frameColor: int16, fillColor: int16) {
+  $12, $0c
+}
+WaitCursor() {
+  $12, $0a
+}
+SeedFill(srcLocInfoPtr: ^LocInfo, srcRect: ^Rect, dstLocInfoPtr: ^LocInfo,
+  dstRect: ^Rect, seedH: int16, seedV: int16, resMode: ModeMask,
+  patternPtr: PatternPtr, leakTblPtr: Ptr) {
+  $12, $0d
+}
+CalcMask(srcLocInfoPtr: ^LocInfo, srcRect: ^Rect, dstLocInfoPtr: ^LocInfo,
+  dstRect: ^Rect, resMode: ModeMask, patternPtr: PatternPtr,
+  leakTblPtr: Ptr) {
+  $12, $0e
+}
+PicComment(kind: int16, dataSize: int16, dataHandle: Handle) {
+  $04, $b8
+}
+ClosePicture() {
+  $04, $b9
+}
+DrawPicture(picHandle: PicHndl, destRect: ^Rect) {
+  $04, $ba
+}
+KillPicture(picHandle: PicHndl) {
+  $04, $bb
+}
+OpenPicture(picFrame: ^Rect): PicHndl {
+  $04, $b7
+}

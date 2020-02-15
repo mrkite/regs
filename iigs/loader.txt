@@ -1,0 +1,95 @@
+LoadErr enum<int16> {
+  idNotFound = $1101,
+  idNotLoadFile = $1104,
+  idBusyErr = $1105,
+  idFilVersErr = $1107,
+  idUserIDErr = $1108,
+  idSequenceErr = $1109,
+  idBadRecordErr = $110a,
+  idForeignSegErr = $110b,
+}
+
+InitialLoadOutputRecPtr = ^InitialLoadOutputRec;
+InitialLoadOutputRec struct {
+  userID: int16;
+  startAddr: Ptr;
+  dPageAddr: int16;
+  buffSize: int16;
+}
+
+RestartOutRecPtr = ^RestartOutRec;
+RestartOutRec struct {
+  userID: int16;
+  startAddr: Ptr;
+  dPageAddr: int16;
+  buffSize: int16;
+}
+
+LoadSegNameOutPtr = ^LoadSegNameOut;
+LoadSegNameOut struct {
+  segAddr: Ptr;
+  fileNum: int16;
+  segNum: int16;
+}
+
+UnloadSegOutRecPtr = ^UnloadSegOutRec;
+UnloadSegOutRec struct {
+  userID: int16;
+  fileNum: int16;
+  segNum: int16;
+}
+
+LoaderInitialization() {
+  $11, $01
+}
+LoaderStartUp() {
+  $11, $02
+}
+LoaderShutDown() {
+  $11, $03
+}
+LoaderVersion(): int16 {
+  $11, $04
+}
+LoaderReset() {
+  $11, $05
+}
+LoaderStatus(): bool {
+  $11, $06
+}
+GetLoadSegInfo(userID: int16, loadFileNum: int16, loadSegNum: int16,
+  bufferPtr: Ptr) {
+  $11, $0f
+}
+GetUserID(pathNamePtr: Ptr): int16 {
+  $11, $10
+}
+GetUserID2(pathNamePtr: Ptr): int16 {
+  $11, $21
+}
+InitialLoad(userID: int16, loadFileNamePtr: Ptr,
+  spMemFlag: bool): ^InitialLoadOutputRec;
+InitialLoad2(userID: int16, loadFileNamePtr: Ptr, spMemFlag: bool,
+  inputType: int16): ^InitialLoadOutputRec;
+GetPathname(userID: int16, fileNumber: int16): Ptr {
+  $11, $11
+}
+GetPathname2(userID: int16, fileNumber: int16): Ptr {
+  $11, $22
+}
+RenamePathname(oldPathname: Ptr, newPathname: Ptr) {
+  $11, $13
+}
+LoadSegName(userID: int16, loadFileNamePtr: Ptr,
+  loadSegNamePtr: Ptr): ^LoadSegNameOut;
+LoadSegNum(userID: int16, loadFileNum: int16, loadSegNum: int16): Ptr {
+  $11, $0b
+}
+Restart(userID: int16): ^RestartOutRec;
+UnloadSeg(segmentPtr: Ptr): ^UnloadSegOutRec;
+UnloadSegNum(userID: int16, loadFileNum: int16, loadSegNum: int16) {
+  $11, $0c
+}
+UserShutDown(userID: int16, restartFlag: int16): int16 {
+  $11, $12
+}

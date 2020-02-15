@@ -1,0 +1,126 @@
+ListType enum<int16> {
+  cString = $0001,
+  selectOnlyOne = $0002,
+}
+
+MemFlag enum<uint8> {
+  memDisabled = $40,
+  memSelected = $80,
+}
+
+LColorTableHndl = ^LColorTablePtr;
+LColorTablePtr = ^LColorTable;
+LColorTable struct {
+  listFrameClr: int16;
+  listNorTextClr: int16;
+  listSelTextClr: int16;
+  listNorBackClr: int16;
+  listSelBackClr: int16;
+}
+
+MemRecHndl = ^MemRecPtr;
+MemRecPtr = ^MemRec;
+MemRec struct {
+  memPtr: Ptr;
+  memFlag: MemFlag;
+}
+
+ListCtlRecHndl = ^ListCtlRecPtr;
+ListCtlRecPtr = ^ListCtlRec;
+ListCtlRec struct {
+  ctlNext: CtlRecHndl;
+  ctlOwner: GrafPortPtr;
+  ctlRect: Rect;
+  ctlFlag: CtlFlag;
+  ctlHilite: uint8;
+  ctlValue: int16;
+  ctlProc: LongProcPtr;
+  ctlAction: LongProcPtr;
+  ctlData: int32;
+  ctlRefCon: int32;
+  ctlColor: LColorTablePtr;
+  ctlMemDraw: VoidProcPtr;
+  ctlMemHeight: int16;
+  cltMemSize: int16;
+  ctlList: MemRecPtr;
+  ctlListbar: CtlRecHndl;
+}
+
+ListRecHndl = ^ListRecPtr;
+ListRecPtr = ^ListRec;
+ListRec struct {
+  listRect: Rect;
+  listSize: int16;
+  listView: int16;
+  listType: ListType;
+  listStart: int16;
+  listCtl: CtlRecHndl;
+  listDraw: VoidProcPtr;
+  listMemHeight: int16;
+  listMemSize: int16;
+  listPointer: MemRecPtr;
+  listRefCon: int32;
+  listScrollClr: BarColorsPtr;
+}
+
+ListBootInit() {
+  $1c, $01
+}
+ListStartup() {
+  $1c, $02
+}
+ListShutDown() {
+  $1c, $03
+}
+ListVersion(): int16 {
+  $1c, $04
+}
+ListReset() {
+  $1c, $05
+}
+ListStatus(): bool {
+  $1c, $06
+}
+CreateList(theWindowPtr: WindowPtr, listRecPtr: ListRecPtr): ListCtlRecHndl {
+  $1c, $09
+}
+DrawMember(memberPtr: MemRecPtr, listRecPtr: ListRecPtr) {
+  $1c, $0c
+}
+GetListDefProc(): LongProcPtr {
+  $1c, $0e
+}
+NewList(memberPtr: MemRecPtr, listRecPtr: ListRecPtr) {
+  $1c, $10
+}
+NextMember(memberPtr: MemRecPtr, listRecPtr: ListRecPtr): MemRecPtr {
+  $1c, $0b
+}
+ResetMember(listRecPtr: ListRecPtr): MemRecPtr {
+  $1c, $0f
+}
+SelectMember(memberPtr: MemRecPtr, listRecPtr: ListRecPtr) {
+  $1c, $0d
+}
+SortList(comparePtr: VoidProcPtr, listRecPtr: ListRecPtr) {
+  $1c, $0a
+}
+DrawMember2(itemNumber: int16, ctlHandle: CtlRecHndl) {
+  $1c, $11
+}
+NextMember2(itemNumber: int16, ctlHandle: CtlRecHndl) {
+  $1c, $12
+}
+ResetMember2(ctlHandle: CtlRecHndl): int16 {
+  $1c, $13
+}
+SelectMember2(itemNumber: int16, ctlHandle: CtlRecHndl) {
+  $1c, $14
+}
+SortList2(comparePtr: Ptr, ctlHandle: CtlRecHndl) {
+  $1c, $15
+}
+NewList2(drawProcPtr: ProcPtr, listStart: int16, listRf: Ref,
+    listRefDesc: RefDescriptor, listSize: int16, ctlHandle: CtlRecHndl) {
+  $1c, $16
+}

@@ -1,0 +1,105 @@
+P16_CREATE(pathname: Ptr, access: uint16, file_type: uint16, aux_type: uint32,
+  storage_type: uint16, create_date: uint16, create_time: uint16) {
+  -1, 4, $01
+}
+P16_DESTROY(pathname: Ptr) {
+  -1, 4, $02
+}
+P16_CHANGE_PATH(pathname: Ptr, new_pathname: Ptr) {
+  -1, 4, $04
+}
+P16_SET_FILE_INFO(pathname: Ptr, access: uint16, file_type: uint16,
+  aux_type: uint32, null: uint16, create_date: uint16, create_time: uint16,
+  mod_date: uint16, mod_time: uint16) {
+  -1, 4, $05
+}
+P16_GET_FILE_INFO(pathname: Ptr, access: uint16, file_type: uint16,
+  aux_type: uint32, storage_type: uint16, create_date: uint16,
+  create_time: uint16, mod_date: uint16, mod_time: uint16,
+  blocks_used: uint32) {
+  -1, 4, $06
+}
+P16_VOLUME(dev_name: Ptr, vol_name: Ptr, total_blocks: uint32,
+  free_blocks: uint32, file_sys_id: uint16) {
+  -1, 4, $08
+}
+P16_SET_PREFIX(prefix_num: uint16, prefix: Ptr) {
+  -1, 4, $09
+}
+P16_GET_PREFIX(prefix_num: uint16, prefix: Ptr) {
+  -1, 4, $0a
+}
+P16_CLEAR_BACKUP_BIT(pathname: Ptr) {
+  -1, 4, $0b
+}
+P16_OPEN(ref_num: uint16, pathname: Ptr, io_buffer: Ptr) {
+  -1, 4, $10
+}
+P16_NEWLINE(ref_num: uint16, enable_mask: uint16, newline_char: uint16) {
+  -1, 4, $11
+}
+P16_READ(ref_num: uint16, data_buffer: Ptr, request_count: uint32,
+  transfer_count: uint32) {
+  -1, 4, $12
+}
+P16_WRITE(ref_num: uint16, data_buffer: Ptr, request_count: uint32,
+  transfer_count: uint32) {
+  -1, 4, $13
+}
+P16_CLOSE(ref_num: uint16) {
+  -1, 4, $14
+}
+P16_FLUSH(ref_num: uint16) {
+  -1, 4, $15
+}
+P16_SET_MARK(ref_num: uint16, position: uint32) {
+  -1, 4, $16
+}
+P16_GET_MARK(ref_num: uint16, position: uint32) {
+  -1, 4, $17
+}
+P16_SET_EOF(ref_num: uint16, eof: uint32) {
+  -1, 4, $18
+}
+P16_GET_EOF(ref_num: uint16, eof: uint32) {
+  -1, 4, $19
+}
+P16_SET_LEVEL(level: uint16) {
+  -1, 4, $1a
+}
+P16_GET_LEVEL(level: uint16) {
+  -1, 4, $1b
+}
+P16_GET_DEV_NUM(dev_name: Ptr, dev_num: uint16) {
+  -1, 4, $20
+}
+P16_GET_LAST_DEV(dev_num: uint16) {
+  -1, 4, $21
+}
+P16_READ_BLOCK(dev_num: uint16, data_buffer: Ptr, block_num: uint32) {
+  -1, 4, $22
+}
+P16_WRITE_BLOCK(dev_num: uint16, data_buffer: Ptr, block_num: uint32) {
+  -1, 4, $23
+}
+P16_FORMAT(dev_name: Ptr, vol_name: Ptr, file_sys_id: uint16) {
+  -1, 4, $24
+}
+P16_GET_NAME(data_buffer: Ptr) {
+  -1, 4, $27
+}
+P16_GET_BOOT_VOL(data_buffer: Ptr) {
+  -1, 4, $28
+}
+P16_QUIT(pathname: Ptr, flags: uint16) {
+  -1, 4, $29
+}
+P16_GET_VERSION(version: uint16) {
+  -1, 4, $2a
+}
+P16_ALLOC_INTERRUPT(int_num: uint16, int_code: Ptr) {
+  -1, 4, $31
+}
+P16_DEALLOCATE_INTERRUPT(int_num: uint16) {
+  -1, 4, $32
+}

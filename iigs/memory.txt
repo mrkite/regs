@@ -1,0 +1,132 @@
+MemErr enum<int16> {
+  memErr = $0201,
+  emptyErr = $0202,
+  notEmptyErr = $0203,
+  lockErr = $0204,
+  purgeErr = $0205,
+  handleErr = $0206,
+  idErr = $0207,
+  attrErr = $0208,
+}
+
+HandleAttr enum<uint16> {
+  attrNoPurge = $0000,
+  attrBank = $0001,
+  attrAddr = $0002,
+  attrPage = $0004,
+  attrNoSpec = $0008,
+  attrNoCross = $0010,
+  attrPurge1 = $0100,
+  attrPurge2 = $0200,
+  attrPurge3 = $0400,
+  attrPurge = $0300,
+  attrHandle = $1000,
+  attrSystem = $2000,
+  attrFixed = $4000,
+  attrLocked = $8000,
+}
+
+MMBootInit() {
+  $02, $01
+}
+MMStartUp(): int16 {
+  $02, $02
+}
+MMShutDown(userID: int16) {
+  $02, $03
+}
+MMVersion(): int16 {
+  $02, $04
+}
+MMReset() {
+  $02, $05
+}
+MMStatus(): bool {
+  $02, $06
+}
+BlockMove(srcPtr: Ptr, dstPtr: Ptr, count: int32) {
+  $02, $2b
+}
+CheckHandle(theHandle: Handle) {
+  $02, $1e
+}
+CompactMem() {
+  $02, $1f
+}
+DisposeAll(userID: int16) {
+  $02, $11
+}
+DisposeHandle(theHandle: Handle) {
+  $02, $10
+}
+FindHandle(locationPtr: Ptr): Handle {
+  $02, $1a
+}
+FreeMem(): int32 {
+  $02, $1b
+}
+GetHandleSize(theHandle: Handle): int32 {
+  $02, $18
+}
+HandToHand(sourceHandle: Handle, destHandle: Handle, count: int32) {
+  $02, $2a
+}
+HandToPtr(sourceHandle: Handle, destPtr: Ptr, count: int32) {
+  $02, $29
+}
+HLock(theHandle: Handle) {
+  $02, $20
+}
+HLockAll(userID: int16) {
+  $02, $21
+}
+HUnlock(theHandle: Handle) {
+  $02, $22
+}
+HUnlockAll(userID: int16) {
+  $02, $23
+}
+MaxBlock(): int32 {
+  $02, $1c
+}
+NewHandle(blockSize: int32, userID: int16, attributes: HandleAttr,
+  locationPtr: Ptr): Handle {
+  $02, $09
+}
+PtrToHand(sourcePtr: Ptr, destHandle: Handle, count: int32) {
+  $02, $28
+}
+PurgeAll(userID: int16) {
+  $02, $13
+}
+PurgeHandle(theHandle: Handle) {
+  $02, $12
+}
+RealFreeMem(): int32 {
+  $02, $2f
+}
+ReallocHandle(blockSize: int32, userID: int16, attributes: HandleAttr,
+  locationPtr: Ptr, theHandle: Handle) {
+  $02, $0a
+}
+RestoreHandle(theHandle: Handle) {
+  $02, $0b
+}
+SetHandleSize(newSize: int32, theHandle: Handle) {
+  $02, $19
+}
+SetPurge(newPurgeLevel: int16, theHandle: Handle) {
+  $02, $24
+}
+SetPurgeAll(newPurgeLevel: int16, userID: int16) {
+  $02, $25
+}
+TotalMem(): int32 {
+  $02, $1d
+}
+AddToOOMQueue(headerPtr: Ptr) {
+  $02, $0c
+}
+DeleteFromOOMQueue(headerPtr: Ptr) {
+  $02, $0d
+}

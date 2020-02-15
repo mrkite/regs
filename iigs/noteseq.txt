@@ -1,0 +1,107 @@
+SeqCommand enum<int32> {
+  pitchBend = $0000,
+  tempo = $0001,
+  turnNotesOff = $0002,
+  jump = $0003,
+  setVibratoDepth = $0004,
+  programChange = $0005,
+  setRegister = $0006,
+  ifGo = $0007,
+  incRegister = $0008,
+  decRegister = $0009,
+  midiNoteOff = $000a,
+  midiNoteOn = $000b,
+  midiPolyKey = $000c,
+  midiCtlChange = $000d,
+  midiProgChange = $000e,
+  midiChnlPress = $000f,
+  midiPitchBend = $0010,
+  midiSelChnlMode = $0011,
+  midiSysExclusive = $0012,
+  midiSysCommon = $0013,
+  midiSysRealTime = $0014,
+  midiSetSysExl = $0015,
+  commandMask = $007f,
+  chord = $0080,
+  toneMask = $7f00,
+  noteMask = $8000,
+  durationMask = $07ff0000,
+  trackMask = $78000000,
+  delayMask = $80000000,
+}
+
+SeqErr enum<int16> {
+  noRoomMidiErr = $1a00,
+  noCommandErr = $1a01,
+  noRoomErr = $1a02,
+  startedErr = $1a03,
+  noNoteErr = $1a04,
+  noStartErr = $1a05,
+  instBndsErr = $1a06,
+  nsWrongVer = $1a07,
+}
+
+LocRecHndl = ^LocRecPtr;
+LocRecPtr = ^LocRec;
+LocRec struct {
+  curPhraseItem: int16;
+  curPattItem: int16;
+  curLevel: int16;
+}
+
+SeqBootInit() {
+  $1a, $01
+}
+SeqStartUp(dPageAddr: int16, mode: int16, updateRate: int16, increment: int16) {
+  $1a, $02
+}
+SeqShutDown() {
+  $1a, $03
+}
+SeqVersion(): int16 {
+  $1a, $04
+}
+SeqReset() {
+  $1a, $05
+}
+SeqStatus(): bool {
+  $1a, $06
+}
+SeqAllNotesOff() {
+  $1a, $0d
+}
+ClearIncr() {
+  $1a, $0a
+}
+GetLoc(): ^LocRec;
+GetTimer(): int16 {
+  $1a, $0b
+}
+SetIncr(increment: int16) {
+  $1a, $09
+}
+SetInstTable(instTable: Handle) {
+  $1a, $12
+}
+SetTrkInfo(priority: int16, instIndex: int16, trackNum: int16) {
+  $1a, $0e
+}
+StartInts() {
+  $1a, $13
+}
+StartSeq(errHndlrRoutine: VoidProcPtr, compRoutine: VoidProcPtr,
+  sequence: Handle) {
+  $1a, $0f
+}
+StepSeq() {
+  $1a, $10
+}
+StopInts() {
+  $1a, $14
+}
+StopSeq(next: int16) {
+  $1a, $11
+}
+StartSeqRel(errHandlerPtr: ProcPtr, compRoutine: ProcPtr, sequence: Handle) {
+  $1a, $15
+}

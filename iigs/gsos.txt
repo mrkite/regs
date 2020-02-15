@@ -1,0 +1,578 @@
+Access enum<int16> {
+  readEnable = $0001,
+  writeEnable = $0002,
+  fileInvisible = $0004,
+  backupNeeded = $0020,
+  renameEnable = $0040,
+  destroyEnable = $0080,
+}
+
+Mark enum<int16> {
+  startPlus = $0000,
+  eofMinus = $0001,
+  markPlus = $0002,
+  markMinus = $0003,
+}
+
+CachePriority enum<int16> {
+  cacheOff = $0000,
+  cacheOn = $0001,
+}
+
+GSOSErr enum<int16> {
+  badSystemCall = $0001,
+  invalidPcount = $0004,
+  gsosActive = $07,
+  devNotFound = $10,
+  invalidDevNum = $11,
+  drvrBadReq = $20,
+  drvrBadCode = $0021,
+  drvrBadParm = $0022,
+  drvrNotOpen = $0023,
+  drvrPriorOpen = $0024,
+  irqTableFull = $0025,
+  drvrNoResrc = $0026,
+  drvrIOError = $0027,
+  drvrNoDevice = $0028,
+  drvrBusy = $0029,
+  drvrWrtProt = $002b,
+  drvrBadCount = $002c,
+  drvrBadBlock = $002d,
+  drvrDiskSwitch = $002e,
+  drvrOffLine = $002f,
+  badPathSyntax = $0040,
+  invalidRefNum = $0043,
+  pathNotFound = $0044,
+  volNotFound = $0045,
+  fileNotFound = $0046,
+  dupPathname = $0047,
+  volumeFull = $0048,
+  volDirFull = $0049,
+  badFileFormat = $004a,
+  badStoreType = $004b,
+  eofEncountered = $004c,
+  outOfRange = $004d,
+  invalidAccess = $004e,
+  buffTooSmall = $004f,
+  fileBusy = $0050,
+  dirError = $0051,
+  unknownVol = $0052,
+  paramRangeErr = $0053,
+  outOfMem = $0054,
+  dupVolume = $0057,
+  notBlockDev = $0058,
+  invalidLevel = $0059,
+  damagedBitMap = $005a,
+  badPathNames = $005b,
+  notSystemFile = $005c,
+  osUnsupported = $005d,
+  stackOverflow = $005f,
+  dataUnavail = $0060,
+  endOfDir = $0061,
+  invalidClass = $0062,
+  resForkNotFound = $0063,
+  invalidFSTID = $0064,
+}
+
+FSID enum<int16> {
+  proDOSFSID = $0001,
+  dos33FSID = $0002,
+  dos32FSID = $0003,
+  dos31FSID = $0003,
+  appleIIPascalFSID = $0004,
+  mfsFSID = $0005,
+  hfsFSID = $0006,
+  lisaFSID = $0007,
+  appleCPMFSID = $0008,
+  charFSTFSID = $0009,
+  msDOSFSID = $000a,
+  highSierraFSID = $000b,
+  iso9660FSID = $000c,
+  appleShareFSID = $000d,
+}
+
+FSTAttr enum<uint16> {
+  characterFST = $4000,
+  ucFST = $8000,
+}
+
+QuitFlags enum<uint16> {
+  onStack = $8000,
+  restartable = $4000,
+}
+
+StorageType enum<uint16> {
+  seedling = $0001,
+  standardFile = $0001,
+  sapling = $0002,
+  tree = $0003,
+  pascalRegion = $0004,
+  extendedFile = $0005,
+  directoryFile = $000d,
+}
+
+FSTCmd union {
+  bufferControl: BufferControlRec;
+  specialOpenFork: SpecialOpenForkRec;
+  byteRangeLock: ByteRangeLockRec;
+  getAccessRights: GetAccessRightsRec;
+  getPrivileges: GetPrivilegesRec;
+  setAccessRights: SetAccessRightsRec;
+  setPrivileges: SetPrivilegesRec;
+  userInfo: UserInfoRec;
+  copyFile: CopyFileRec;
+  getUserPath: GetUserPathRec;
+  desktop: DesktopRec;
+  getComment: GetCommentRec;
+  setComment: SetCommentRec;
+  getServerName: GetServerNameRec;
+}
+
+GSString255Hndl = ^GSString255Ptr;
+GSString255Ptr = ^GSString255;
+GSString255 struct {
+  length: int16;
+  text: int8[255];
+}
+GSString255HndlPtr = ^GSString255Hndl;
+
+GSString32Hndl = ^GSString32Ptr;
+GSString32Ptr = ^GSString32;
+GSString32 struct {
+  length: int16;
+  text: int8[32];
+}
+
+ResultBuf255Hndl = ^ResultBuf255Ptr;
+ResultBuf255Ptr = ^ResultBuf255;
+ResultBuf255 struct {
+  bufSize: int16;
+  bufString: GSString255;
+}
+ResultBuf255HndlPtr = ^ResultBuf255Hndl;
+
+ResultBuf32Hndl = ^ResultBuf32Ptr;
+ResultBuf32Ptr = ^ResultBuf32;
+ResultBuf32 struct {
+  bufSize: int16;
+  bufString: GSString32;
+}
+
+ChangePathRecPtrGS = ^ChangePathRecGS;
+ChangePathRecGS struct {
+  pCount: int16;
+  pathname: GSString255Ptr;
+  newPathanem: GSString255Ptr;
+}
+
+CreateRecPtrGS = ^CreateRecGS;
+CreateRecGS struct {
+  pCount: int16;
+  pathname: GSString255Ptr;
+  access: Access;
+  fileType: int16;
+  auxType: int32;
+  storageType: StorageType;
+  eof: int32;
+  resourceEOF: int32;
+}
+
+DAccessRecPtrGS = ^DAccessRecGS;
+DAccessRecGS struct {
+  pCount: int16;
+  devNum: int16;
+  code: int16;
+  list: Ptr;
+  requestCount: int32;
+  transferCount: int32;
+}
+
+DevNumRecPtrGS = ^DevNumRecGS;
+DevNumRecGS struct {
+  pCount: int16;
+  devName: GSString255Ptr;
+  devNum: int16;
+}
+
+DInfoRecPtrGS = ^DInfoRecGS;
+DInfoRecGS struct {
+  pCount: int16;
+  devNum: int16;
+  devName: GSString32Ptr;
+  characteristics: int16;
+  totalBlocks: int32;
+  slotNum: int16;
+  unitNum: int16;
+  version: int16;
+  deviceID: int16;
+  headLink: int16;
+  forwardink: int16;
+  extendedDIBptr: int32;
+}
+
+DIORecPtrGS = ^DIORecGS;
+DIORecGS struct {
+  pCount: int16;
+  devNum: int16;
+  buffer: Ptr;
+  requestCount: int32;
+  startingBlock: int32;
+  blockSize: int16;
+  transferCount: int32;
+}
+
+DirEntryRecPtrGS = ^DirEntryRecGS;
+DirEntryRecGS struct {
+  pCount: int16;
+  refNum: int16;
+  flags: int16;
+  base: Mark;
+  displacement: int32;
+  name: Ptr;
+  entryNum: int16;
+  fileType: int16;
+  eof: int32;
+  blockCount: int32;
+  createDateTime: TimeRec;
+  modDateTime: TimeRec;
+  access: Access;
+  auxType: int32;
+  fileSysID: FSID;
+  optionList: ResultBuf255Ptr;
+  resourceEOF: int32;
+  resourceBlocks: int32;
+}
+
+ExpandPathRecPtrGS = ^ExpandPathRecGS;
+ExpandPathRecGS struct {
+  pCount: int16;
+  inputPath: GSString255Ptr;
+  outputPath: ResultBuf255Ptr;
+  flags: int16;
+}
+
+FileInfoRecPtrGS = ^FileInfoRecGS;
+FileInfoRecGS struct {
+  pCount: int16;
+  pathname: GSString255Ptr;
+  access: Access;
+  fileType: int16;
+  auxType: int32;
+  storageType: StorageType;
+  createDateTime: TimeRec;
+  modDateTime: TimeRec;
+  optionsList: int32;
+  eof: int32;
+  blocksUsed: int32;
+  resourceEOF: int32;
+  resourceBlocks: int32;
+}
+
+FormatRecPtrGS = ^FormatRecGS;
+FormatRecGS struct {
+  pCount: int16;
+  devName: GSString32Ptr;
+  volName: GSString32Ptr;
+  fileSysID: FSID;
+  reqFileSysID: FSID;
+}
+
+FSTInfoRecPtrGS = ^FSTInfoRecGS;
+FSTInfoRecGS struct {
+  pCount: int16;
+  fstNum: int16;
+  fileSysID: FSID;
+  fstName: ResultBuf255Ptr;
+  version: int16;
+  attributes: FSTAttr;
+  blockSize: int16;
+  maxVolSize: int32;
+  maxFileSize: int32;
+}
+
+InterruptRecPtrGS = ^InterruptRecGS;
+InterruptRecGS struct {
+  pCount: int16;
+  intNum: int16;
+  vrn: int16;
+  intCode: int32;
+}
+
+IORecPtrGS = ^IORecGS;
+IORecGS struct {
+  pCount: int16;
+  refNum: int16;
+  dataBuffer: Ptr;
+  requestCount: int32;
+  transferCount: int32;
+  cachePriority: int16;
+}
+
+LevelRecPtrGS = ^LevelRecGS;
+LevelRecGS struct {
+  pCount: int16;
+  level: int16;
+}
+
+NameRecPtrGS = ^NameRecGS;
+NameRecGS struct {
+  pCount: int16;
+  pathanem: GSString255Ptr;
+}
+
+GetNameRecPtrGS = ^GetNameRecGS;
+GetNameRecGS struct {
+  pCount: int16;
+  dataBuffer: ResultBuf255Ptr;
+}
+
+NewlineRecPtrGS = ^NewlineRecGS;
+NewlineRecGS struct {
+  pCount: int16;
+  refNum: int16;
+  enableMask: int16;
+  numChars: int16;
+  newlineTable: Ptr;
+}
+
+OpenRecPtrGS = ^OpenRecGS;
+OpenRecGS struct {
+  pCount: int16;
+  refNum: int16;
+  pathname: GSString255Ptr;
+  requestAccess: Access;
+  resourceNumber: int16;
+  access: Access;
+  fileType: int16;
+  auxType: int32;
+  storageType: StorageType;
+  createDateTime: TimeRec;
+  modDateTime: TimeRec;
+  optionList: IntPtr;
+  eof: int32;
+  blocksUsed: int32;
+  resourceEOF: int32;
+  resourceBlocks: int32;
+}
+
+OSShutdownRecPtrGS = ^OSShutdownRecGS;
+OSShutdownRecGS struct {
+  pCount: int16;
+  shutdownFlag: int16;
+}
+
+PositionRecPtrGS = ^PositionRecGS;
+PositionRecGS struct {
+  pCount: int16;
+  refNum: int16;
+  position: int32;
+}
+
+EOFRecPtrGS = ^EOFRecGS;
+EOFRecGS struct {
+  pCount: int16;
+  refNum: int16;
+  eof: int32;
+}
+
+PrefixRecPtrGS = ^PrefixRecGS;
+PrefixRecGS struct {
+  pCount: int16;
+  prefixNum: int16;
+  union {
+    getPrefix: ResultBuf255Ptr;
+    setPrefix: GSString255Ptr;
+  }
+}
+
+QuitRecPtrGS = ^QuitRecGS;
+QuitRecGS struct {
+  pCount: int16;
+  pathname: GSString255Ptr;
+  flags: QuitFlags;
+}
+
+RefNumRecPtrGS = ^RefNumRecGS;
+RefNumRecGS struct {
+  pCount: int16;
+  refNum: int16;
+}
+
+SessionStatusRecPtrGS = ^SessionStatusRecGS;
+SessionStatusRecGS struct {
+  pCount: int16;
+  status: int16;
+}
+
+SetPositionRecPtrGS = ^SetPositionRecGS;
+SetPositionRecGS struct {
+  pCount: int16;
+  refNum: int16;
+  base: Mark;
+  displacement: int32;
+}
+
+SysPrefsRecPtrGS = ^SysPrefsRecGS;
+SysPrefsRecGS struct {
+  pCount: int16;
+  preferences: int16;
+}
+
+VersionRecPtrGS = ^VersionRecGS;
+VersionRecGS struct {
+  pCount: int16;
+  version: int16;
+}
+
+VolumeRecPtrGS = ^VolumeRecGS;
+VolumeRecGS struct {
+  pCount: int16;
+  devName: GSString32Ptr;
+  volName: ResultBuf255Ptr;
+  totalBlocks: int32;
+  freeBlocks: int32;
+  fileSysID: FSID;
+  blockSize: int16;
+}
+
+BeginSessionGS(pblockPtr: ^SessionStatusRecGS) {
+  -1, 4, $201d
+}
+BindIntGS(pblockPtr: ^InterruptRecGS) {
+  -1, 4, $2031
+}
+ChangePathGS(pblockPtr: ^ChangePathRecGS) {
+  -1, 4, $2004
+}
+ClearBackupBitGS(pblockPtr: ^NameRecGS) {
+  -1, 4, $200b
+}
+CloseGS(pblockPtr: ^RefNumRecGS) {
+  -1, 4, $2014
+}
+CreateGS(pblockPtr: ^CreateRecGS) {
+  -1, 4, $2001
+}
+DControlGS(pblockPtr: ^DAccessRecGS){
+  -1, 4, $202e
+}
+DestroyGS(pblockPtr: ^NameRecGS) {
+  -1, 4, $2002
+}
+DInfoGS(pblockPtr: ^DInfoRecGS) {
+  -1, 4, $202c
+}
+DReadGS(pblockPtr: ^DIORecGS) {
+  -1, 4, $202f
+}
+DStatusGS(pblockPtr: ^DAccessRecGS) {
+  -1, 4, $202d
+}
+DWriteGS(pblockPtr: ^DIORecGS) {
+  -1, 4, $2030
+}
+EndSessionGS(pblockPtr: ^SessionStatusRecGS) {
+  -1, 4, $201e
+}
+EraseDiskGS(pblockPtr: ^FormatRecGS) {
+  -1, 4, $2025
+}
+ExpandPathGS(pblockPtr: ^ExpandPathRecGS) {
+  -1, 4, $200e
+}
+FlushGS(pblockPtr: ^RefNumRecGS) {
+  -1, 4, $2015
+}
+FormatGS(pblockPtr: ^FormatRecGS) {
+  -1, 4, $2024
+}
+GetBootVolGS(pblockPtr: ^NameRecGS) {
+  -1, 4, $2028
+}
+GetDevNumberGS(pblockPtr: ^DevNumRecGS) {
+  -1, 4, $2020
+}
+GetDirEntryGS(pblockPtr: ^DirEntryRecGS) {
+  -1, 4, $201c
+}
+GetEOFGS(pblockPtr: ^EOFRecGS) {
+  -1, 4, $2019
+}
+GetFileInfoGS(pblockPtr: ^FileInfoRecGS) {
+  -1, 4, $2006
+}
+GetFSTInfoGS(pblockPtr: ^FSTInfoRecGS) {
+  -1, 4, $202b
+}
+GetLevelGS(pblockPtr: ^LevelRecGS) {
+  -1, 4, $201b
+}
+GetMarkGS(pblockPtr: ^PositionRecGS) {
+  -1, 4, $2017
+}
+GetNameGS(pblockPtr: ^GetNameRecGS) {
+  -1, 4, $2027
+}
+GetPrefixGS(pblockPtr: ^PrefixRecGS) {
+  -1, 4, $200a
+}
+GetVersionGS(pblockPtr: ^VersionRecGS) {
+  -1, 4, $202a
+}
+GetSysPrefsGS(pblockPtr: ^SysPrefsRecGS) {
+  -1, 4, $200f
+}
+NewlineGS(pblockPtr: ^NewlineRecGS) {
+  -1, 4, $2011
+}
+NullGS(pblockPtr: ^IntPtr) {
+  -1, 4, $200d
+}
+OpenGS(pblockPtr: ^OpenRecGS) {
+  -1, 4, $2010
+}
+QuitGS(pblockPtr: ^QuitRecGS) {
+  -1, 4, $2029
+}
+ReadGS(pblockPtr: ^IORecGS) {
+  -1, 4, $2012
+}
+ResetCacheGS(pblockPtr: ^IntPtr) {
+  -1, 4, $2026
+}
+SessionStatusGS(pblockPtr: ^SessionStatusRecGS) {
+  -1, 4, $201f
+}
+SetEOFGS(pblockPtr: ^SetPositionRecGS) {
+  -1, 4, $2018
+}
+SetFileInfoGS(pblockPtr: ^FileInfoRecGS) {
+  -1, 4, $2005
+}
+SetLevelGS(pblockPtr: ^LevelRecGS) {
+  -1, 4, $201a
+}
+SetMarkGS(pblockPtr: ^SetPositionRecGS) {
+  -1, 4, $2016
+}
+SetPrefixGS(pblockPtr: ^PrefixRecGS) {
+  -1, 4, $2009
+}
+SetSysPrefsGS(pblockPtr: ^SysPrefsRecGS) {
+  -1, 4, $200c
+}
+UnbindIntGS(pblockPtr: ^InterruptRecGS) {
+  -1, 4, $2032
+}
+VolumeGS(pblockPtr: ^VolumeRecGS) {
+  -1, 4, $2008
+}
+WriteGS(pblockPtr: ^IORecGS) {
+  -1, 4, $2013
+}
+OSShutdownGS(pblockPtr: ^OSShutdownRecGS) {
+  -1, 4, $2003
+}
+FSTSpecific(pblockPtr: ^FSTCmd) {
+  -1, 4, $2033
+}

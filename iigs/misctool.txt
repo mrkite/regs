@@ -1,0 +1,444 @@
+MiscErr enum<int16> {
+  badInputErr = $0301,
+  noDevParamErr = $0302,
+  taskInstlErr = $0303,
+  noSigTaskErr = $0304,
+  queueDmgdErr = $0305,
+  taskNtFdErr = $0306,
+  firmTaskErr = $0307,
+  hbQueueBadErr = $0308,
+  unCnctdDevErr = $0309,
+  idTagNtAvlErr = $030b,
+}
+
+SysFailCode enum<int16> {
+  pdosUnClmdIntErr = $0001,
+  divByZeroErr = $0004,
+  pdosVCBErr = $000a,
+  pdosFCBErr = $000b,
+  pdosBlk0Err = $000c,
+  pdosIntShdwErr = $000d,
+  segLoader1Err = $0015,
+  sPackage0Err = $0017,
+  package1Err = $0018,
+  package2Err = $0019,
+  package3Err = $001a,
+  package4Err = $001b,
+  package5Err = $001c,
+  package6Err = $001d,
+  package7Err = $001e,
+  package8Err = $0020,
+  package9Err = $0021,
+  package10Err = $0022,
+  package11Err = $0023,
+  package12Err = $0024,
+  outOfMemErr = $0025,
+  segLoader2Err = $0026,
+  fMapTrshdErr = $0027,
+  stkOvrFlwErr = $0028,
+  psInstDiskErr = $0030,
+  memMgr1Err = $0032,
+  memMgr2Err = $0033,
+  memMgr3Err = $0034,
+  memMgr4Err = $0035,
+  memMgr5Err = $0036,
+  memMgr6Err = $0037,
+  memMgr7Err = $0038,
+  memMgr8Err = $0039,
+  memMgr9Err = $003a,
+  memMgr10Err = $003b,
+  memMgr11Err = $003c,
+  memMgr12Err = $003d,
+  memMgr13Err = $003e,
+  memMgr14Err = $003f,
+  memMgr15Err = $0040,
+  memMgr16Err = $0041,
+  memMgr17Err = $0042,
+  memMgr18Err = $0043,
+  memMgr19Err = $0044,
+  memMgr20Err = $0045,
+  memMgr21Err = $0046,
+  memMgr22Err = $0047,
+  memMgr23Err = $0048,
+  memMgr24Err = $0049,
+  memMgr25Err = $004a,
+  memMgr26Err = $004b,
+  memMgr27Err = $004c,
+  memMgr28Err = $004d,
+  memMgr29Err = $004e,
+  memMgr30Err = $004f,
+  memMgr31Err = $0050,
+  memMgr32Err = $0051,
+  memMgr33Err = $0052,
+  memMgr34Err = $0053,
+  stupVolMntErr = $0100,
+}
+
+BatteryParam enum<int16> {
+  p1PrntModem = $0000,
+  p1LineLnth = $0001,
+  p1DelLine = $0002,
+  p1AddLine = $0003,
+  p1Echo = $0004,
+  p1Buffer = $0005,
+  p1Baud = $0006,
+  p1DtStpBits = $0007,
+  p1Parity = $0008,
+  p1DCDHndShk = $0009,
+  p1DSRHndShk = $000a,
+  p1XnfHndShk = $000b,
+  p2PrntModem = $000c,
+  p2LineLnth = $000d,
+  p2DelLine = $000e,
+  p2AddLine = $000f,
+  p2Echo = $0010,
+  p2Buffer = $0011,
+  p2Baud = $0012,
+  p2DtStpBits = $0013,
+  p2Parity = $0014,
+  p2DCDHndShk = $0015,
+  p2DSRHndShk = $0016,
+  p2XnfHndShk = $0017,
+  dspColMono = $0018,
+  dsp40or80 = $0019,
+  dspTxtColor = $001a,
+  dspBckColor = $001b,
+  dspBrdColor = $001c,
+  hrtz50or60 = $001d,
+  userVolume = $001e,
+  bellVolume = $001f,
+  sysSpeed = $0020,
+  slt1intExt = $0021,
+  slt2intExt = $0022,
+  slt3intExt = $0023,
+  slt4intExt = $0024,
+  slt5intExt = $0025,
+  slt6intExt = $0026,
+  slt7intExt = $0027,
+  startupSlt = $0028,
+  txtDspLang = $0029,
+  kybdLng = $002a,
+  kyBdBuffer = $002b,
+  kyBdRepSpd = $002c,
+  kyBdRepDel = $002d,
+  dblClkTime = $002e,
+  flashRate = $002f,
+  shftCpsLCas = $0030,
+  fstSpDelKey = $0031,
+  dualSpeed = $0032,
+  hiMouseRes = $0033,
+  dateFormat = $0034,
+  clockFormat = $0035,
+  rdMinRam = $0036,
+  rdMaxRam = $0037,
+  langCount = $0038,
+  lang1 = $0039,
+  lang2 = $003a,
+  lang3 = $003b,
+  lang4 = $003c,
+  lang5 = $003d,
+  lang6 = $003e,
+  lang7 = $003f,
+  lang8 = $0040,
+  layoutCount = $0041,
+  layout1 = $0042,
+  layout2 = $0043,
+  layout3 = $0044,
+  layout4 = $0045,
+  layout5 = $0046,
+  layout6 = $0047,
+  layout7 = $0048,
+  layout8 = $0049,
+  layout9 = $004a,
+  layout10 = $004b,
+  layout11 = $004c,
+  layout12 = $004d,
+  layout13 = $004e,
+  layout14 = $004f,
+  layout15 = $0050,
+  layout16 = $0051,
+  aTalkModeNo = $0080,
+}
+
+GetAddrParam enum<int16> {
+  irqIntFlag = $0000,
+  irqDataReg = $0001,
+  irqSerial1 = $0002,
+  irqSerial2 = $0003,
+  irqAplTlkHi = $0004,
+  tickCnt = $0005,
+  irqVolume = $0006,
+  irqActive = $0007,
+  irqSndData = $0008,
+  brkVar = $0009,
+  evMgrData = $000a,
+  mouseSlot = $000b,
+  mouseClamps = $000c,
+  absClamps = $000d,
+  sccIntFlag = $000e,
+}
+
+IRQStatus enum<uint8> {
+  extVGCInt = $01,
+  scanLineInt = $02,
+  adbDataInt = $04,
+  oneSecInt = $10,
+  quartSecInt = $20,
+  vbInt = $40,
+  kbdInt = $80,
+}
+
+IntSourceRef enum<int16> {
+  kybdEnable = $0000,
+  kybdDisable = $0001,
+  vblEnable = $0002,
+  vblDisable = $0003,
+  qSecEnable = $0004,
+  qSecDisable = $0005,
+  oSecEnable = $0006,
+  oSecDisable = $0007,
+  adbEnable = $000a,
+  adbDisable = $000b,
+  scLnEnable = $000c,
+  scLnDisable = $000d,
+  exVCGEnable = $000e,
+  exVCGDisable = $000f,
+}
+
+MouseMode enum<int16> {
+  mouseOff = $0000,
+  transparent = $0001,
+  moveIntrpt = $0003,
+  bttnIntrpt = $0005,
+  bttnOrMove = $0007,
+  mouseOffVI = $0008,
+  transparentVI = $0009,
+  moveIntrptVI = $000b,
+  bttnIntrptVI = $000d,
+  bttnOrMoveVI = $000f,
+}
+
+VectorRef enum<int16> {
+  toolLoc1 = $0000,
+  toolLoc2 = $0001,
+  usrTLoc1 = $0002,
+  usrTLoc2 = $0003,
+  intrptMgr = $0004,
+  copMgr = $0005,
+  abortMgr = $0006,
+  sysFailMgr = $0007,
+  aTalkIntHnd = $0008,
+  sccIntHnd = $0009,
+  scLnIntHnd = $000a,
+  sndIntHnd = $000b,
+  vblIntHnd = $000c,
+  mouseIntHnd = $000d,
+  qSecIntHnd = $000e,
+  kybdIntHnd = $000f,
+  adbRBIHnd = $0010,
+  adbSRQHnd = $0011,
+  descAccHnd = $0012,
+  flshBufHnd = $0013,
+  kybdMicHnd = $0014,
+  oneSecHnd = $0015,
+  extVCGHnd = $0016,
+  otherIntHnd = $0017,
+  crsrUpdtHnd = $0018,
+  incBsyFlag = $0019,
+  decBsyFlag = $001a,
+  bellVector = $001b,
+  breakVector = $001c,
+  traceVector = $001d,
+  stepVector = $001e,
+  ctlYVector = $0028,
+  proDOSVctr = $002a,
+  osVector = $002b,
+  msgPtrVctr = $002c,
+}
+
+ClampRecHndl = ^ClampRecPtr;
+ClampRecPtr = ^ClampRec;
+ClampRec struct {
+  yMaxClamp: int16;
+  yMinClamp: int16;
+  xMaxClamp: int16;
+  xMinClamp: int16;
+}
+
+FWRecHndl = ^FWRecPtr;
+FWRecPtr = ^FWRec;
+FWRec struct {
+  yRegExit: int16;
+  xRegExit: int16;
+  aRegExit: int16;
+  status: int16;
+}
+
+MouseRecHndl = ^MouseRecPtr;
+MouseRecPtr = ^MouseRec;
+MouseRec struct {
+  mouseMode: uint8;
+  mouseStatus: uint8;
+  yPos: int16;
+  xPos: int16;
+}
+
+InterruptStateRecHndl = ^InterruptStateRecPtr;
+InterruptStateRecPtr = ^InterruptStateRec;
+InterruptStateRec struct {
+  irq_A: int16;
+  irq_X: int16;
+  irq_Y: int16;
+  irq_S: int16;
+  irq_D: int16;
+  irq_P: uint8;
+  irq_DB: uint8;
+  irq_e: uint8;
+  irq_K: uint8;
+  irq_PC: int16;
+  irq_state: uint8;
+  irq_shadow: int16;
+  irq_mslot: uint8;
+}
+
+MTBootInit() {
+  $03, $01
+}
+MTStartUp() {
+  $03, $02
+}
+MTShutDown() {
+  $03, $03
+}
+MTVersion(): int16 {
+  $03, $04
+}
+MTReset() {
+  $03, $05
+}
+MTStatus(): bool {
+  $03, $06
+}
+ClampMouse(xMinClamp: int16, xMaxClamp: int16, yMinClamp: int16,
+  yMaxClamp: int16) {
+  $03, $1c
+}
+ClearMouse() {
+  $03, $1b
+}
+ClrHeartBeat() {
+  $03, $14
+}
+DeleteID(idTag: int16) {
+  $03, $21
+}
+DelHeartBeat(taskPtr: Ptr) {
+  $03, $13
+}
+FWEntry(aRegValue: int16, xRegValue: int16, yRegValue: int16,
+  eModeEntryPt: int16): ^FWRec;
+GetAbsClamp(): ^ClampRec;
+GetAddr(refNum: int16) {
+  $03, $16
+}
+GetIRQEnable(): int16 {
+  $03, $29
+}
+GetMouseClamp(): ^ClampRec;
+GetNewID(idTag: int16) {
+  $03, $20
+}
+GetTick(): int32 {
+  $03, $25
+}
+GetVector(vectorRefNum: VectorRef): Ptr {
+  $03, $11
+}
+HomeMouse() {
+  $03, $1a
+}
+InitMouse(mouseSlot: int16) {
+  $03, $18
+}
+IntSource(srcRefNum: IntSourceRef) {
+  $03, $23
+}
+Munger(destPtr: Ptr, destLenPtr: IntPtr, targPtr: Ptr, targLen: int16,
+  replPtr: Ptr, replLen: int16, padPtr: Ptr): int16 {
+  $03, $28
+}
+PackBytes(srcBuffer: ^Ptr, srcSize: ^int16, dstBuffer: Ptr,
+  dstSize: int16): int16 {
+  $03, $26
+}
+PosMouse(xPos: int16, yPos: int16) {
+  $03, $1e
+}
+ReadAsciiTime(bufferPtr: Ptr) {
+  $03, $0f
+}
+ReadBParam(paramRefNum: BatteryParam): int16 {
+  $03, $0c
+}
+ReadBRam(bufferPtr: Ptr) {
+  $03, $0a
+}
+ReadMouse(): ^MouseRec;
+ReadTimeHex(): ^TimeRec;
+ServeMouse(): int16 {
+  $03, $1f
+}
+SetAbsClamp(xMinClamp: int16, xMaxClamp: int16, yMinClamp: int16,
+  yMaxClamp: int16);
+SetHeartBeat(taskPtr: Ptr) {
+  $03, $12
+}
+SetMouse(mouseMode: MouseMode) {
+  $03, $19
+}
+SetVector(vectorRefNum: VectorRef, vectorPtr: Ptr) {
+  $03, $10
+}
+StatusID(idTag: int16) {
+  $03, $22
+}
+SysBeep() {
+  $03, $2c
+}
+SysFailMgr(errorCode: SysFailCode, str: ^Str255) {
+  $03, $15
+}
+UnPackBytes(srcBfufer: Ptr, srcSize: int16, dstBuffer: ^Ptr,
+  dstSize: ^int16): int16 {
+  $03, $27
+}
+WriteBParam(theData: int16, paramRefNum: BatteryParam) {
+  $03, $0b
+}
+WriteBRam(bufferPtr: Ptr) {
+  $03, $09
+}
+WriteTimeHex(month: uint8, day: uint8, curYear: uint8, hour: uint8,
+  minute: uint8, second: uint8);
+AddToQueue(newEntryPtr: Ptr, headerPtr: Ptr) {
+  $03, $2e
+}
+DeleteFromQueue(entryPtr: Ptr, headerPtr: Ptr) {
+  $03, $2f
+}
+SetInterruptState(iStateRec: ^InterruptStateRec, bytesDesired: int16) {
+  $03, $30
+}
+GetInterruptState(iStateRec: ^InterruptStateRec, bytesDesired: int16) {
+  $03, $31
+}
+getIntStateRecSize(): int16 {
+  $03, $32
+}
+ReadMouse2(): ^MouseRec;
+GetCodeResConverter(): ProcPtr {
+  $03, $34
+}
+GetRomResource(): Ptr {
+  $03, $35
+}

@@ -1,0 +1,377 @@
+CTLErr enum<int16> {
+  wmNotStartedUp = $1001,
+  noCtlError = $1004,
+  noSuperCtlError = $1005,
+  noCtlTargetError = $1006,
+  notSuperCtlError = $1007,
+  canNotbeTargetError = $1008,
+  noSuchIDError = $1009,
+  tooFewParmsError = $100a,
+  noCtlToBeTargetError = $100b,
+  noWind_Err = $100c,
+}
+
+Axis enum<int16> {
+  noConstraint = $0000,
+  hAxisOnly = $0001,
+  vAxisOnly = $0002,
+}
+
+CtlFlag enum<uint8> {
+  simpRound = $00,
+  upFlag = $01,
+  simpBRound = $01,
+  downFlag = $02,
+  simpSquare = $02,
+  simpDropSquare = $03,
+  leftFlag = $04,
+  rightFlag = $08,
+  horScroll = $10,
+  family = $7f,
+  ctlInVis = $80,
+  inListBox = $88,
+}
+
+CtlProc enum<uint32> {
+  simpleProc = $00000000,
+  checkProc = $02000000,
+  radioProc = $04000000,
+  scrollProc = $06000000,
+  growProc = $08000000,
+}
+
+DefProc enum<int16> {
+  drawCtl = $0000,
+  calcCRect = $0001,
+  testCtl = $0002,
+  initCtl = $0003,
+  dispCtl = $0004,
+  posCtl = $0005,
+  thumbCtl = $0006,
+  dragCtl = $0007,
+  autoTrack = $0008,
+  newValue = $0009,
+  setParams = $000a,
+  moveCtl = $000b,
+  recSize = $000c,
+  ctlHandleEvent = $000d,
+  ctlChangeTarget = $000e,
+  ctlChangeBounds = $000f,
+  ctlWindChangeSize = $0010,
+  ctlHandleTab = $0011,
+  ctlHideCtl = $0012,
+}
+
+HiliteState enum<uint8> {
+  noHilite = $00,
+  inactiveHilite = $ff,
+}
+
+PartCode enum<int16> {
+  noPart = $0000,
+  simpleButton = $0002,
+  checkBox = $0003,
+  radioButton = $0004,
+  upArrow = $0005,
+  downArrow = $0006,
+  pageUp = $0007,
+  pageDown = $0008,
+  growBox = $000a,
+  thumb = $0081,
+}
+
+CtlMoreFlags enum<uint16> {
+  fCtlTarget = $8000,
+  fCtlCanBeTarget = $4000,
+  fCtlWantEvents = $2000,
+  fCtlProcRefNotPtr = $1000,
+  fCtlTellAboutSize = $0800,
+  fCtlIsMultiPar = $0400,
+}
+
+TitleVerb enum<int8> {
+  titleIsPtr = $00,
+  titleIsHandle = $01,
+  titleIsResource = $02,
+}
+
+ColorVerb enum<int8> {
+  colorTableIsPtr = $00,
+  colorTableIsHandle = $04,
+  colorTableIsResource = $08,
+}
+
+InputVerb enum<int16> {
+  singlePtr = $0000,
+  singleHandle = $0001,
+  singleResource = $0002,
+  ptrToPtr = $0003,
+  ptrToHandle = $0004,
+  ptrToResource = $0005,
+  handleToPtr = $0006,
+  handleToHandle = $0007,
+  handleToResource = $0008,
+  resourceToResource = $0009,
+}
+
+ProcRef enum<uint32> {
+  simpleButtonControl = $80000000,
+  checkControl = $82000000,
+  radioControl = $84000000,
+  scrollBarControl = $86000000,
+  growControl = $88000000,
+  statTextControl = $81000000,
+  editLineControl = $83000000,
+  editTextControl = $85000000,
+  popUpControl = $87000000,
+  listControl = $89000000,
+  iconButtonControl = $07ff0001,
+  pictureControl = $8d000000,
+}
+
+WindowPtr = GrafPortPtr;
+
+BarColorsHndl = ^BarColorsPtr;
+BarColorsPtr = ^BarColors;
+BarColors struct {
+  barOutline: int16;
+  barNorArrow: int16;
+  barSelArrow: int16;
+  barArrowBack: int16;
+  barNorThumb: int16;
+  barSelThumb: int16;
+  barPageRgn: int16;
+  barInactive: int16;
+}
+
+BoxColorsHndl = ^BoxColorsPtr;
+BoxColorsPtr = ^BoxColors;
+BoxColors struct {
+  boxReserved: int16;
+  boxNor: int16;
+  boxSel: int16;
+  boxTitle: int16;
+}
+
+BttnColorsHndl = ^BttnColorsPtr;
+BttnColorsPtr = ^BttnColors;
+BttnColors struct {
+  bttnOutline: int16;
+  bttnNorBack: int16;
+  bttnSelBack: int16;
+  bttnNorText: int16;
+  bttnSelText: int16;
+}
+
+RadioColorsHndl = ^RadioColorsPtr;
+RadioColorsPtr = ^RadioColors;
+RadioColors struct {
+  radReserved: int16;
+  radNor: int16;
+  radSel: int16;
+  radTitle: int16;
+}
+
+CtlColorPtr union {
+  bar: BarColorsPtr;
+  box: BoxColorsPtr;
+  bttn: BttnColorsPtr;
+  radio: RadioColorsPtr;
+}
+
+CtlRecHndlPtr = ^CtlRecHndl;
+CtlRecHndl = ^CtlRecPtr;
+CtlRecPtr = ^CtlRec;
+CtlRec struct {
+  ctlNext: CtlRecHndl;
+  ctlOwner: WindowPtr;
+  ctlRct: Rect;
+  ctlFlag: CtlFlag;
+  ctlHilite: HiliteState;
+  ctlValue: int16;
+  ctlProc: CtlProc;
+  ctlAction: LongProcPtr;
+  ctlData: int32;
+  ctlRefCon: int32;
+  ctlColor: CtlColorPtr;
+  ctlReserved: int8[16];
+  ctlID: int32;
+  ctlMoreFlags: CtlMoreFlags;
+  ctlVersion: int16;
+}
+
+LimitBlkHndl = ^LimitBlkPtr;
+LimitBlkPtr = ^LimitBlk;
+LimitBlk struct {
+  boundRect: Rect;
+  slopRect: Rect;
+  axisParam: Axis;
+  dragPatt: ^Pattern;
+}
+
+CtlBootInit() {
+  $10, $01
+}
+CtlStartUp(userID: int16, dPageAddr: int16) {
+  $10, $02
+}
+CtlShutDown() {
+  $10, $03
+}
+CtlVersion(): int16 {
+  $10, $04
+}
+CtlReset() {
+  $10, $05
+}
+CtlStatus(): bool {
+  $10, $06
+}
+CtlNewRes() {
+  $10, $12
+}
+DisposeControl(theControlHandle: CtlRecHndl) {
+  $10, $0a
+}
+DragControl(startX: int16, startY: int16, limitRectPtr: ^Rect,
+  slopRectPtr: ^Rect, dragFlag: int16, theControlHandle: CtlRecHndl) {
+  $10, $17
+}
+DragRect(actionProcPtr: VoidProcPtr, dragPatternPtr: ^Pattern,
+  startX: int16, startY: int16, dragRectPtr: ^Rect, limitRectPtr: ^Rect,
+  slopRectPtr: ^Rect, dragFlag: int16): int32 {
+  $10, $1d
+}
+DrawControls(theWindowPtr: WindowPtr) {
+  $10, $10
+}
+DrawOneCtl(theControlHandle: CtlRecHndl) {
+  $10, $25
+}
+EraseControl(theControlHandle: CtlRecHndl) {
+  $10, $24
+}
+FindControl(foundCtl: ^CtlRecHndl, pointX: int16, pointY: int16,
+  theWindowPtr: WindowPtr): int16 {
+  $10, $13
+}
+GetCtlAction(theControlHandle: CtlRecHndl): LongProcPtr {
+  $10, $21
+}
+GetCtlDPage(): int16 {
+  $10, $1f
+}
+GetCtlParams(theControlHandle: CtlRecHndl): int32 {
+  $10, $1c
+}
+GetCtlRefCon(theControlHandle: CtlRecHndl): int32 {
+  $10, $23
+}
+GetCtlTitle(theControlHandle: CtlRecHndl): Ptr {
+  $10, $0d
+}
+GetCtlValue(theControlHandle: CtlRecHndl): int16 {
+  $10, $1a
+}
+GrowSize(): int32 {
+  $10, $1e
+}
+HideControl(theControlHandle: CtlRecHndl) {
+  $10, $0e
+}
+HiliteControl(hiliteState: int16, theControlHandle: CtlRecHndl) {
+  $10, $11
+}
+KillControls(theWindowPtr: WindowPtr) {
+  $10, $0b
+}
+MoveControl(newX: int16, newY: int16, theControlHandle: CtlRecHndl) {
+  $10, $16
+}
+NewControl(theWindowPtr: WindowPtr, boundsRectPtr: ^Rect, titlePtr: Ptr,
+  flag: CtlFlag, value: int16, param1: int16, param2: int16,
+  defProcPtr: LongProcPtr, refCon: int32,
+  colorTablePtr: CtlColorPtr): CtlRecHndl {
+  $10, $09
+}
+SetCtlAction(newActionPtr: LongProcPtr, theControlHandle: CtlRecHndl) {
+  $10, $20
+}
+SetCtlIcons(newFontHandle: FontHndl): FontHndl {
+  $10, $18
+}
+SetCtlParams(param2: int16, param1: int16, theControlHandle: CtlRecHndl) {
+  $10, $1b
+}
+SetCtlRefCon(newRefCon: int32, theControlHandle: CtlRecHndl) {
+  $10, $22
+}
+SetCtlTitle(title: ^Str255, theControlHandle: CtlRecHndl) {
+  $10, $0c
+}
+SetCtlValue(curValue: int16, theControlHandle: CtlRecHndl) {
+  $10, $19
+}
+ShowControl(theControlHandle: CtlRecHndl) {
+  $10, $0f
+}
+TestControl(pointX: int16, pointY: int16, theControlHandle: CtlRecHndl) {
+  $10, $14
+}
+TrackControl(startX: int16, startY: int16, actionProcPtr: LongProcPtr,
+  theControlHndl: CtlRecHndl): PartCode {
+  $10, $15
+}
+NewControl2(ownerPtr: WindowPtr, inputDesc: RefDescriptor,
+  inputRef: Ref): CtlRecHndl {
+  $10, $31
+}
+FindTargetCtl(): CtlRecHndl {
+  $10, $26
+}
+MakeNextCtlTarget(): CtlRecHndl {
+  $10, $27
+}
+MakeThisCtlTarget(targetCtlRecHndl: CtlRecHndl) {
+  $10, $28
+}
+CallCtlDefProc(ctlRecHndl: CtlRecHndl, defProcMessage: DefProc, param: int32) {
+  $10, $2c
+}
+NotifyControls(mask: int16, message: DefProc, param: int32, window: WindowPtr) {
+  $10, $2d
+}
+SendEventToCtl(targetOnlyFlag: int16, windowPtr: WindowPtr,
+  extendedTaskRecPtr: Ptr): bool {
+  $10, $29
+}
+GetCtlID(theCtlHandle: CtlRecHndl): int32 {
+  $10, $2a
+}
+SetCtlID(newID: int32, theCtlHandle: CtlRecHndl) {
+  $10, $2b
+}
+GetCtlMoreFlags(theCtlHandle: CtlRecHndl): CtlMoreFlags {
+  $10, $2e
+}
+SetCtlMoreFlags(newFlags: CtlMoreFlags, theCtlHandle: CtlRecHndl) {
+  $10, $2f
+}
+GetCtlHandleFromID(windowPtr: WindowPtr, ControlID: int32): CtlRecHndl {
+  $10, $30
+}
+SetCtlParamPtr(subArrayPtr: Ptr) {
+  $10, $34
+}
+GetCtlParamPtr(): Ptr {
+  $10, $35
+}
+CMLoadResource(resType: int16, resID: int32): Handle {
+  $10, $32
+}
+CMReleaseResource(resType: int16, resID: int32) {
+  $10, $33
+}
+InvalCtls(windowPtr: WindowPtr) {
+  $10, $37
+}

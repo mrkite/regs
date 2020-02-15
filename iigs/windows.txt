@@ -1,0 +1,446 @@
+WinErr enum<int16> {
+  paramLenErr = $0e01,
+  allocateErr = $0e02,
+  taskMaskErr = $0e03,
+}
+
+DeskCmd enum<int16> {
+  FromDesk = $00,
+  ToDesk = $01,
+  GetDesktop = $02,
+  SetDesktop = $03,
+  GetDeskPat = $04,
+  SetDeskPat = $05,
+  GetVisDesktop = $06,
+  BackgroundRgn = $07,
+}
+
+TaskMask enum<int16> {
+  tmMenuKey = $0001,
+  tmUpdate = $0002,
+  tmFindW = $0004,
+  tmMenuSel = $0008,
+  tmOpenNDA = $0010,
+  tmSysClick = $0020,
+  tmDragW = $0040,
+  tmContent = $0080,
+  tmClose = $0100,
+  tmZoom = $0200,
+  tmGrow = $0400,
+  tmScroll = $0800,
+  tmSpecial = $1000,
+  tmCRedraw = $2000,
+  tmInactive = $4000,
+  tmInfo = $8000,
+}
+
+TaskMasterCode enum<uint16> {
+  inNull = $0000,
+  inKey = $0003,
+  inButtDwn = $0001,
+  inUpdate = $0006,
+  wInDesk = $0010,
+  wInMenuBar = $0011,
+  wClickCalled = $0012,
+  wInContent = $0013,
+  wInDrag = $0014,
+  wInGrow = $0015,
+  wInGoAway = $0016,
+  wInZoom = $0017,
+  wInInfo = $0018,
+  wInSpecial = $0019,
+  wInDeskItem = $001a,
+  wInFrame = $001b,
+  wInactMenu = $001c,
+  wClosedNDA = $001d,
+  wCalledSysEdit = $001e,
+  wTrackZoom = $001f,
+  wHitFrame = $0020,
+  wInControl = $0021,
+  wInSysWindow = $8000,
+}
+
+VarCode enum<int16> {
+  wDraw = $00,
+  wHit = $01,
+  wCalcRgns = $02,
+  wNew = $03,
+  wDispose = $04,
+}
+
+WFrame enum<int16> {
+  fHilited = $0001,
+  fZoomed = $0002,
+  fAllocated = $0004,
+  fCtlTie = $0008,
+  fInfo = $0010,
+  fVis = $0020,
+  fQContent = $0040,
+  fMove = $0080,
+  fZoom = $0100,
+  fFlex = $0200,
+  fGrow = $0400,
+  fBScroll = $0800,
+  fRScroll = $1000,
+  fAlert = $2000,
+  fClose = $4000,
+  fTitle = $8000,
+}
+
+WmTaskRec = EventRecord;
+WmTaskRecPtr = EventRecordPtr;
+
+WindColorHndl = ^WindColorPtr;
+WindColorPtr = ^WindColor;
+WindColor struct {
+  frameColor: int16;
+  titleColor: int16;
+  tBarColor: int16;
+  growColor: int16;
+  infoColor: int16;
+}
+
+WindRecPtr = ^WindRec;
+WindRec struct {
+  port: GrafPort;
+  wDefProc: ProcPtr;
+  wRefCon: int32;
+  wContDraw: ProcPtr;
+  wReserved: int32;
+  wStrucRgn: RgnHandle;
+  wContRgn: RgnHandle;
+  wUpdateRgn: RgnHandle;
+  wControls: CtlRecHndl;
+  wFrameCtrls: CtlRecHndl;
+  wFrame: WFrame;
+}
+
+WindowChainPtr = ^WindowChain;
+WindowChain struct {
+  wNext: WindowChainPtr;
+  theWindow: WindRec;
+}
+
+ParamListHndl = ^ParamListPtr;
+ParamListPtr = ^ParamList;
+ParamList struct {
+  paramLength: int16;
+  wFrameBits: WFrame;
+  wTitle: Ptr;
+  wRefCon: int32;
+  wZoom: Rect;
+  wColor: WindColorPtr;
+  wYOrigin: int16;
+  wXOrigin: int16;
+  wDataH: int16;
+  wDataW: int16;
+  wMaxH: int16;
+  wMaxW: int16;
+  wScrollVer: int16;
+  wScrollHor: int16;
+  wPageVer: int16;
+  wPageHor: int16;
+  wInfoRefCon: int32;
+  wInfoHeight: int16;
+  wFrameDefProc: LongProcPtr;
+  wInfoDefProc: VoidProcPtr;
+  wContDefProc: VoidProcPtr;
+  wPosition: Rect;
+  wPlane: WindowPtr;
+  wStorage: WindowChainPtr;
+}
+
+DeskMessageRecordPtr = ^DeskMessageRecord;
+DeskMessageRecord struct {
+  reserved: int32;
+  messageType: int16;
+  drawType: int16;
+}
+
+AlertWindow(alertFlags: int16, subStrPtr: Ptr, alertStrPtr: Ref): int16 {
+  $0e, $59
+}
+DrawInfoBar(theWindowPtr: WindowPtr) {
+  $0e, $55
+}
+EndFrameDrawing() {
+  $0e, $5b
+}
+GetWindowMgrGlobals(): int32 {
+  $0e, $58
+}
+ResizeWindow(hiddenFlag: int16, rectPtr: ^Rect, theWindowPtr: WindowPtr) {
+  $0e, $5c
+}
+StartFrameDrawing(windowPtr: WindowPtr) {
+  $0e, $5a
+}
+WindBootInit() {
+  $0e, $01
+}
+WindStartUp(userID: int16) {
+  $0e, $02
+}
+WindShutDown() {
+  $0e, $03
+}
+WindVersion(): int16 {
+  $0e, $04
+}
+WindReset() {
+  $0e, $05
+}
+WindStatus(): bool {
+  $0e, $06
+}
+BeginUpdate(theWindowPtr: WindowPtr) {
+  $0e, $1e
+}
+BringToFront(theWindowPtr: WindowPtr) {
+  $0e, $24
+}
+CheckUpdate(theEventPtr: EventRecordPtr): bool {
+  $0e, $0a
+}
+CloseWindow(theWindowPtr: WindowPtr) {
+  $0e, $0b
+}
+Desktop(desktopOp: DeskCmd, dtParam: int32): Ptr {
+  $0e, $0c
+}
+DragWindow(grid: int16, startx: int16, startY: int16, grace: int16,
+  boundsRectPtr: RectPtr, theWindowPtr: WindowPtr) {
+  $0e, $1a
+}
+EndInfoDrawing() {
+  $0e, $51
+}
+EndUpdate(theWindowPtr: WindowPtr) {
+  $0e, $1f
+}
+FindWindow(theWindowPtr: ^WindowPtr, pointX: int16, pointY: int16): int16 {
+  $0e, $17
+}
+FrontWindow(): WindowPtr {
+  $0e, $15
+}
+GetContentDraw(theWindowPtr: WindowPtr): VoidProcPtr {
+  $0e, $48
+}
+GetContentOrigin(theWindowPtr: WindowPtr): Point {
+  $0e, $3e
+}
+GetContentRgn(theWindowPtr: WindowPtr): RgnHandle {
+  $0e, $2f
+}
+GetDataSize(theWindowPtr: WindowPtr): int32 {
+  $0e, $40
+}
+GetDefProc(theWindowPtr: WindowPtr): LongProcPtr {
+  $0e, $31
+}
+GetFirstWindow(): WindowPtr {
+  $0e, $52
+}
+GetFrameColor(colorPtr: ^WindColorPtr, theWindowPtr: WindowPtr) {
+  $0e, $10
+}
+GetInfoDraw(theWindowPtr: WindowPtr): VoidProcPtr {
+  $0e, $4a
+}
+GetInfoRefCon(theWindowPtr: WindowPtr): int32 {
+  $0e, $35
+}
+GetMaxGrow(theWindowPtr: WindowPtr): int32 {
+  $0e, $42
+}
+GetNextWindow(theWindowPtr: WindowPtr): WindowPtr {
+  $0e, $2a
+}
+GetPage(theWindowPtr: WindowPtr): int32 {
+  $0e, $46
+}
+GetRectInfo(infoRectPtr: ^Rect, theWindowPtr: WindowPtr) {
+  $0e, $4f
+}
+GetScroll(theWindowPtr: WindowPtr): int32 {
+  $0e, $44
+}
+GetStructRgn(theWindowPtr: WindowPtr): RgnHandle {
+  $0e, $2e
+}
+GetSysWFlag(theWindowPtr: WindowPtr): bool {
+  $0e, $4c
+}
+GetUpdateRgn(theWindowPtr: WindowPtr): RgnHandle {
+  $0e, $30
+}
+GetWControls(theWindowPtr: WindowPtr): CtlRecHndl {
+  $0e, $33
+}
+GetWFrame(theWindowPtr: WindowPtr): WFrame {
+  $0e, $2c
+}
+GetWKind(theWindowPtr: WindowPtr): int16 {
+  $0e, $2b
+}
+GetWMgrPort(): WindowPtr {
+  $0e, $20
+}
+GetWRefCon(theWindowPtr: WindowPtr): int32 {
+  $0e, $29
+}
+GetWTitle(theWindowPtr: WindowPtr): Ptr {
+  $0e, $0e
+}
+GetZoomRect(theWindowPtr: WindowPtr): RectPtr {
+  $0e, $37
+}
+GrowWindow(minWidth: int16, minHeight: int16, startX: int16, startY: int16,
+  theWindowPtr: WindowPtr): int32 {
+  $0e, $1b
+}
+HideWindow(theWindowPtr: WindowPtr) {
+  $0e, $12
+}
+HiliteWindow(fHiliteFlag: bool, theWindowPtr: WindowPtr) {
+  $0e, $22
+}
+InvalRect(badRectPtr: ^Rect) {
+  $0e, $3a
+}
+InvalRgn(badRgnHandle: RgnHandle) {
+  $0e, $3b
+}
+MoveWindow(newX: int16, newY: int16, theWindowPtr: WindowPtr) {
+  $0e, $19
+}
+NewWindow(theParamListPtr: ^ParamList): WindowPtr {
+  $0e, $09
+}
+PinRect(theXPt: int16, theYPt: int16, theRectPtr: ^Rect): Point {
+  $0e, $21
+}
+RefreshDesktop(redrawRect: RectPtr) {
+  $0e, $39
+}
+SelectWindow(theWindowPtr: WindowPtr) {
+  $0e, $11
+}
+SendBehind(behindWindowPtr: WindowPtr, theWindowPtr: WindowPtr) {
+  $0e, $14
+}
+SetContentDraw(contentDrawPtr: VoidProcPtr, theWindowPtr: WindowPtr) {
+  $0e, $49
+}
+SetContentOrigin(xOrigin: int16, yOrigin: int16, theWindowPtr: WindowPtr) {
+  $0e, $3f
+}
+SetContentOrigin2(scrollFlag: int16, xOrigin: int16, yOrigin: int16,
+  theWindowPtr: WindowPtr) {
+  $0e, $57
+}
+SetDataSize(dataWidth: int16, dataHeight: int16, theWindowPtr: WindowPtr) {
+  $0e, $41
+}
+SetDefProc(wDefProcPtr: LongProcPtr, theWindowPtr: WindowPtr) {
+  $0e, $32
+}
+SetFrameColor(newColorPtr: WindColorPtr, theWindowPtr: WindowPtr) {
+  $0e, $0f
+}
+SetInfoDraw(infoRecCon: VoidProcPtr, theWindowPtr: WindowPtr) {
+  $0e, $16
+}
+SetInfoRefCon(infoRefCon: int32, theWindowPtr: WindowPtr) {
+  $0e, $36
+}
+SetMaxGrow(maxWidth: int16, maxHeight: int16, theWindowPtr: WindowPtr) {
+  $0e, $43
+}
+SetOriginMask(originmask: int16, theWindowPtr: WindowPtr) {
+  $0e, $34
+}
+SetPage(hpage: int16, vPage: int16, theWindowPtr: WindowPtr) {
+  $0e, $47
+}
+SetScroll(hScroll: int16, vScroll: int16, theWindowPtr: WindowPtr) {
+  $0e, $45
+}
+SetSysWindow(theWindowPtr: WindowPtr) {
+  $0e, $4b
+}
+SetWFrame(wFrame: WFrame, theWindowPtr: WindowPtr) {
+  $0e, $2d
+}
+SetWindowIcons(newFontHandle: FontHndl): FontHndl {
+  $0e, $4e
+}
+SetWRefCon(wRefCon: int32, theWindowPtr: WindowPtr) {
+  $0e, $28
+}
+SetWTitle(title: ^Str255, theWindowPtr: WindowPtr) {
+  $0e, $0d
+}
+SetZoomRect(wZoomSizePtr: ^Rect, theWindowPtr: WindowPtr) {
+  $0e, $38
+}
+ShowHide(showFlag: bool, theWindowPtr: WindowPtr) {
+  $0e, $23
+}
+ShowWindow(theWindowPtr: WindowPtr) {
+  $0e, $13
+}
+SizeWindow(newWidth: int16, newHeight: int16, theWindowPtr: WindowPtr) {
+  $0e, $1c
+}
+StartDrawing(theWindowPtr: WindowPtr) {
+  $0e, $4d
+}
+StartInfoDrawing(infoRectPtr: ^Rect, theWindowPtr: WindowPtr) {
+  $0e, $50
+}
+TaskMaster(taskMask: TaskMask, taskRecPtr: ^WmTaskRec): TaskMasterCode {
+  $0e, $1d
+}
+TrackGoAway(startX: int16, startY: int16, theWindowPtr: WindowPtr): bool {
+  $0e, $18
+}
+TrackZoom(startX: int16, startY: int16, theWindowPtr: WindowPtr): bool {
+  $0e, $26
+}
+ValidRect(goodRectPtr: ^Rect) {
+  $0e, $3c
+}
+ValidRgn(goodRgnHandle: RgnHandle) {
+  $0e, $3d
+}
+WindDragRect(actionProcPtr: VoidProcPtr, dragPatternPtr: ^Pattern,
+  startX: int16, startY: int16, dragRectPtr: ^Rect, limitRectPtr: ^Rect,
+  slopRectPtr: ^Rect, dragFlag: ^int16): int32 {
+  $0e, $53
+}
+WindNewRes() {
+  $0e, $25
+}
+WindowGlboal(windowGlobalMask: int16): int16 {
+  $0e, $56
+}
+ZoomWindow(theWindowPtr: WindowPtr) {
+  $0e, $27
+}
+TaskMasterDA(eventMask: TaskMask, taskRecPtr: ^WmTaskRec): TaskMasterCode {
+  $0e, $5f
+}
+CompileText(subType: int16, subStringsPtr: Ptr, srcStringPtr: Ptr,
+  srcSize: int16): Handle {
+  $0e, $60
+}
+NewWindow2(titlePtr: StringPtr, refCon: int32, contentDrawPtr: ProcPtr,
+  defProcPtr: ProcPtr, paramTableDesc: RefDescriptor, paramTableRef: Ref,
+  resourceType: int16): WindowPtr {
+  $0e, $61
+}
+ErrorWindow(subType: int16, subStringPtr: Ptr, errNum: int16): int16 {
+  $0e, $62
+}

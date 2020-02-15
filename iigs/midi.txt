@@ -1,0 +1,117 @@
+MIDIErr enum<int16> {
+  miStartUpErr = $2000,
+  miPacketErr = $2001,
+  miArrayErr = $2002,
+  miFullBufErr = $2003,
+  miToolsErr = $2004,
+  miOutOffErr = $2005,
+  miNoBufErr = $2007,
+  miDriverErr = $2008,
+  miBadFreqErr = $2009,
+  miClockErr = $200a,
+  miConflictErr = $200b,
+  miNoDevErr = $200c,
+  miDevNotAvail = $2080,
+  miDevSlotBusy = $2081,
+  miDevBusy = $2082,
+  miDevOverrun = $2083,
+  miDevNoConnect = $2084,
+  miDevReadErr = $2085,
+  miDevVersion = $2086,
+  miDevIntHndlr = $2087,
+}
+
+MidiClockFunc enum<int16> {
+  miSetClock = $0000,
+  miStartClock = $0001,
+  miStopClock = $0002,
+  miSetFreq = $0003,
+}
+
+MidiControlCode enum<int16> {
+  miSetRTVec = $0000,
+  miSetErrVec = $0001,
+  miSetInBuf = $0002,
+  miSetOutBuf = $0003,
+  miStartInput = $0004,
+  miStartOutput = $0005,
+  miStopInput = $0006,
+  miStopOutput = $0007,
+  miFlushInput = $0008,
+  miFlushOutput = $0009,
+  miFlushPacket = $000a,
+  miWaitOutput = $000b,
+  miSetInMode = $000c,
+  miSetOutMode = $000d,
+  miClrNotePad = $000e,
+  miSetDelay = $000f,
+  miOutputStat = $0010,
+  miIgnoreSysEx = $0011,
+}
+
+MidiDeviceFunc enum<int16> {
+  miSelectDrvr = $0000,
+  miLoadDrvr = $0001,
+  miUnloadDrvr = $0002,
+}
+
+MidiInfoFunc enum<int16> {
+  miNextPktLen = $0000,
+  miInputChars = $0001,
+  miOutputChars = $0002,
+  miMaxInChars = $0003,
+  miMaxOutChars = $0004,
+  miRecordAddr = $0005,
+  miPlayAddr = $0006,
+  miClockValue = $0007,
+  miClockFreq = $0008,
+}
+
+MiBufInfo struct {
+  bufSize: int16;
+  address: Ptr;
+}
+
+MiDriverInfo struct {
+  slot: int16;
+  external: int16;
+  pathname: int8[65];
+}
+
+MidiBootInit() {
+  $20, $01
+}
+MidiStartUp(userID: int16, directPages: int16) {
+  $20, $02
+}
+MidiShutDown() {
+  $20, $03
+}
+MidiVersion(): int16 {
+  $20, $04
+}
+MidiReset() {
+  $20, $05
+}
+MidiStatus(): bool {
+  $20, $06
+}
+MidiClock(funcNum: MidiClockFunc, arg: int32) {
+  $20, $0b
+}
+MidiControl(controlCode: MidiControlCode) {
+  $20, $09
+}
+MidiDevice(funcNum: MidiDeviceFunc, driverInfO: Ptr) {
+  $20, $0a
+}
+MidiInfo(funcNum: MidiInfoFunc): int32 {
+  $20, $0c
+}
+MidiInputPoll();
+MidiReadPacket(arrayAddr: Ptr, arraySize: int16): int16 {
+  $20, $0d
+}
+MidiWritePacket(arrayAddr: Ptr): int16 {
+  $20, $0e
+}

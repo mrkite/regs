@@ -1,0 +1,48 @@
+ACEErr enum<uint16> {
+  aceNoError = $0,
+  aceIsActive = $1d01,
+  aceBadDP = $1d02,
+  aceNotActive = $1d03,
+  aceNoSuchParam = $1d04,
+  aceBadMethod = $1d05,
+  aceBadSrc = $1d06,
+  aceBadDest = $1d07,
+  aceDataOverlap = $1d08,
+  aceNotImplemented = $1dff,
+}
+
+ACEBootInit() {
+  $1d, $01
+}
+ACEStartUp(dPageAddr: int16) {
+  $1d, $02
+}
+ACEShutDown() {
+  $1d, $03
+}
+ACEVersion(): int16 {
+  $1d, $04
+}
+ACEReset() {
+  $1d, $05
+}
+ACEStatus(): bool {
+  $1d, $06
+}
+ACEInfo(infoItemCode: int16): int32 {
+  $1d, $07
+}
+ACECompBegin() {
+  $1d, $0b
+}
+ACECompress(src: Handle, srcOffset: int32, dest: Handle, destOffset: int32,
+  nBlks: int16, method: int16) {
+  $1d, $09
+}
+ACEExpand(src: Handle, srcOffset: int32, dest: Handle, destOffset: int32,
+  nBlks: int16, method: int16) {
+  $1d, $0a
+}
+ACEExpBegin() {
+  $1d, $0c
+}

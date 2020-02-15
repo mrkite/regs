@@ -1,0 +1,144 @@
+VidErr enum<int16> {
+  vdNoVideoDevice = $2110,
+  vdAlreadyStarted = $2111,
+  vdInvalidSelector = $2112,
+  vdInvalidParam = $2113,
+  vdUnImplemented = $21ff,
+}
+
+VideoStandard enum<int16> {
+  vdNone = $00,
+  vdNTSC = $01,
+  vdPAL = $02,
+  vdSECAM = $04,
+  vdSNTSC = $08,
+  vdSPAL = $10,
+  vdSSECAM = $20,
+  vdRGB60 = $40,
+  vdRGB50 = $80,
+}
+
+VideoSelector enum<int16> {
+  vdVideoOverlay = $01,
+  vdFrameGrabber = $02,
+  vdInVStandards = $03,
+  vdOutVStandards = $04,
+  vdKeyDissLevels = $05,
+  vdNKeyDissLevels = $06,
+  vdAdjSideEffect = $07,
+  vdKeyColorBits = $08,
+  vdInHueAdj = $09,
+  vdInSatAdj = $0a,
+  vdInContrastAdj = $0b,
+  vdInBrightAdj = $0c,
+  vdOutSetup = $0d,
+  vdOutChromaFilter = $0e,
+  vdOutExtBlank = $0f,
+  vdKeyEnhDiss = $10,
+  vdLineInterrupt = $11,
+  vdGGBus = $12,
+  vdDualOut = $13,
+  vdTextMonoOver = $14,
+  vdGenlock = $32,
+  vdVideoDetect = $33,
+  vdGenlocked = $34,
+  vdAdjInc = $50,
+  vdAdjDec = $51,
+  vdAdjSave = $52,
+  vdKColorEnable = $64,
+  vdVerticalBlank = $82,
+  vdMainPageLin = $c8,
+  vdRAMPageSel = $c9,
+  vdVBLInterrupt = $ca,
+  vdInterlaceMode = $cb,
+  vdClearVBLInt = $cc,
+  vdClearLineInt = $cd,
+  vdDisplayField = $ce,
+  vdVBLIntRequest = $cf,
+  vdLineIntRequest = $d0,
+}
+
+VDBootInit() {
+  $21, $01
+}
+VDStartUp() {
+  $21, $02
+}
+VDShutdown() {
+  $21, $03
+}
+VDVersion(): int16 {
+  $21, $04
+}
+VDReset() {
+  $21, $05
+}
+VDStatus(): bool {
+  $21, $06
+}
+VDGetFeatures(videoSelector: VideoSelector): int16 {
+  $21, $1b
+}
+VDInControl(videoSelector: VideoSelector, inputCtlValue: int16) {
+  $21, $1c
+}
+VDInStatus(videoSelector: VideoSelector): int16 {
+  $21, $09
+}
+VDInSetStd(inputStandard: VideoStandard) {
+  $21, $0a
+}
+VDInGetStd(): VideoStandard {
+  $21, $0b
+}
+VDInConvAdj(videoSelector: VideoSelector, adjustFunction: int16) {
+  $21, $0c
+}
+VDKeyControl(videoSelector: VideoSelector, keyerCtlValue: int16) {
+  $21, $0d
+}
+VDKeyStatus(videoSelector: VideoSelector): int16 {
+  $21, $0e
+}
+VDKeySetKCol(redValue: int16, greenValue: int16, blueValue: int16) {
+  $21, $0f
+}
+VDKeyGetRCol(): int16 {
+  $21, $10
+}
+VDKeyGetGCol(): int16 {
+  $21, $11
+}
+VDKeyGetBCol(): int16 {
+  $21, $12
+}
+VDKeySetKDiss(kDissolve: int16) {
+  $21, $13
+}
+VDKeyGetKDiss(): int16 {
+  $21, $14
+}
+VDKeySetNKDiss(nonKeyDissolve: int16) {
+  $21, $15
+}
+VDKeyGetNKDiss(): int16 {
+  $21, $16
+}
+VDOutSetStd(outStandard: VideoStandard) {
+  $21, $17
+}
+VDOutGetStd(): VideoStandard {
+  $21, $18
+}
+VDOutControl(videoSelector: VideoSelector, outCtlValue: int16) {
+  $21, $19
+}
+VDOutStatus(videoSelector: VideoSelector): int16 {
+  $21, $1a
+}
+VDGGControl(videoSelector: VideoSelector, gGCtlValue: int16) {
+  $21, $1d
+}
+VDGGStatus(videoSelector: VideoSelector): int16 {
+  $21, $1e
+}

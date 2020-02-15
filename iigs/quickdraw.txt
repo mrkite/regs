@@ -1,0 +1,901 @@
+QDErr enum<int16> {
+  alreadyInitialized = $0401,
+  cannotReset = $0402,
+  notInitialized = $0403,
+  screenReserved = $0410,
+  badRect = $0411,
+  notEqualChunkiness = $0420,
+  rgnAlreadyOpen = $0430,
+  rgnNotOpen = $0431,
+  rgnScanOverflow = $0432,
+  rgnFull = $0433,
+  polyAlreadyOpen = $0440,
+  polyNotOpen = $0441,
+  polyTooBig = $0442,
+  badTableNum = $0450,
+  badColorNum = $0451,
+  badScanLine = $0452,
+  notImplemented = $04ff,
+}
+
+AnSCBByte enum<uint8> {
+  colorTable = $f,
+  scbReserved = $10,
+  scbFill = $20,
+  scbInterrupt = $40,
+  scbColorMode = $80,
+}
+
+ColorValue enum<int16> {
+  blueMask = $000f,
+  greenMask = $00f0,
+  redMask = $0f00,
+}
+
+FontFlags enum<int16> {
+  widMaxSize = $0001,
+  zeroSize = $0002,
+}
+
+GrafPortSize enum<uint8> {
+  maskSize = $8,
+  locSize = $10,
+  patSize = $20,
+  pnStateSize = $32,
+  portSize = $aa,
+}
+
+MasterColors enum<int16> {
+  black = $000,
+  blue = $00f,
+  darkGreen320 = $080,
+  green320 = $0e0,
+  green640 = $0f0,
+  lightBlue320 = $4df,
+  purple320 = $72c,
+  darkGray320 = $777,
+  periwinkleBlue320 = $78f,
+  brown320 = $841,
+  lightGray320 = $ccc,
+  red320 = $d00,
+  lilac320 = $daf,
+  red640 = $f00,
+  orange320 = $f70,
+  flesh320 = $fa9,
+  yellow = $ff0,
+  white = $fff,
+}
+
+Mode enum<uint16> {
+  modeCopy = $0000,
+  modeOR = $0001,
+  modeXOR = $0002,
+  modeBIC = $0003,
+  modeForeCopy = $0004,
+  modeForeOR = $0005,
+  modeForeXOR = $0006,
+  modeForeBIC = $0007,
+  notCopy = $8000,
+  notOR = $8001,
+  notXOR = $8002,
+  notBIC = $8003,
+  notForeCopy = $8004,
+  notForeOR = $8005,
+  notForeXOR = $8006,
+  notForeBIC = $8007,
+}
+
+QDStartMode enum<int16> {
+  mode320 = $0000,
+  mode640 = $0080,
+}
+
+TextStyle enum<int16> {
+  plainMask = $0000,
+  boldMask = $0001,
+  italicMask = $0002,
+  underlineMask = $0004,
+  outlineMask = $0008,
+  shadowMask = $0010,
+}
+
+PatternPtr = ^Pattern;
+Pattern = uint8[32];
+Mask = uint8[8];
+CursorHndl = ^CursorPtr;
+CursorPtr = ^Cursor;
+Cursor struct {
+  cursorHeight: int16;
+  cursorWidth: int16;
+  cursorData: int16[];
+  cursorMask: int16[];
+  cursorHotSpot: Point;
+}
+
+RgnHandle = ^RgnPtr;
+RgnPtr = ^Region;
+Region struct {
+  rgnSize: int16;
+  rgnBBox: Rect;
+  data: int16[];
+}
+
+BufDimRecHndl = ^BufDimRecPtr;
+BufDimRecPtr = ^BufDimRec;
+BufDimRec struct {
+  maxWidth: int16;
+  textBufHeight: int16;
+  textBufferWords: int16;
+  fontWidth: int16;
+}
+
+FontHndl = ^FontPtr;
+FontPtr = ^Font;
+Font struct {
+  offsetToMF: int16;
+  family: int16;
+  style: TextStyle;
+  size: int16;
+  version: int16;
+  fbrExtent: int16;
+}
+
+FontGlobalsRecHndl = ^FontGlobalsRecPtr;
+FontGlobalsRecPtr = ^FontGlobalsRecord;
+FontGlobalsRecord struct {
+  fgFontID: int16;
+  fgStyle: TextStyle;
+  fgSize: int16;
+  fgVersion: int16;
+  fgWidMax: int16;
+  fgFBRExtent: int16;
+}
+
+FontIDHndl = ^FontIDPtr;
+FontIDPtr = ^FontID;
+FontID struct {
+  famNum: int16;
+  fontStyle: uint8;
+  fontSize: uint8;
+}
+
+FontInfoRecHndl = ^FontInfoRecPtr;
+FontInfoRecPtr = ^FontInfoRecord;
+FontInfoRecord struct {
+  ascent: int16;
+  descent: int16;
+  widMax: int16;
+  leading: int16;
+}
+
+LocInfoHndl = ^LocInfoPtr;
+LocInfoPtr = ^LocInfo;
+LocInfo struct {
+  portSCB: int16;
+  ptrToPixImage: Ptr;
+  width: int16;
+  boundsRect: Rect;
+}
+
+QDProcsHndl = ^QDProcsPtr;
+QDProcsPtr = ^QDProcs;
+QDProcs struct {
+  stdText: VoidProcPtr;
+  stdLine: VoidProcPtr;
+  stdRect: VoidProcPtr;
+  stdRRect: VoidProcPtr;
+  stdOval: VoidProcPtr;
+  stdArc: VoidProcPtr;
+  stdPoly: VoidProcPtr;
+  stdRgn: VoidProcPtr;
+  stdPixels: VoidProcPtr;
+  stdComment: VoidProcPtr;
+  stdTxMeas: VoidProcPtr;
+  stdTxBnds: VoidProcPtr;
+  stdGetPic: VoidProcPtr;
+  stdPutPic: VoidProcPtr;
+}
+
+GrafPortHndl = ^GrafPortPtr;
+GrafPortPtr = ^GrafPort;
+GrafPort struct {
+  portInfo: LocInfo;
+  portRect: Rect;
+  clipRgn: RgnHandle;
+  visRgn: RgnHandle;
+  bkPat: Pattern;
+  pnLoc: Point;
+  pnSize: Point;
+  pnMode: Mode;
+  pnPat: Pattern;
+  pnMask: Mask;
+  pnVis: int16;
+  fontHandle: FontHndl;
+  gfontID: FontID;
+  fontFlags: FontFlags;
+  txSize: int16;
+  txFace: TextStyle;
+  txMode: Mode;
+  spExtra: Fixed;
+  chExtra: Fixed;
+  fgColor: MasterColors;
+  bgColor: MasterColors;
+  picSave: Handle;
+  rgnSave: Handle;
+  polySave: Handle;
+  grafProcs: QDProcsPtr;
+  arcRot: int16;
+  userField: int32;
+  sysField: int32;
+}
+
+PaintParamHndl = ^PaintParamPtr;
+PaintParamPtr = ^PaintParam;
+PaintParam struct {
+  ptrToSourceLocInfo: LocInfoPtr;
+  ptrToDestLocInfo: LocInfoPtr;
+  ptrToSourceRect: RectPtr;
+  ptrToDestPoint: PointPtr;
+  mode: Mode;
+  maskHandle: Handle;
+}
+
+PenStateHndl = ^PenStatePtr;
+PenStatePtr = ^PenState;
+PenState struct {
+  psPnSize: Point;
+  psPnMode: Mode;
+  psPnPat: Pattern;
+  psPnMask: Mask;
+}
+
+RomFontRecHndl = ^RomFontRecPtr;
+RomFontRecPtr = ^RomFontRec;
+RomFontRec struct {
+  rfFamNum: int16;
+  rfFamStyle: int16;
+  rfSize: int16;
+  rfFontHandle: FontHndl;
+  rfNamePtr: Ptr;
+  rfFBRExtent: int16;
+}
+
+ColorTableHndl = ^ColorTablePtr;
+ColorTablePtr = ^ColorTable;
+ColorTable struct {
+  entries: int16[16];
+}
+
+QDBootInit() {
+  $04, $01
+}
+QDStartUp(dPageAddr: int16, masterSCB: int16, maxWidth: int16, userID: int16) {
+  $04, $02
+}
+QDShutDown() {
+  $04, $03
+}
+QDVersion(): int16 {
+  $04, $04
+}
+QDReset() {
+  $04, $05
+}
+QDStatus(): bool {
+  $04, $06
+}
+AddPt(srcPtPtr: ^Point, destPtPtr: ^Point) {
+  $04, $80
+}
+CharBounds(theChar: int8, resultPtr: ^Rect) {
+  $04, $ac
+}
+CharWidth(theChar: int8): int16 {
+  $04, $a8
+}
+ClearScreen(colorWord: MasterColors) {
+  $04, $15
+}
+ClipRect(rectPtr: ^Rect) {
+  $04, $26
+}
+ClosePoly() {
+  $04, $c2
+}
+ClosePort(portPtr: GrafPortPtr) {
+  $04, $1a
+}
+CloseRgn(aRgnHndle: RgnHandle) {
+  $04, $6e
+}
+CopyRgn(srcRgnHandle: RgnHandle, destRgnHandle: RgnHandle) {
+  $04, $69
+}
+CStringBounds(cStringPtr: Ptr, resultRect: ^Rect) {
+  $04, $ae
+}
+CStringWidth(cStringPtr: Ptr): int16 {
+  $04, $aa
+}
+DiffRgn(rgn1Handle: RgnHandle, rgn2Handle: RgnHandle, diffRgnHndle: RgnHandle) {
+  $04, $73
+}
+DisposeRgn(aRgnHandle: RgnHandle) {
+  $04, $68
+}
+DrawChar(theChar: int8) {
+  $04, $a4
+}
+DrawCString(cStrPtr: CStringPtr) {
+  $04, $a6
+}
+DrawString(str: ^Str255) {
+  $04, $a5
+}
+DrawText(textPtr: Ptr, textLengt: int16) {
+  $04, $a7
+}
+NotEmptyRect(rectPtr: ^Rect): bool {
+  $04, $52
+}
+EmptyRgn(aRgnHandle: RgnHandle): bool {
+  $04, $78
+}
+EqualPt(point1Ptr: ^Point, point2Ptr: ^Point): bool {
+  $04, $83
+}
+EqualRect(rect1Ptr: ^Rect, rect2Ptr: ^Rect): bool {
+  $04, $51
+}
+EqualRgn(rgn1Handle: RgnHandle, rgn2Handle: RgnHandle): bool {
+  $04, $77
+}
+EraseArc(rectPtr: ^Rect, startAngle: int16, arcAngle: int16) {
+  $04, $64
+}
+EraseOval(rectPtr: ^Rect) {
+  $04, $5a
+}
+ErasePoly(polyHandle: Handle) {
+  $04, $be
+}
+EraseRect(rectPtr: ^Rect) {
+  $04, $55
+}
+EraseRgn(aRgnHandle: RgnHandle) {
+  $04, $7b
+}
+EraseRRect(rectPtr: ^Rect, ovalWidth: int16, ovalHeight: int16) {
+  $04, $5f
+}
+FillArc(rectPtr: ^Rect, startAngle: int16, arcAngle: int16,
+  patternPtr: ^Pattern) {
+  $04, $66
+}
+FillOval(rectPtr: ^Rect, patternPtr: ^Pattern) {
+  $04, $5c
+}
+FillPoly(polyhandle: Handle, patternPtr: ^Pattern) {
+  $04, $c0
+}
+FillRect(rectPtr: ^Rect, patternPtr: ^Pattern) {
+  $04, $57
+}
+FillRgn(aRgnHandle: RgnHandle, patternPtr: ^Pattern) {
+  $04, $7d
+}
+FillRRect(rectPtr: ^Rect, ovalWidth: int16, ovalHeight: int16,
+  patternPtr: ^Pattern) {
+  $04, $61
+}
+ForceBufDims(maxWidth: int16, maxFontHeight: int16, maxFBRExtent: int16) {
+  $04, $cc
+}
+FrameArc(rectPtr: ^Rect, startAngle: int16, arcAngle: int16) {
+  $04, $62
+}
+FrameOval(rectPtr: ^Rect) {
+  $04, $58
+}
+FramePoly(polyHandle: Handle) {
+  $04, $bc
+}
+FrameRect(rectPtr: ^Rect) {
+  $04, $53
+}
+FrameRgn(aRgnHandle: RgnHandle) {
+  $04, $79
+}
+FrameRRect(rectPtr: ^Rect, ovalWidth: int16, ovalHeight: int16) {
+  $04, $5d
+}
+GetAddress(tableID: int16): Ptr {
+  $04, $09
+}
+GetArcRot(): int16 {
+  $04, $b1
+}
+GetBackColor(): MasterColors {
+  $04, $a3
+}
+GetBackPat(patternPtr: ^Pattern) {
+  $04, $35
+}
+GetCharExtra(): Fixed {
+  $04, $d5
+}
+GetClip(aRgnHandle: RgnHandle) {
+  $04, $25
+}
+GetClipHandle(): RgnHandle {
+  $04, $c7
+}
+GetColorEntry(tableNumber: int16, entryNumber: int16): MasterColors {
+  $04, $11
+}
+GetColorTable(tableNumber: int16, destTablePtr: ^ColorTable) {
+  $04, $0f
+}
+GetCursorAdr(): CursorPtr {
+  $04, $8f
+}
+GetFGSize(): int16 {
+  $04, $cf
+}
+GetFont(): FontHndl {
+  $04, $95
+}
+GetFontFlags(): int16 {
+  $04, $99
+}
+GetFontGlobals(fgRecPtr: ^FontGlobalsRecord) {
+  $04, $97
+}
+GetFontID(): FontID {
+  $04, $d1
+}
+GetFontInfo(fontInfoRecPtr: ^FontInfoRecord) {
+  $04, $96
+}
+GetFontLore(recordPtr: ^FontGlobalsRecord, recordSize: int16): int16 {
+  $04, $d9
+}
+GetForeColor(): MasterColors {
+  $04, $a1
+}
+GetGrafProcs(): QDProcsPtr {
+  $04, $45
+}
+GetMasterSCB(): int16 {
+  $04, $17
+}
+GetPen(pointPtr: ^Point) {
+  $04, $29
+}
+GetPenMask(maskPtr: ^Mask) {
+  $04, $33
+}
+GetPenMode(): Mode {
+  $04, $2f
+}
+GetPenPat(patternPtr: ^Pattern) {
+  $04, $31
+}
+GetPenSize(pointPtr: ^Point) {
+  $04, $2d
+}
+GetPenState(penStatePtr: ^PenState) {
+  $04, $2b
+}
+GetPicSave(): int32 {
+  $04, $3f
+}
+GetPixel(h: int16, v: int16): int16 {
+  $04, $88
+}
+GetPolySave(): int32 {
+  $04, $43
+}
+GetPort(): GrafPortPtr {
+  $04, $1c
+}
+GetPortLoc(locInfoPtr: ^LocInfo) {
+  $04, $1e
+}
+GetPortRect(rectPtr: ^Rect) {
+  $04, $20
+}
+GetRgnSave(): int32 {
+  $04, $41
+}
+GetROMFont(recordPtr: ^RomFontRec) {
+  $04, $d8
+}
+GetSCB(scanLine: int16): int16 {
+  $04, $13
+}
+GetSpaceExtra(): Fixed {
+  $04, $9f
+}
+GetStandardSCB(): int16 {
+  $04, $0c
+}
+GetSysField(): int32 {
+  $04, $49
+}
+GetSysFont(): FontHndl {
+  $04, $b3
+}
+GetTextFace(): TextStyle {
+  $04, $9b
+}
+GetTextMode(): Mode {
+  $04, $9d
+}
+GetTextSize(): int16 {
+  $04, $d3
+}
+GetUserField(): int32 {
+  $04, $47
+}
+GetVisHndle(): RgnHandle {
+  $04, $c9
+}
+GetVisRgn(RgnHandle: RgnHandle) {
+  $04, $b5
+}
+GlobalToLocal(pointPtr: ^Point) {
+  $04, $85
+}
+GrafOff() {
+  $04, $0b
+}
+GrafOn() {
+  $04, $0a
+}
+HideCursor() {
+  $04, $90
+}
+HidePen() {
+  $04, $27
+}
+InflateTextBuffer(newWidth: int16, newHeight: int16) {
+  $04, $d7
+}
+InitColorTable(tablePtr: ^ColorTable) {
+  $04, $0d
+}
+InitCursor() {
+  $04, $ca
+}
+InitPort(portPtr: GrafPortPtr) {
+  $04, $19
+}
+InsetRect(rectPtr: ^Rect, deltaH: int16, deltaV: int16) {
+  $04, $4c
+}
+InsetRgn(aRgnHandle: RgnHandle, dH: int16, dV: int16) {
+  $04, $70
+}
+InvertArc(rectPtr: ^Rect, startAngle: int16, arcAngle: int16) {
+  $04, $65
+}
+InvertOval(rectPtr: ^Rect) {
+  $04, $5b
+}
+InvertPoly(polyHandle: Handle) {
+  $04, $bf
+}
+InvertRect(rectPtr: ^Rect) {
+  $04, $56
+}
+InvertRgn(aRgnHandle: RgnHandle) {
+  $04, $7c
+}
+InvertRRect(rectPtr: ^Rect, ovalWidth: int16, ovalHeight: int16) {
+  $04, $60
+}
+KillPoly(polyHandle: Handle) {
+  $04, $c3
+}
+Line(dH: int16, dV: int16) {
+  $04, $3d
+}
+LineTo(h: int16, v: int16) {
+  $04, $3c
+}
+LocalToGlobal(pointPtr: ^Point) {
+  $04, $84
+}
+MapPoly(polyHandle: Handle, srcRectPtr: ^Rect, destRectPtr: ^Rect) {
+  $04, $c5
+}
+MapPt(pointPtr: ^Point, srcRectPtr: ^Rect, destRectPtr: ^Rect) {
+  $04, $8a
+}
+MapRect(rectPtr: ^Rect, srcRectPtr: ^Rect, destRectPtr: ^Rect) {
+  $04, $8b
+}
+MapRgn(aRgnHandle: RgnHandle, srcRectPtr: ^Rect, destRectPtr: ^Rect) {
+  $04, $8c
+}
+Move(dH: int16, dV: int16) {
+  $04, $3b
+}
+MovePortTo(h: int16, v: int16) {
+  $04, $22
+}
+MoveTo(h: int16, v: int16) {
+  $04, $3a
+}
+NewRgn(): RgnHandle {
+  $04, $67
+}
+ObscureCursor() {
+  $04, $92
+}
+OffsetPoly(polyHandle: Handle, dH: int16, dV: int16) {
+  $04, $c4
+}
+OffsetRect(rectPtr: ^Rect, deltaH: int16, deltaV: int16) {
+  $04, $4b
+}
+OffsetRgn(aRgnHandle: RgnHandle, dH: int16, dV: int16) {
+  $04, $6f
+}
+OpenPoly(): Handle {
+  $04, $c1
+}
+OpenPort(portPtr: GrafPortPtr) {
+  $04, $18
+}
+OpenRgn() {
+  $04, $6d
+}
+PaintArc(rectPtr: ^Rect, startAngle: int16, arcAngle: int16) {
+  $04, $63
+}
+PaintOval(rectPtr: ^Rect) {
+  $04, $59
+}
+PaintPixels(paintParamPtr: ^PaintParam) {
+  $04, $7f
+}
+PaintPoly(polyHandle: Handle) {
+  $04, $bd
+}
+PaintRect(rectPtr: ^Rect) {
+  $04, $54
+}
+PaintRgn(aRgnHandle: RgnHandle) {
+  $04, $7a
+}
+PaintRRect(rectPtr: ^Rect, ovalWidth: int16, ovalHeight: int16) {
+  $04, $5e
+}
+PenNormal() {
+  $04, $36
+}
+PPToPort(srcLocPtr: ^LocInfoPtr, srcRectPtr: ^Rect, destX: int16, destY: int16,
+  transferMode: Mode) {
+  $04, $d6
+}
+Pt2Rect(point1Ptr: ^Point, point2Ptr: ^Point, rectPtr: ^Rect) {
+  $04, $50
+}
+PtInRect(pointPtr: ^Point, rectPtr: ^Rect): bool {
+  $04, $4f
+}
+PtInRgn(pointPtr: ^Point, aRgnHandle: RgnHandle): bool {
+  $04, $75
+}
+Random(): int16 {
+  $04, $86
+}
+RectInRgn(rectPtr: ^Rect, aRgnHandle: RgnHandle): bool {
+  $04, $76
+}
+RectRgn(aRgnHandle: RgnHandle, rectPtr: ^Rect) {
+  $04, $6c
+}
+RestoreBufDims(sizeInfoPtr: BufDimRecPtr) {
+  $04, $ce
+}
+SaveBufDims(sizeInfoPtr: ^BufDimRec) {
+  $04, $cd
+}
+ScalePt(pointPtr: ^Point, srcRectPtr: ^Rect, destRectPtr: ^Rect) {
+  $04, $89
+}
+ScrollRect(rectPtr: ^Rect, dH: int16, dV: int16, aRgnHandle: RgnHandle) {
+  $04, $7e
+}
+SectRect(rect1Ptr: ^Rect, rect2Ptr: ^Rect, intersectRectPtr: ^Rect): bool {
+  $04, $4d
+}
+SectRgn(rgn1Handle: RgnHandle, rgn2Handle: RgnHandle,
+  destRgnHandle: RgnHandle) {
+  $04, $71
+}
+SetAllSCBs(newSCB: int16) {
+  $04, $14
+}
+SetArcRot() {
+  $04, $b0
+}
+SetBackColor(backColor: MasterColors) {
+  $04, $a2
+}
+SetBackPat(patternPtr: ^Pattern) {
+  $04, $34
+}
+SetBufDims(maxWidth: int16, maxFontHeight: int16, maxFBRExtent: int16) {
+  $04, $cb
+}
+SetCharExtra(charExtra: Fixed) {
+  $04, $d4
+}
+SetClip(aRgnHandle: RgnHandle) {
+  $04, $24
+}
+StClipHandle(RgnHandle: RgnHandle) {
+  $04, $c6
+}
+SetColorEntry(tableNumber: int16, entryNumber: int16, newColor: ColorValue) {
+  $04, $10
+}
+SetColorTable(tableNumber: int16, srcTablePtr: ^ColorTable) {
+  $04, $0e
+}
+SetCursor(theCursorPtr: ^Cursor) {
+  $04, $8e
+}
+SetEmptyRgn(aRgnHandle: RgnHandle) {
+  $04, $6a
+}
+SetFont(newFontHandle: FontHndl) {
+  $04, $94
+}
+SetFontFlags(fontFlags: FontFlags) {
+  $04, $98
+}
+SetFontID(fontID: ^FontID) {
+  $04, $d0
+}
+SetForeColor(foreColor: MasterColors) {
+  $04, $a0
+}
+SetGrafProcs(grafProcsPtr: QDProcsPtr) {
+  $04, $44
+}
+SetIntUse(useInt: int16) {
+  $04, $b6
+}
+SetMasterSCB(masterSCB: int16) {
+  $04, $16
+}
+SetOrigin(h: int16, v: int16) {
+  $04, $23
+}
+SetPenMask(maskPtr: ^Mask) {
+  $04, $32
+}
+SetPenMode(penMode: int16) {
+  $04, $2e
+}
+SetPenPat(patternPtr: ^Pattern) {
+  $04, $30
+}
+SetPenSize(penWidth: int16, penHeight: int16) {
+  $04, $2c
+}
+SetPenState(penStatePtr: ^PenState) {
+  $04, $2a
+}
+SetPicSave(picSaveValue: int32) {
+  $04, $3e
+}
+SetPolySave(polySaveValue: int32) {
+  $04, $42
+}
+SetPort(portPtr: GrafPortPtr) {
+  $04, $1b
+}
+SetPortLoc(locInfoPtr: ^LocInfo) {
+  $04, $1d
+}
+SetPortRect(rectPtr: ^Rect) {
+  $04, $1f
+}
+SetPortSize(portWidth: int16, portHeight: int16) {
+  $04, $21
+}
+SetPt(srcPtPtr: ^Point, h: int16, v: int16) {
+  $04, $82
+}
+SetRandSeed(randomSeed: int32) {
+  $04, $87
+}
+SetRect(aRectPtr: ^Rect, left: int16, top: int16, right: int16, bottom: int16) {
+  $04, $4a
+}
+SetRectRgn(RgnHandle: RgnHandle, left: int16, top: int16, right: int16,
+  bottom: int16) {
+  $04, $6b
+}
+SetRgnSave(rgnSaveValue: int32) {
+  $04, $40
+}
+SetSCB(scanLine: int16, newSCB: int16) {
+  $04, $12
+}
+SetSolidBackPat(colorNum: MasterColors) {
+  $04, $38
+}
+SetSolidPenPat(colorNum: MasterColors) {
+  $04, $37
+}
+SetSpaceExtra(spaceExtra: Fixed) {
+  $04, $9e
+}
+SetStdProcs(stdProcRecPtr: QDProcsPtr) {
+  $04, $8d
+}
+SetSysField(sysFieldValue: int32) {
+  $04, $48
+}
+SetSysFont(fontHandle: FontHndl) {
+  $04, $b2
+}
+SetTextFace(textFace: TextStyle) {
+  $04, $9a
+}
+SetTextMode(textMode: Mode) {
+  $04, $9c
+}
+SetTextSize(textSize: int16) {
+  $04, $d2
+}
+SetUserField(userFieldValue: int32) {
+  $04, $46
+}
+SetVisHandle(aRgnHandle: RgnHandle) {
+  $04, $c8
+}
+SetVisRgn(aRgnHandle: RgnHandle) {
+  $04, $b4
+}
+ShowCursor() {
+  $04, $91
+}
+ShowPen() {
+  $04, $28
+}
+SolidPattern(colorNum: int16, patternPtr: ^Pattern) {
+  $04, $39
+}
+StringBounds(str: ^Str255, resultPtr: ^Rect) {
+  $04, $ad,
+}
+StringWidth(str: ^Str255): int16 {
+  $04, $a9
+}
+SubPt(srcPtPtr: ^Point, destPtPtr: ^Point) {
+  $04, $81
+}
+TextBounds(textPtr: Ptr, textLength: int16, resultPtr: ^Rect) {
+  $04, $af
+}
+TextWidth(textPtr: Ptr, textLength: int16): int16 {
+  $04, $ab
+}
+UnionRect(rect1Ptr: ^Rect, rect2Ptr: ^Rect, unionrectPtr: ^Rect) {
+  $04, $4e
+}
+UnionRgn(rgn1Handle: RgnHandle, rgn2Handle: RgnHandle,
+  unionRgnHandle: RgnHandle) {
+  $04, $72
+}
+XorRgn(rgn1Handle: RgnHandle, rgn2Handle: RgnHandle, xorRgnHandle: RgnHandle) {
+  $04, $74
+}

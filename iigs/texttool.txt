@@ -1,0 +1,149 @@
+TTErr enum<int16> {
+  badDevType = $0c01,
+  badDevNum = $0c02,
+  badMode = $0c03,
+  unDefHW = $0c04,
+  lostDev = $0c05,
+  lostFile = $0c06,
+  badTitle = $0c07,
+  noRoom = $0c08,
+  noDevice = $0c09,
+  noFile = $0c0a,
+  dupFile = $0c0b,
+  notClosed = $0c0c,
+  notOpen = $0c0d,
+  badFormat = $0c0e,
+  ringBuffOFlo = $0c0f,
+  writeProtected = $0c10,
+  devErr = $0c40,
+}
+
+DeviceNum enum<int16> {
+  input = $0000,
+  output = $0001,
+  errorOutput = $0002,
+}
+
+DeviceType enum<int16> {
+  basicType = $0000,
+  pascalType = $0001,
+  ramBased = $0002,
+}
+
+EchoFlag enum<int16> {
+  noEcho = $0000,
+  echo = $0001,
+}
+
+DeviceRecHndl = ^DeviceRecPtr;
+DeviceRecPtr = ^DeviceRec;
+DeviceRec struct {
+  ptrOrSlot: int32;
+  deviceType: DeviceType;
+}
+
+TxtMskRecHndl = ^TxtMaskRecPtr;
+TxtMaskRecPtr = ^TxtMaskRec;
+TxtMaskRec struct {
+  orMask: int16;
+  andMask: int16;
+}
+
+TextBootInit() {
+  $0c, $01
+}
+TextStartUp() {
+  $0c, $02
+}
+TextShutDown() {
+  $0c, $03
+}
+TextVersion(): int16 {
+  $0c, $04
+}
+TextReset() {
+  $0c, $05
+}
+TextStatus(): bool {
+  $0c, $06
+}
+CtlTextDev(deviceNum: int16, controlCode: int16) {
+  $0c, $16
+}
+ErrWriteBlock(textPtr: Ptr, offset: int16, count: int16) {
+  $0c, $1f
+}
+ErrWriteChar(theChar: int16) {
+  $0c, $19
+}
+ErrWriteCString(cStrPtr: CStringPtr) {
+  $0c, $21
+}
+ErrWriteLine(str: ^Str255) {
+  $0c, $1b
+}
+ErrWriteString(str: ^Str255) {
+  $0c, $1d
+}
+GetErrGlobals(): TxtMaskRec {
+  $0c, $0e
+}
+GetErrorDevice(): ^DeviceRec;
+GetInGlobals(): TxtMaskRec {
+  $0c, $0c
+}
+GetInputDevice(): ^DeviceRec;
+GetOutGlobals(): TxtMaskRec {
+  $0c, $0d
+}
+GetOutputDevice(): ^DeviceRec;
+InitTextDev(deviceNum: int16) {
+  $0c, $15
+}
+ReadChar(echoFlag: EchoFlag): int16 {
+  $0c, $22
+}
+ReadLine(bufferPtr: Ptr, maxCount: int16, eolChar: int16,
+  echoFlag: EchoFlag): int16 {
+  $0c, $24
+}
+SetErrGlobals(andMask: int16, orMask: int16) {
+  $0c, $0b
+}
+SetErrorDevice(deviceType: DeviceType, ptrOrSlot: int32) {
+  $0c, $11
+}
+SetInGlobals(andMask: int16, orMask: int16) {
+  $0c, $09
+}
+SetInputDevice(deviceType: DeviceType, ptrOrSlot: int32) {
+  $0c, $0f
+}
+SetOutGlobals(andMask: int16, orMask: int16) {
+  $0c, $0a
+}
+SetOutputDevice(deviceType: DeviceType, ptrOrSlot: int32) {
+  $0c, $10
+}
+StatusTextDev(deviceNum: int16, requestCode: int16) {
+  $0c, $17
+}
+TextReadBlock(bufferPtr: Ptr, offset: int16, blockSize: int16,
+  echoFlag: EchoFlag) {
+  $0c, $23
+}
+TextWriteBlock(textPtr: Ptr, offset: int16, count: int16) {
+  $0c, $1e
+}
+WriteChar(theChar: int16) {
+  $0c, $18
+}
+WriteCString(cStrPtr: CStringPtr) {
+  $0c, $20
+}
+WriteLine(str: ^Str255) {
+  $0c, $1a
+}
+WriteString(str: ^Str255) {
+  $0c, $1c
+}

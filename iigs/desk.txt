@@ -1,0 +1,113 @@
+DeskErr enum<int16> {
+  daNotFound = $510,
+  notSysWindow = $511,
+}
+
+NDAAction enum<int16> {
+  eventAction = $0001,
+  runAction = $0002,
+  undoAction = $0005,
+  cutAction = $0006,
+  copyAction = $0007,
+  pasteAction = $0008,
+  clearAction = $0009,
+  cursorAction = $0003,
+}
+
+SysEditType enum<int16> {
+  kUndo = $0001,
+  kCut = $0002,
+  kCopy = $0003,
+  kPaste = $0004,
+  kClear = $0005,
+}
+
+DeskBootInit() {
+  $05, $01
+}
+DeskStartUp() {
+  $05, $02
+}
+DeskShutDown() {
+  $05, $03
+}
+DeskVersion(): int16 {
+  $05, $04
+}
+DeskReset() {
+  $05, $05
+}
+DeskStatus(): bool {
+  $05, $06
+}
+ChooseCDA() {
+  $05, $11
+}
+CloseAllNDAs() {
+  $05, $1d
+}
+CloseNDA(refNum: int16) {
+  $05, $16
+}
+CloseNDAByWinPtr(theWindowPtr: GrafPortPtr) {
+  $05, $1c
+}
+FixAppleMenu(startingID: int16) {
+  $05, $1e
+}
+GetDAStrPtr(): Ptr {
+  $05, $14
+}
+GetNumNDAs(): int16 {
+  $05, $1b
+}
+InstallCDA(idHandle: Handle) {
+  $05, $0f
+}
+InstallNDA(idHandle: Handle) {
+  $05, $0e
+}
+OpenNDA(idNum: int16): int16 {
+  $05, $15
+}
+RestAll() {
+  $05, $0c
+}
+RestScrn() {
+  $05, $0a
+}
+SaveAll() {
+  $05, $0b
+}
+SaveScrn() {
+  $05, $09
+}
+SetDAStrPtr(altDispHandle: Handle, stringTablePtr: Ptr) {
+  $05, $13
+}
+SystemClick(eventRecPtr: ^EventRecord, theWindowPtr: GrafPortPtr,
+  findWndwResult: int16) {
+  $05, $17
+}
+SystemEdit(editType: SysEditType): bool {
+  $05, $18
+}
+SystemEvent(eventWhat: int16, eventMessage: int32, eventWhen: int32,
+  eventWhere: Point, eventMods: int16): bool {
+  $05, $1a
+}
+SystemTask() {
+  $05, $19
+}
+AddToRunQ(headerPtr: Ptr) {
+  $05, $1f
+}
+RemoveFromRunQ(headerPtr: Ptr) {
+  $05, $20
+}
+RemoveCDA(idHandle: Handle) {
+  $05, $21
+}
+RemoveNDA(idHandle: Handle) {
+  $05, $22
+}

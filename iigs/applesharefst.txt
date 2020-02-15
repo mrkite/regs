@@ -1,0 +1,181 @@
+ASErr enum<int16> {
+  appleShareNetError = $0088,
+  unknownUser = $007e,
+  unknownGroup = $007f,
+}
+
+ASCommand enum<int16> {
+  ASBufferControl = $0001,
+  ASByteRangeLock = $0002,
+  ASSpecialOpenFork = $0003,
+  ASGetPrivileges = $0004,
+  ASSetPrivileges = $0005,
+  ASUserInfo = $0006,
+  ASCopyFile = $0007,
+  ASGetUserPath = $0008,
+  ASOpenDesktop = $0009,
+  ASCloseDesktop = $000a,
+  ASGetComment = $000b,
+  ASSetComment = $000c,
+  ASGetServerName = $000d,
+}
+
+ASMask enum<uint16> {
+  lockRange = $8000,
+  relativeToEOF = $4000,
+  seeFolders = $0000,
+  seeFiles = $0002,
+  makeChanges = $0004,
+  folderOwner = $0080,
+}
+
+FileInfoMask enum<uint16> {
+  onDesktop = $0001,
+  bfOwnAppl = $0002,
+  bfNever = $0010,
+  bfAlways = $0020,
+  shareApplication = $0040,
+  fileIsInited = $0100,
+  fileHasChanged = $0200,
+  fileIsBusy = $0400,
+  fileNoCopy = $0800,
+  fileIsSystem = $1000,
+  fileHasBundle = $2000,
+  fileIsInvisible = $4000,
+  fileIsLocked = $8000,
+}
+
+WindowInfoMask enum<uint16> {
+  inTrashWindow = $fffd,
+  inDesktopWindow = $fffe,
+  inDiskWindow = $0000,
+}
+
+AccessModeMask enum<uint16> {
+  requestReadAccess = $0000,
+  requestWriteAccess = $0002,
+  denyReadAccess = $0010,
+  denyWriteAccess = $0020,
+}
+
+ForkNumMask enum<uint16> {
+  dataForkNum = $0000,
+  resourceForkNum = $0001,
+}
+
+CommandBlock struct {
+  pCount: int16;
+  fstNum: int16;
+  commandNum: ASCommand;
+}
+
+BufferControlRecPtr = ^BufferControlRec;
+BufferControlRec struct {
+  pBlock: CommandBlock;
+  refNum: int16;
+  flags: ASMask;
+}
+
+SpecialOpenForkRecPtr = ^SpecialOpenForkRec;
+SpecialOpenForkRec struct {
+  pBlock: CommandBlock;
+  pathname: GSString255Ptr;
+  accessMode: AccessModeMask;
+  forkNum: ForkNumMask;
+}
+
+ByteRangeLockRecPtr = ^ByteRangeLockRec;
+ByteRangeLockRec struct {
+  pBlock: CommandBlock;
+  referenceNum: int16;
+  lockFlag: int16;
+  fileOffset: int32;
+  rangeLength: int32;
+  rangeStart: int32;
+}
+
+GetAccessRightsRecPtr = ^GetAccessRightsRec;
+GetAccessRightsRec struct {
+  reserved: uint8;
+  world: uint8;
+  group: uint8;
+  owner: uint8;
+}
+
+GetPrivilegesRecPtr = ^GetPrivilegesRec;
+GetPrivilegesRec struct {
+  pBlock: CommandBlock;
+  pathname: GSString255Ptr;
+  accessRights: GetAccessRightsRec;
+  ownerName: ResultBuf255Ptr;
+  groupName: ResultBuf255Ptr;
+}
+
+SetAccessRightsRecPtr = ^SetAccessRightsRec;
+SetAccessRightsRec struct {
+  userSummary: uint8;
+  world: uint8;
+  group: uint8;
+  owner: uint8;
+}
+
+SetPrivilegesRecPtr = ^SetPrivilegesRec;
+SetPrivilegesRec struct {
+  pBlock: CommandBlock;
+  pathname: GSString255Ptr;
+  accessRights: SetAccessRightsRec;
+  ownerName: ResultBuf255Ptr;
+  groupName: ResultBuf255Ptr;
+}
+
+UserInfoRecPtr = ^UserInfoRec;
+UserInfoRec struct {
+  pBlock: CommandBlock;
+  deviceNum: int16;
+  userName: ResultBuf255Ptr;
+  primaryGroupName: ResultBuf255Ptr;
+}
+
+CopyFileRecPtr = ^CopyFileRec;
+CopyFileRec struct {
+  pBlock: CommandBlock;
+  sourcePathname: GSString255Ptr;
+  destPathname: GSString255Ptr;
+}
+
+GetUserPathRecPtr = ^GetUserPathRec;
+GetUserPathRec struct {
+  pBlock: CommandBlock;
+  prefix: ResultBuf255Ptr;
+}
+
+DesktopRecPtr = ^DesktopRec;
+DesktopRec struct {
+  pBlock: CommandBlock;
+  desktopRefNum: int16;
+  pathname: GSString255Ptr;
+}
+
+GetCommentRecPtr = ^GetCommentRec;
+GetCommentRec struct {
+  pBlock: CommandBlock;
+  desktopRefNum: int16;
+  pathname: GSString255Ptr;
+  comment: ResultBuf255Ptr;
+}
+
+SetCommentRecPtr = ^SetCommentRec;
+SetCommentRec struct {
+  pBlock: CommandBlock;
+  desktopRefNum: int16;
+  pathname: GSString255Ptr;
+  comment: GSString255Ptr;
+}
+
+GetServerNameRecPtr = ^GetServerNameRec;
+GetServerNameRec struct {
+  pBlock: CommandBlock;
+  pathname: GSString255Ptr;
+  serverName: ResultBuf255Ptr;
+  zoneName: ResultBuf255Ptr;
+}
