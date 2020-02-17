@@ -2,6 +2,17 @@
 #include "omf.h"
 #include <set>
 
+enum SegOp {
+  DONE = 0x00,
+  RELOC = 0xe2,
+  INTERSEG = 0xe3,
+  DS = 0xf1,
+  LCONST = 0xf2,
+  cRELOC = 0xf5,
+  cINTERSEG = 0xf6,
+  SUPER = 0xf7,
+};
+
 OMF::OMF(const Map &map) : map(map) {
 }
 
@@ -39,9 +50,9 @@ bool OMF::isOMF() {
     handle->skip(11);
     uint8_t version = handle->r8();
     if (version == 1) {
-      ofs += version * 512;
+      ofs += bytecnt * 512;
     } else if (version == 2) {
-      ofs += version;
+      ofs += bytecnt;
     } else {
       return false;
     }
@@ -89,19 +100,20 @@ bool OMF::loadSegments() {
     ofs += seg.bytecnt;
     segments.push_back(seg);
   }
+  return true;
 }
 
 bool OMF::mapSegments() {
   // for ease of disassembly, first attempt to map each segment to a bank.
-  auto canDirectmap = true;
+  auto canDirectMap = true;
   for (auto &seg : segments) {
     if (seg.org) {  // segment wants to be somewhere specific, no direct map
       canDirectMap = false;
     } else if (seg.length > 0xffff) {  // segment too long for a single bank
-      canDirectmap = false;
+      canDirectMap = false;
     }
   }
-  if (canDirectmap) {
+  if (canDirectMap) {
     for (auto &seg : segments) {
       seg.mapped = seg.segnum << 16;
     }
@@ -109,8 +121,8 @@ bool OMF::mapSegments() {
   }
   // use a memory map that denotes runs of available ram
   std::set<uint32_t> memory;
-  memory.push_back(0x10000);  // min
-  memory.push_back(0xf80000);  // max
+  memory.insert(0x10000);  // min
+  memory.insert(0xf80000);  // max
   // first map any segments that know where they belong
   for (auto &seg : segments) {
     if (seg.org) {
@@ -121,13 +133,8 @@ bool OMF::mapSegments() {
       }
       bool collision = false;
       // verify we aren't overlapping anything
-      for (auto node = 0; node < memory.length(); node += 2) {
-        if (seg.mapped < memory[node] &&
-            seg.mapped + seg.length > memory[node]) {
-          collision = true;
-        }
-        if (seg.mapped < memory[node + 1] &&
-            seg.mapped + seg.length > memory[node + 1]) {
+      for (auto it = memory.begin(); it != memory.end(); it++) {
+        if (seg.mapped < *it && seg.mapped + seg.length > *it) {
           collision = true;
         }
       }
@@ -136,34 +143,31 @@ bool OMF::mapSegments() {
                 seg.segnum, seg.name.c_str());
         return false;
       }
-      memory.push_back(seg.mapped);
-      memory.push_back(seg.mapped + seg.length);
-      if (seg.mapped < memory[0]) {  // below the minimum
-        memory[0] = seg.mapped;  // calc new min
-      }
+      memory.insert(seg.mapped);
+      memory.insert(seg.mapped + seg.length);
     }
   }
 
   // now map everything else by first fit
   for (auto &seg : segments) {
     if (seg.mapped == 0) {
-      for (auto i = 0; i < memory.length(); i += 2) {
-        auto base = memory[i];
+      for (auto it = memory.begin(); it != memory.end(); it++) {
+        auto base = *it;
         if (seg.align && (base & (seg.align - 1))) {
           base += seg.align;
           base &= ~(seg.align - 1);
         }
-        if (seg.banksize && (((baes & (seg.banksize - 1)) + seg.length) &
+        if (seg.banksize && (((base & (seg.banksize - 1)) + seg.length) &
                              ~(seg.banksize - 1))) {  // crosses bank
           base += seg.banksize;
           base &= ~(seg.banksize - 1);
         }
         // does it fit?
-        if (base < memory[i + 1] && memory[i + 1] - base >= seg.length) {
+        it++;
+        if (base < *it && *it - base >= seg.length) {
           seg.mapped = base;
-          memory.push_back(seg.mapped);
-          memory.push_back(seg.mapped + seg.length);
-          std::sort(memory.begin(), memory.end());
+          memory.insert(seg.mapped);
+          memory.insert(seg.mapped + seg.length);
           break;
         }
       }
@@ -231,7 +235,8 @@ bool OMF::relocSegments() {
         case LCONST:
           {
             auto count = handle->r32();
-            data.replace(pc - seg.mapped, count, handle->read(count), count);
+            auto v = handle->readBytes(count);
+            std::copy(v.begin(), v.end(), data.begin() + (pc - seg.mapped));
             pc += count;
           }
           break;
@@ -279,7 +284,7 @@ bool OMF::relocSegments() {
             while (handle->tell() < superLen) {
               auto numOfs = handle->r8();
               if (numOfs & 0x80) {
-                superPage += 256 * (nuMofs & 0x7f);
+                superPage += 256 * (numOfs & 0x7f);
                 continue;
               }
               auto subHandle = TheHandle::createFromArray(data);
@@ -287,7 +292,7 @@ bool OMF::relocSegments() {
                 auto offset = superPage | handle->r8();
                 uint8_t numBytes = 0;
                 subHandle->seek(offset);
-                int32_t subOfset = subHandle->r16();
+                int32_t subOffset = subHandle->r16();
                 if (superType == 0 || superType == 1) {
                   subOffset += seg.mapped;
                   numBytes = superType + 2;
@@ -328,7 +333,8 @@ bool OMF::relocSegments() {
           break;
         default:
           if (opcode < 0xe0) {
-            data.replace(pc - seg.mapped, opcode, handle->read(opcode), opcode);
+            auto v = handle->readBytes(opcode);
+            std::copy(v.begin(), v.end(), data.begin() + (pc - seg.mapped));
             pc += opcode;
           } else {
             fprintf(stderr, "Unknown segment opcode: $%02x\n", opcode);

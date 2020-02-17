@@ -4,6 +4,7 @@
 #include "handle.h"
 #include "map.h"
 #include <vector>
+#include <string>
 
 struct Segment {
   int32_t bytecnt;

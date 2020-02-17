@@ -21,7 +21,7 @@ static struct argp_option options[] = {
 struct arguments {
   const char *filename;
   uint32_t org;
-  int32_t flags;
+  uint32_t flags;
 };
 
 static inline uint32_t parseNum(const char *s) {
