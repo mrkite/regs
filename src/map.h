@@ -6,5 +6,5 @@
 
 class Map {
  public:
-  Map(const char *filename, uint32_t org, int32_t flags);
+  Map(const char *filename, uint32_t org, uint32_t flags);
 };

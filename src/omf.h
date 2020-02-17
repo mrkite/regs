@@ -3,6 +3,7 @@
 
 #include "handle.h"
 #include "map.h"
+#include <vector>
 
 struct Segment {
   int32_t bytecnt;

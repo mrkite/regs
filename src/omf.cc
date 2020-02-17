@@ -1,5 +1,6 @@
 /** @copyright 2020 Sean Kasun */
 #include "omf.h"
+#include <set>
 
 OMF::OMF(const Map &map) : map(map) {
 }
@@ -10,6 +11,8 @@ bool OMF::load(const char *filename) {
   if (!isOMF()) {
     Segment seg;
     seg.bytecnt = handle->length;
+    seg.kind = 0;  // code
+    seg.mapped = map.org;
     segments.push_back(seg);
   } else {
     if (!loadSegments()) {
@@ -105,7 +108,7 @@ bool OMF::mapSegments() {
     return true;
   }
   // use a memory map that denotes runs of available ram
-  std::vector<uint32_t> memory;
+  std::set<uint32_t> memory;
   memory.push_back(0x10000);  // min
   memory.push_back(0xf80000);  // max
   // first map any segments that know where they belong
@@ -138,7 +141,6 @@ bool OMF::mapSegments() {
       if (seg.mapped < memory[0]) {  // below the minimum
         memory[0] = seg.mapped;  // calc new min
       }
-      std::sort(memory.begin(), memory.end());
     }
   }
 

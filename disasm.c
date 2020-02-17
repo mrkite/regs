@@ -83,6 +83,7 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
 
       const char *inst = opcodes[opcode].inst;
       Address mode = opcodes[opcode].address;
+      OpType type = opcodes[opcode].type;
 
       if (smart || dos8) {
         mode = DB;
@@ -101,6 +102,8 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
         width--;
       }
       addr += width;
+      flags &= IsFlags;   // clear changed flags
+      MapFlags oldFlags = flags;
 
       for (int i = 0; i < width; i++) {
         printf(" %02x", start[i]);
@@ -115,13 +118,26 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
 
       const char *comments = NULL;
       uint8_t oprlen = 0;
+      uint8_t oper = 0;
 
       switch (mode) {
         case IMP:
           break;
         case IMM:
-          printf("#$%02x", *ptr++);
+          oper = *ptr++;
+          printf("#$%02x", oper);
           oprlen = 4;
+          if (opcode == 0xe2) {
+            flags |= oper & IsFlags;
+          } else if (opcode == 0xc2) {
+            flags &= ~oper;
+          }
+          if ((flags ^ oldFlags) & IsX8) {
+            flags |= IsX8Changed;
+          }
+          if ((flags ^ oldFlags) & IsM8) {
+            flags |= IsM8Changed;
+          }
           break;
         case IMMM:
           if (flags & (IsEmu | IsM8)) {
@@ -154,8 +170,13 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
           break;
         case ABS:
           val = r16(ptr); ptr += 2;
-          printf("$%04x", val);
-          oprlen = 5;
+          if (type == JUMP || type == CALL) {
+            val |= addr & 0xff0000;  // K
+          } else {
+            val |= flags & 0xff0000;  // B
+          }
+          printf("$%02x/%04x", val >> 16, val & 0xffff);
+          oprlen = 8;
           comments = addressLookup(val, map);
           break;
         case ABL:
@@ -166,14 +187,24 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
           break;
         case ABX:
           val = r16(ptr); ptr += 2;
-          printf("$%04x, x", val);
-          oprlen = 8;
+          if (type == JUMP || type == CALL) {
+            val |= addr & 0xff0000;  // K
+          } else {
+            val |= flags & 0xff0000;  // B
+          }
+          printf("$%02x/%04x, x", val >> 16, val & 0xffff);
+          oprlen = 11;
           comments = addressLookup(val, map);
           break;
         case ABY:
           val = r16(ptr); ptr += 2;
-          printf("$%04x, y", val);
-          oprlen = 8;
+          if (type == JUMP || type == CALL) {
+            val |= addr & 0xff0000;  // K
+          } else {
+            val |= flags & 0xff0000;  // B
+          }
+          printf("$%02x/%04x, y", val >> 16, val & 0xffff);
+          oprlen = 11;
           comments = addressLookup(val, map);
           break;
         case ABLX:
@@ -184,8 +215,13 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
           break;
         case AIX:
           val = r16(ptr); ptr += 2;
-          printf("($%04x, x)", val);
-          oprlen = 10;
+          if (type == JUMP || type == CALL) {
+            val |= addr & 0xff0000;  // K
+          } else {
+            val |= flags & 0xff0000;  // B
+          }
+          printf("($%02x/%04x, x)", val >> 16, val & 0xffff);
+          oprlen = 13;
           comments = addressLookup(val, map);
           break;
         case ZP:
@@ -206,8 +242,13 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
           break;
         case IND:
           val = r16(ptr); ptr += 2;
-          printf("($%04x)", val);
-          oprlen = 7;
+          if (type == JUMP || type == CALL) {
+            val |= addr & 0xff0000;  // K
+          } else {
+            val |= flags & 0xff0000;  // B
+          }
+          printf("($%02x/%04x)", val >> 16, val & 0xffff);
+          oprlen = 10;
           comments = addressLookup(val, map);
           break;
         case INZ:
@@ -268,6 +309,7 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
           break;
       }
 
+
       if (smart) {
         comments = smartportLookup(opcode);
         smart = false;
@@ -279,6 +321,58 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
       if (dos16) {
         comments = prodos16Lookup(val);
         dos16 = false;
+      }
+
+      // track plb
+      if (opcode == 0xab) {  // plb, was it previously a9 xx 48?
+        bool bset = false;
+        ptr -= 4;
+        uint8_t lda = *ptr++;
+        uint8_t b = *ptr++;
+        uint8_t pha = *ptr++;
+        ptr++;
+        if (lda == 0xa9 && pha == 0x48) {
+          flags &= 0xffff;
+          flags |= b << 16;  // set B
+          bset = true;
+        }
+        if (!bset) {
+          ptr -= 2;
+          uint8_t phk = *ptr++;
+          ptr++;
+          if (phk == 0x4b) {
+            flags &= 0xffff;
+            flags |= addr & 0xff0000;  // B = K
+            bset = true;
+          }
+        }
+        if (!bset) {
+          ptr -= 7;
+          uint8_t lda = *ptr++;
+          uint8_t b = r16(ptr); ptr += 2;
+          ptr += 2;  // sep #20
+          uint8_t pha = *ptr++;
+          ptr++;
+          if (lda == 0xa9 && pha == 0x48) {
+            flags &= 0xffff;
+            flags |= b << 16;  // set B
+            bset = true;
+          }
+        }
+      }
+
+      if (opcode == 0x18) {
+        if (*ptr == 0xfb) {  // clc xce = 16 bit mode
+          flags &= 0xffffff ^ IsEmu;
+        }
+      }
+      if (opcode == 0x38) {
+        if (*ptr == 0xfb) {  // sec xce = 8 bit mode
+          flags |= IsEmu;
+        }
+      }
+      if ((flags ^ oldFlags) & IsEmu) {
+        flags |= IsEmuChanged;
       }
 
       if (opcode == 0xa2) {  // ldx
@@ -302,41 +396,40 @@ void disassemble(uint8_t *data, size_t len, Map *map) {
         }
       }
 
+      if (flags & (IsEmuChanged | IsM8Changed | IsX8Changed)) {
+        for (int i = oprlen; i < 16; i++) {
+          printf(" ");
+        }
+        printf("; ");
+      }
+
+      if (flags & IsEmuChanged) {
+        if (flags & IsEmu) {
+          printf(" 8-bit mode");
+        } else {
+          printf(" 16-bit mode");
+        }
+      }
+      if (flags & IsM8Changed) {
+        if (flags & IsM8) {
+          printf(" a.b");
+        } else {
+          printf(" a.w");
+        }
+      }
+      if (flags & IsX8Changed) {
+        if (flags & IsX8) {
+          printf(" x.b");
+        } else {
+          printf(" x.w");
+        }
+      }
+
       if (comments != NULL) {
         for (int i = oprlen; i < 16; i++) {
           printf(" ");
         }
         printf("; %s", comments);
-      }
-
-      uint16_t nextFlags = map->mem[addr - map->minMemory];
-      if (((flags ^ nextFlags) & (IsEmu | IsM8 | IsX8)) && comments == NULL &&
-          (nextFlags & IsOpcode)) {
-        for (int i = oprlen; i < 16; i++) {
-          printf(" ");
-        }
-        printf(";");
-        if ((flags ^ nextFlags) & IsEmu) {
-          if (nextFlags & IsEmu) {
-            printf(" 8-bit mode");
-          } else {
-            printf(" 16-bit mode");
-          }
-        }
-        if ((flags ^ nextFlags) & IsM8) {
-          if (nextFlags & IsM8) {
-            printf(" a.b");
-          } else {
-            printf(" a.w");
-          }
-        }
-        if ((flags ^ nextFlags) & IsX8) {
-          if (nextFlags & IsX8) {
-            printf(" x.b");
-          } else {
-            printf(" x.w");
-          }
-        }
       }
       printf("\n");
     } else {
