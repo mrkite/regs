@@ -32,6 +32,7 @@ struct Entry {
 class Map {
  public:
   Map(const char *filename, uint32_t org, uint32_t flags);
+  void addEntry(uint32_t entry);
   uint32_t org;
 
  private:

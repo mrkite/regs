@@ -115,4 +115,5 @@ int main(int argc, char **argv) {
     std::cerr << "Failed to load " << arguments.filename << std::endl;
     return -1;
   }
+  auto segments = omf.get();
 }

@@ -54,6 +54,13 @@ Map::Map(const char *filename, uint32_t org, uint32_t flags) {
   }
 }
 
+void Map::addEntry(uint32_t entry) {
+  Entry e;
+  e.org = entry;
+  e.flags = 0;
+  entryPoints.push_back(e);
+}
+
 File::File(const std::string &filename) {
   data = p = nullptr;
   std::ifstream f(filename, std::ios::in | std::ios::binary | std::ios::ate);

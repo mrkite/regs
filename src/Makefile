@@ -1,11 +1,12 @@
 OBJS = main.o omf.o handle.o map.o
 CXX = clang++
-CXXFLAGS = -Wall -std=c++11
+CXXFLAGS = -g -Wall -std=c++11
+LDFLAGS = -largp
 
 all: regs
 
 regs: $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LIBS) -o $@ -largp $^
+	$(CXX) $(CXXFLAGS) $(LIBS) -o $@ $^
 
 %.o: %.cc
 	$(CXX) -c $(CXXFLAGS) -o $@ $<

@@ -1,6 +1,6 @@
 /** @copyright 2020 Sean Kasun */
 #include "omf.h"
-#include <set>
+#include <algorithm>
 
 enum SegOp {
   DONE = 0x00,
@@ -16,6 +16,10 @@ enum SegOp {
 OMF::OMF(const Map &map) : map(map) {
 }
 
+static bool compareSegments(const Segment &a, const Segment &b) {
+  return a.mapped < b.mapped;
+}
+
 bool OMF::load(const char *filename) {
   handle = TheHandle::createFromFile(filename);
 
@@ -24,6 +28,7 @@ bool OMF::load(const char *filename) {
     seg.bytecnt = handle->length;
     seg.kind = 0;  // code
     seg.mapped = map.org;
+    seg.data = handle;
     segments.push_back(seg);
   } else {
     if (!loadSegments()) {
@@ -35,7 +40,15 @@ bool OMF::load(const char *filename) {
     if (!relocSegments()) {
       return false;
     }
+    // add the first entry point
+    for (auto &s : segments) {
+      if ((s.kind & 0x1f) == 0) {  // code
+        map.addEntry(s.mapped + s.entry);
+        break;
+      }
+    }
   }
+  std::sort(segments.begin(), segments.end(), compareSegments);
   return true;
 }
 
@@ -89,7 +102,7 @@ bool OMF::loadSegments() {
         seg.lablen = 0xa;
       }
     }
-    handle->seek(ofs + dispname);
+    handle->seek(ofs + dispname + seg.lablen);  // skip past load name
     seg.name = handle->read(seg.lablen);
     seg.offset = ofs + dispdata;
     if (version == 1) {  // convert to v2
@@ -120,9 +133,9 @@ bool OMF::mapSegments() {
     return true;
   }
   // use a memory map that denotes runs of available ram
-  std::set<uint32_t> memory;
-  memory.insert(0x10000);  // min
-  memory.insert(0xf80000);  // max
+  std::vector<uint32_t> memory;
+  memory.push_back(0x10000);  // min
+  memory.push_back(0x7f0000);  // max
   // first map any segments that know where they belong
   for (auto &seg : segments) {
     if (seg.org) {
@@ -143,8 +156,12 @@ bool OMF::mapSegments() {
                 seg.segnum, seg.name.c_str());
         return false;
       }
-      memory.insert(seg.mapped);
-      memory.insert(seg.mapped + seg.length);
+      memory.push_back(seg.mapped);
+      memory.push_back(seg.mapped + seg.length);
+      if (seg.mapped < memory[0]) {  // below the minimum
+        memory[0] = seg.mapped;  // new min
+      }
+      std::sort(memory.begin(), memory.end());
     }
   }
 
@@ -166,8 +183,9 @@ bool OMF::mapSegments() {
         it++;
         if (base < *it && *it - base >= seg.length) {
           seg.mapped = base;
-          memory.insert(seg.mapped);
-          memory.insert(seg.mapped + seg.length);
+          memory.push_back(seg.mapped);
+          memory.push_back(seg.mapped + seg.length);
+          std::sort(memory.begin(), memory.end());
           break;
         }
       }
@@ -353,4 +371,8 @@ void OMF::patch(std::vector<uint8_t> &array, uint32_t offset, uint8_t numBytes,
   for (int i = 0; i < numBytes; i++, value >>= 8) {
     array[offset + i] = value & 0xff;
   }
+}
+
+std::vector<Segment> OMF::get() const {
+  return segments;
 }
