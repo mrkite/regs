@@ -26,8 +26,8 @@ struct Segment {
 
 class OMF {
  public:
-  explicit OMF(const Map &map);
-  bool load(const char *filename);
+  explicit OMF();
+  bool load(const char *filename, uint32_t org);
   std::vector<Segment> get() const;
 
  private:
@@ -39,6 +39,5 @@ class OMF {
              uint32_t value);
 
   Handle handle;
-  const Map &map;
   std::vector<Segment> segments;
 };

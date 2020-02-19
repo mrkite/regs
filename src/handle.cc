@@ -68,6 +68,15 @@ uint8_t TheHandle::r8() {
   return *pos++;
 }
 
+std::string TheHandle::rs() {
+  std::string r;
+  uint8_t len = *pos++;
+  for (auto i = 0; i < len; i++) {
+    r += static_cast<char>(*pos++);
+  }
+  return r;
+}
+
 std::string TheHandle::read(int32_t len) {
   std::string r;
   for (auto i = 0; i < len; i++) {

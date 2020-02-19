@@ -19,6 +19,7 @@ class TheHandle {
   uint32_t r24();
   uint16_t r16();
   uint8_t r8();
+  std::string rs();
   void seek(int64_t pos);
   void skip(int64_t length);
   std::string read(int32_t length);

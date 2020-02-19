@@ -13,21 +13,22 @@ enum SegOp {
   SUPER = 0xf7,
 };
 
-OMF::OMF(const Map &map) : map(map) {
+OMF::OMF() {
 }
 
 static bool compareSegments(const Segment &a, const Segment &b) {
   return a.mapped < b.mapped;
 }
 
-bool OMF::load(const char *filename) {
+bool OMF::load(const char *filename, uint32_t org) {
   handle = TheHandle::createFromFile(filename);
 
   if (!isOMF()) {
     Segment seg;
     seg.bytecnt = handle->length;
     seg.kind = 0;  // code
-    seg.mapped = map.org;
+    seg.entry = 0;
+    seg.mapped = org;
     seg.data = handle;
     segments.push_back(seg);
   } else {
@@ -39,13 +40,6 @@ bool OMF::load(const char *filename) {
     }
     if (!relocSegments()) {
       return false;
-    }
-    // add the first entry point
-    for (auto &s : segments) {
-      if ((s.kind & 0x1f) == 0) {  // code
-        map.addEntry(s.mapped + s.entry);
-        break;
-      }
     }
   }
   std::sort(segments.begin(), segments.end(), compareSegments);

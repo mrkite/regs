@@ -3,16 +3,11 @@
 #include <string>
 #include <fstream>
 
-Map::Map(const char *filename, uint32_t org, uint32_t flags) {
+Map::Map(const char *filename) {
   std::string mapname = filename;
   mapname += ".regs";
   File file(mapname);
   if (!file.is_open()) {
-    Entry entry;
-    entry.org = org;
-    this->org = org;
-    entry.flags = flags;
-    entryPoints.push_back(entry);
     return;
   }
 
@@ -54,10 +49,18 @@ Map::Map(const char *filename, uint32_t org, uint32_t flags) {
   }
 }
 
-void Map::addEntry(uint32_t entry) {
+bool Map::needsEntry() {
+  return entryPoints.size() == 0;
+}
+
+std::vector<Entry> Map::getEntries() {
+  return entryPoints;
+}
+
+void Map::addEntry(uint32_t entry, uint32_t flags) {
   Entry e;
   e.org = entry;
-  e.flags = 0;
+  e.flags = flags;
   entryPoints.push_back(e);
 }
 

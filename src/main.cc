@@ -4,7 +4,8 @@
 #include <iostream>
 #include "disasm.h"
 #include "omf.h"
-
+#include "api.h"
+#include "../iigs.c"
 
 const char *argp_program_version = "regs 0.2";
 const char *argp_program_bug_address = "sean@seancode.com";
@@ -109,11 +110,54 @@ int main(int argc, char **argv) {
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
   // load map if it exists
-  Map map(arguments.filename, arguments.org, arguments.flags);
-  OMF omf(map);
-  if (!omf.load(arguments.filename)) {
+  Map map(arguments.filename);
+  OMF omf;
+  if (!omf.load(arguments.filename, arguments.org)) {
     std::cerr << "Failed to load " << arguments.filename << std::endl;
     return -1;
   }
   auto segments = omf.get();
+  if (map.needsEntry()) {
+    for (auto &s : segments) {
+      if ((s.kind & 0x1f) == 0) {  // code
+        map.addEntry(s.mapped + s.entry, arguments.flags);
+        break;
+      }
+    }
+  }
+
+  API api(iigs_dat, iigs_dat_len);
+
+  auto prints = std::make_shared<Fingerprints>();
+  for (auto s : api.symbols) {
+    if (s->kind == symbol::isFunction) {
+      auto f = std::static_pointer_cast<symbol::Function>(s);
+      if (f->signature.size() >= 2) {
+        if (f->signature[0] >= 0) {  // tool
+          // ldx tool, jsl e1/0000
+          std::vector<uint8_t> sig = { 0xa2, f->signature[0], f->signature[1],
+            0x22, 0x00, 0x00, 0xe1 };
+          prints->add(sig, f->name);
+        } else if (f->signature[0] == -1) {  // p16/gsos
+          // jsl e1/00a8
+          std::vector<uint8_t> sig = { 0x22, 0xa8, 0x00, 0xe1,
+            f->signature[2] & 0xff, f->signature[2] >> 8 };
+          prints->add(sig, f->name, f->signature[1] & 0xff);
+        } else if (f->signature[0] == -2) {  // p8
+          // jsr bf00
+          std::vector<uint8_t> sig = { 0x20, 0x00, 0xbf, f->signature[2] };
+          prints->add(sig, f->name, f->signature[1] & 0xff);
+        } else if (f->signature[0] == -3) {  // smartport
+          // jsr c50d
+          std::vector<uint8_t> sig5 = { 0x20, 0x0d, 0xc5, f->signature[2] };
+          std::vector<uint8_t> sig7 = { 0x20, 0x0d, 0xc7, f->signature[2] };
+          prints->add(sig5, f->name, f->signature[1]);
+          prints->add(sig7, f->name, f->signature[1]);
+        }
+      }
+    }
+  }
+
+  Disassembler d(prints);
+  d.disassemble(segments, map.getEntries());
 }
