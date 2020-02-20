@@ -34,6 +34,7 @@ class Map {
   Map(const char *filename);
   bool needsEntry();
   std::vector<Entry> getEntries();
+  std::map<uint32_t, std::string> getSymbols();
   void addEntry(uint32_t entry, uint32_t flags);
   uint32_t org;
 

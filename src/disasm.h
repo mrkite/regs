@@ -26,23 +26,44 @@ enum InsType : uint16_t {
   Invalid = 0xff,
 };
 
+enum HexType {
+  Value = 0x01,
+  Address = 0x02,
+};
+
+enum class Opr {
+  None = 0, Imm, Abs, AbsB, AbsD, AbsX, AbsXB, AbsXD, AbsY, AbsYB, AbsYD, AbsS,
+  Ind, IndB, IndD, IndX, IndXB, IndY, IndL, IndLY, IndS, Bank,
+};
+
 struct Inst {
   std::string name;
   InsType type;
   uint16_t length;
+  Opr operType;
+  uint32_t oper;
+  uint32_t flags;
 };
 
 class Disassembler {
  public:
-  Disassembler(std::shared_ptr<Fingerprints> prints);
-  bool disassemble(std::vector<Segment> segments, std::vector<Entry> entries);
+  Disassembler(std::shared_ptr<Fingerprints> prints,
+               std::map<uint32_t, std::string> symbols);
+  bool disassemble(std::vector<struct Segment> segments,
+                   std::vector<struct Entry> entries);
 
  private:
-  bool trace(const Entry &start);
+  bool trace(const struct Entry &start);
+  bool basicBlocks();
+  std::shared_ptr<Inst> decodeInst(Handle f, Entry *entry);
   Handle getAddress(uint32_t address);
+  bool valid(uint32_t address);
+  std::string hex(uint32_t value, HexType type);
 
+  std::map<uint32_t, std::string> symbols;
   std::map<uint32_t, uint32_t> labels;
   std::map<uint32_t, uint32_t> branches;
-  std::vector<Segment> segments;
+  std::vector<struct Segment> segments;
   std::shared_ptr<Fingerprints> fingerprints;
+  std::map<uint32_t, std::shared_ptr<Inst>> map;
 };
