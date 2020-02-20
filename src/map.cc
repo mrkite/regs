@@ -57,6 +57,10 @@ std::vector<Entry> Map::getEntries() {
   return entryPoints;
 }
 
+std::map<uint32_t, std::string> Map::getSymbols() {
+  return symbols;
+}
+
 void Map::addEntry(uint32_t entry, uint32_t flags) {
   Entry e;
   e.org = entry;

@@ -1,4 +1,4 @@
-OBJS = main.o omf.o handle.o map.o disasm.o api.o
+OBJS = main.o omf.o handle.o map.o disasm.o api.o scanner.o
 CXX = clang++
 CXXFLAGS = -Wall -std=c++11
 

@@ -63,7 +63,7 @@ API::API(unsigned char *dat, unsigned int len) {
         break;
     }
     s->name = name;
-    symbols.insert(std::pair<std::string, symbol::Symbol>(name, s));
+    symbols[name] = s;
   }
 
   for (uint32_t i = 0; i < numSymbols; i++) {

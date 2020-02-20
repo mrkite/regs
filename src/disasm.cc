@@ -2,9 +2,12 @@
 
 #include "disasm.h"
 #include "65816.h"
+#include "scanner.h"
 #include <fstream>
 #include <iostream>
 #include <stack>
+
+namespace ph = std::placeholders;
 
 static std::map<Addressing, int> sizes;
 
@@ -18,16 +21,17 @@ Disassembler::Disassembler(std::shared_ptr<Fingerprints> prints,
 
 bool Disassembler::disassemble(std::vector<Segment> segments,
                           std::vector<Entry> entries) {
-  this->segments = segments;
+  Scanner scanner(segments, symbols, fingerprints);
   // trace all entry points
   for (auto &entry : entries) {
-    if (!trace(entry)) {
+    if (!scanner.trace(entry, std::bind(&Disassembler::decodeInst, this,
+                                        ph::_1, ph::_2))) {
       std::cerr << "Failed to trace execution flow" << std::endl;
       return false;
     }
   }
   // build the basic blocks
-  if (!basicBlocks()) {
+  if (!scanner.basicBlocks()) {
     std::cerr << "Failed to calculate basic blocks" << std::endl;
     return false;
   }
@@ -41,170 +45,16 @@ bool Disassembler::disassemble(std::vector<Segment> segments,
     }
     f << "Section $" << hex(segment.segnum, Value) << " "
       << segment.name << std::endl;
-    if (!decode(segment.mapped, segment.mapped + segment.length)) {
+    if (!scanner.disassemble(f, segment.mapped,
+                             segment.mapped + segment.length,
+                             std::bind(&Disassembler::printInst, this,
+                                       ph::_1))) {
       std::cerr << "Disassembly failed" << std::endl;
       return false;
     }
     f.close();
   }
   return true;
-}
-
-bool Disassembler::trace(const Entry &start) {
-  std::stack<Entry> workList;
-
-  workList.push(start);
-  labels.insert(std::pair<uint32_t, uint32_t>(start.org, start.org));
-  while (!workList.empty()) {
-    auto state = workList.top();
-    workList.pop();
-    std::shared_ptr<Inst> inst = nullptr;
-    do {
-      auto ptr = getAddress(state.org);
-      if (ptr == nullptr) {
-        return false;
-      }
-      auto addr = state.org;
-      inst = nullptr;
-      int16_t numDB = 0;
-      if (fingerprints) {  // scan for fingerprints
-        auto node = fingerprints->root;
-        int8_t len = 0;
-        auto fstart = ptr->tell();
-        do {
-          node = node->map[ptr->r8()];
-          len++;
-          if (node != nullptr && !node->name.empty()) {
-            if (inst == nullptr) {
-              inst = std::make_shared<Inst>();
-              inst->type = Special;
-            }
-            inst->name = node->name;
-            inst->length = len;
-            numDB = node->numDB;
-          }
-        } while (node != nullptr && !ptr->eof());
-        if (inst) {
-          fstart += inst->length;
-          state.org += inst->length;
-        }
-        ptr->seek(fstart);
-      }
-      if (numDB > 0 && inst) {
-        inst->name += " {";
-        for (int i = 0; i < numDB; i++) {
-          if (i) {
-            inst->name += ", ";
-          }
-          inst->name += hex(ptr->r8(), Value);
-        }
-        inst->name += "}";
-        inst->length += numDB;
-        state.org += numDB;
-      }
-      if (!inst) {
-        inst = decodeInst(ptr, &state);
-      }
-      map[addr] = inst;
-      if (inst->type == Jump || inst->type == Branch || inst->type == Call) {
-        if (inst->operType == Opr::Imm || inst->operType == Opr::Abs) {
-          if (valid(inst->oper) && labels.find(inst->oper) == labels.end()) {
-            workList.push({state.flags, inst->oper});
-            labels.insert(std::pair<uint32_t, uint32_t>(inst->oper,
-                                                        inst->oper));
-          }
-        }
-      }
-      if (inst->type == Jump || inst->type == Branch ||
-          inst->type == Return) {
-        branches.insert(std::pair<uint32_t, uint32_t>(state.org, addr));
-      }
-      if (inst->type == Invalid) {
-        branches.insert(std::pair<uint32_t, uint32_t>(addr, addr));
-      }
-    } while (inst->type != Return && inst->type != Jump &&
-             inst->type != Invalid);
-  }
-  return true;
-}
-
-bool Disassembler::basicBlocks() {
-  // always starts at a label
-  auto address = labels.lower_bound(0)->first;
-  auto block = getBlock(address);
-  auto done = false;
-  while (!done) {
-    auto label = labels.upper_bound(address);
-    auto branch = branches.upper_bound(address);
-    if (label != labels.end() && (branch == branches.end() ||
-                                  label->second < branch->second)) {
-      // label was earliest
-      address = label->second;
-      block->length = address - block->address;
-      auto next = getBlock(address);
-      next->preds.append(block);
-      block->succs.append(next);
-      block = next;
-    } else if (branch != branches.end() && (label == labels.end() ||
-                                            branch->second <= label->second)) {
-      // branch was earliest (or equal)
-      auto b = map[branch->second];
-      block->branchLen = b->length;
-      block->length = branch->first - block->address;
-      if (b->type != Return && b->type != Invalid) {
-        // branch has a destination
-        if (b->operType == Opr::Imm || b->operType == Opr::Abs) {
-          if (valid(b->oper)) {
-            auto next = getBlock(b->oper);
-            next->preds.append(block);
-            block->succs.append(next);
-          }
-        }
-      }
-      if (b->type == Jump || b->type == Return || b->type == Invalid) {
-        // branch doesn't continue
-        auto next = labels.upper_bound(branch->second);
-        if (next == labels.end()) {
-          done = true;
-        } else {
-          address = next->second;
-          block = getBlock(address);
-        }
-      } else {
-        // branch continues
-        auto next = getBlock(branch->first);
-        next->preds.append(block);
-        block->succs.append(next);
-        block = next;
-        address = block->address;
-      }
-    } else {
-      // out of labels and branches, we screwed up
-      block->length = map.lastKey() + map.last()->length - block->address;
-      done = true;
-    }
-  }
-  std::sort(blocks.begin(), blocks.end(), compareBlocks);
-  return true;
-}
-
-Handle Disassembler::getAddress(uint32_t address) {
-  for (auto &s : segments) {
-    if (address >= s.mapped && address < s.mapped + s.length) {
-      s.data->seek(address - s.mapped);
-      return s.data;
-    }
-  }
-  return nullptr;
-}
-
-bool Disassembler::valid(uint32_t address) {
-  for (auto &s : segments) {
-    if (address >= s.mapped && address < s.mapped + s.length) {
-      return true;
-    }
-  }
-  return false;
 }
 
 std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
@@ -398,6 +248,111 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
   }
   inst->flags = entry->flags;
   return inst;
+}
+
+std::string Disassembler::printInst(std::shared_ptr<Inst> inst) {
+  std::string args;
+  std::string comment;
+
+  if (inst->type == Special) {
+    return inst->name;
+  }
+  switch (inst->operType) {
+    case Opr::None:
+      break;
+    case Opr::Imm:
+      args = "#" + hex(inst->oper, Value);
+      break;
+    case Opr::Abs:
+      args = hex(inst->oper, Address);
+      break;
+    case Opr::AbsB:
+      args = "B:" + hex(inst->oper, Value);
+      break;
+    case Opr::AbsD:
+      args = "D:" + hex(inst->oper, Value);
+      break;
+    case Opr::AbsX:
+      args = hex(inst->oper, Address) + ", x";
+      break;
+    case Opr::AbsXB:
+      args = "B:" + hex(inst->oper, Value) + ", x";
+      break;
+    case Opr::AbsXD:
+      args = "D:" + hex(inst->oper, Value) + ", x";
+      break;
+    case Opr::AbsY:
+      args = hex(inst->oper, Address) + ", y";
+      break;
+    case Opr::AbsYB:
+      args = "B:" + hex(inst->oper, Value) + ", y";
+      break;
+    case Opr::AbsYD:
+      args = "D:" + hex(inst->oper, Value) + ", y";
+      break;
+    case Opr::AbsS:
+      args = hex(inst->oper, Value) + ", s";
+      break;
+    case Opr::Ind:
+      args = "(" + hex(inst->oper, Address) + ")";
+      break;
+    case Opr::IndB:
+      args = "(B:" + hex(inst->oper, Value) + ")";
+      break;
+    case Opr::IndD:
+      args = "(D:" + hex(inst->oper, Value) + ")";
+      break;
+    case Opr::IndX:
+      args = "(" + hex(inst->oper, Address) + ", x)";
+      break;
+    case Opr::IndXB:
+      args = "(B:" + hex(inst->oper, Value) + ", x)";
+      break;
+    case Opr::IndY:
+      args = "(" + hex(inst->oper, Address) + "), y";
+      break;
+    case Opr::IndL:
+      args = "[" + hex(inst->oper, Address) + "]";
+      break;
+    case Opr::IndLY:
+      args = "[" + hex(inst->oper, Address) + "], y";
+      break;
+    case Opr::IndS:
+      args = "(" + hex(inst->oper, Value) + ", s), y";
+      break;
+    case Opr::Bank:
+      args = hex(inst->oper >> 8, Value) + ", " + hex(inst->oper & 0xff, Value);
+      break;
+  }
+  if (inst->flags & IsEmuChanged) {
+    if (inst->flags & IsEmu) {
+      comment = " 8-bit mode";
+    } else {
+      comment = " 16-bit mode";
+    }
+  }
+  if (inst->flags & IsM8Changed) {
+    if (inst->flags & IsM8) {
+      comment += " a.b";
+    } else {
+      comment += " a.w";
+    }
+  }
+  if (inst->flags & IsX8Changed) {
+    if (inst->flags & IsX8) {
+      comment += " x.b";
+    } else {
+      comment += " x.w";
+    }
+  }
+  std::string r = args;
+  if (!comment.empty()) {
+    while (r.length() < 20) {
+      r += " ";
+    }
+    r += "; " + comment;
+  }
+  return r;
 }
 
 std::string Disassembler::hex(uint32_t val, HexType type) {

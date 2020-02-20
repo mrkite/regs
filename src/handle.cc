@@ -58,6 +58,13 @@ uint32_t TheHandle::r32() {
   return r;
 }
 
+uint32_t TheHandle::r24() {
+  uint32_t r = *pos++;
+  r |= *pos << 8;
+  r |= *pos << 16;
+  return r;
+}
+
 uint16_t TheHandle::r16() {
   uint16_t r = *pos++;
   r |= *pos++ << 8;

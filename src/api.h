@@ -59,7 +59,7 @@ struct Struct : public Symbol {
 };
 
 struct Intrinsic : public Symbol {
-  enum uint8_t { U8, U16, U23, S8, S16, S32 } type;
+  enum uint8_t { U8, U16, U32, S8, S16, S32 } type;
 };
 
 struct Enum : public Symbol {

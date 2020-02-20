@@ -53,17 +53,11 @@ class Disassembler {
                    std::vector<struct Entry> entries);
 
  private:
-  bool trace(const struct Entry &start);
-  bool basicBlocks();
+  std::string printInst(std::shared_ptr<Inst> inst);
   std::shared_ptr<Inst> decodeInst(Handle f, Entry *entry);
-  Handle getAddress(uint32_t address);
   bool valid(uint32_t address);
   std::string hex(uint32_t value, HexType type);
 
   std::map<uint32_t, std::string> symbols;
-  std::map<uint32_t, uint32_t> labels;
-  std::map<uint32_t, uint32_t> branches;
-  std::vector<struct Segment> segments;
   std::shared_ptr<Fingerprints> fingerprints;
-  std::map<uint32_t, std::shared_ptr<Inst>> map;
 };
