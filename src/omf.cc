@@ -30,6 +30,7 @@ bool OMF::load(const char *filename, uint32_t org) {
     seg.entry = 0;
     seg.mapped = org;
     seg.data = handle;
+    seg.length = seg.bytecnt;
     segments.push_back(seg);
   } else {
     if (!loadSegments()) {

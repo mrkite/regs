@@ -196,6 +196,6 @@ void API::setFunction(Handle h, std::shared_ptr<symbol::Symbol> s) {
   setRef(h, f->returnType);
   auto numSig = h->r32();
   for (uint32_t i = 0; i < numSig; i++) {
-    f->signature.push_back(h->r32());
+    f->signature.push_back(static_cast<int32_t>(h->r32()));
   }
 }

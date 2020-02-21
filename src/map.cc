@@ -3,8 +3,16 @@
 #include <string>
 #include <fstream>
 
-Map::Map(const char *filename) {
-  std::string mapname = filename;
+struct Field {
+  uint32_t org;
+  std::string flags;
+  bool isEntry;
+  bool isOrg;
+  std::string symbol;
+};
+
+Map::Map(const char *filename, uint32_t org) : org(org) {
+  mapname = filename;
   mapname += ".regs";
   File file(mapname);
   if (!file.is_open()) {
@@ -13,23 +21,18 @@ Map::Map(const char *filename) {
 
   while (!file.eof()) {
     uint32_t ofs = file.hex();
-    if (!ofs) {
-      return;
+    if (file.check('!')) {
+      if (!this->org) {  // commandline overrides
+        this->org = ofs;
+      }
     }
     if (file.check(':')) {
       Entry entry;
       entry.org = ofs;
       entry.flags = 0;
       uint8_t ch;
-      while ((ch = file.oneOf("oemx")) != 0) {
+      while ((ch = file.oneOf("emx")) != 0) {
         switch (ch) {
-          case 'o':
-            if (this->org) {
-              file.error("Duplicate org address");
-              return;
-            }
-            this->org = ofs;
-            break;
           case 'e':
             entry.flags |= IsEmu;
             break;
@@ -49,6 +52,55 @@ Map::Map(const char *filename) {
   }
 }
 
+static bool compareFields(const Field &a, const Field &b) {
+  return a.org < b.org;
+}
+
+void Map::save() {
+  std::map<uint32_t, Field> fields;
+  fields[this->org].isOrg = true;
+  for (auto & entryPoint : entryPoints) {
+    auto org = entryPoint.org;
+    fields[org].isEntry = true;
+    if (entryPoint.flags & IsEmu) {
+      fields[org].flags += 'e';
+    }
+    if (entryPoint.flags & IsM8) {
+      fields[org].flags += 'm';
+    }
+    if (entryPoint.flags & IsX8) {
+      fields[org].flags += 'x';
+    }
+  }
+  for (auto sym : symbols) {
+    fields[sym.first].symbol = sym.second;
+  }
+  std::vector<Field> outFields;
+  for (auto field : fields) {
+    field.second.org = field.first;
+    outFields.push_back(field.second);
+  }
+  std::sort(outFields.begin(), outFields.end(), compareFields);
+  std::ofstream f(mapname, std::ios::out | std::ios::binary | std::ios::trunc);
+  for (auto field : outFields) {
+    f << toAddress(field.org);
+    if (field.isOrg) {
+      f << "!";
+    }
+    if (field.isEntry) {
+      f << ":";
+    }
+    if (!field.flags.empty()) {
+      f << field.flags;
+    }
+    if (!field.symbol.empty()) {
+      f << "<" << field.symbol << ">";
+    }
+    f << std::endl;
+  }
+  f.close();
+}
+
 bool Map::needsEntry() {
   return entryPoints.size() == 0;
 }
@@ -66,6 +118,10 @@ void Map::addEntry(uint32_t entry, uint32_t flags) {
   e.org = entry;
   e.flags = flags;
   entryPoints.push_back(e);
+}
+
+void Map::addSymbol(uint32_t ofs, std::string name) {
+  symbols[ofs] = name;
 }
 
 File::File(const std::string &filename) {
@@ -99,7 +155,7 @@ void File::ws() {
 
 bool File::eof() {
   ws();
-  return p < end;
+  return p >= end;
 }
 
 uint32_t File::hex() {
@@ -130,6 +186,7 @@ uint32_t File::hex() {
 bool File::check(uint8_t ch) {
   ws();
   if (p < end && ch == *p) {
+    p++;
     return true;
   }
   return false;
@@ -154,4 +211,13 @@ std::string File::until(uint8_t ch) {
   }
   p++;  // skip ending character
   return r;
+}
+
+std::string Map::toAddress(uint32_t value) {
+  static const char *digits = "0123456789abcdef";
+  std::string ret="$00/0000";
+  for (size_t i = 0, j = 5 << 2; i < 6; i++, j -= 4) {
+    ret[i < 2 ? i + 1 : i + 2] = digits[(value >> j) & 0xf];
+  }
+  return ret;
 }

@@ -43,7 +43,7 @@ bool Disassembler::disassemble(std::vector<Segment> segments,
       std::cerr << "Failed to open '" << fname << "' for writing" << std::endl;
       return false;
     }
-    f << "Section $" << hex(segment.segnum, Value) << " "
+    f << "Segment " << hex(segment.segnum, 2) << " "
       << segment.name << std::endl;
     if (!scanner.disassemble(f, segment.mapped,
                              segment.mapped + segment.length,
@@ -80,7 +80,7 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
       break;
     case IMM:
       inst->oper = f->r8();
-      inst->operType = Opr::Imm;
+      inst->operType = Opr::Imm8;
       if (opcode == 0xe2) {
         entry->flags |= inst->oper & IsFlags;
       } else if (opcode == 0xc2) {
@@ -96,22 +96,24 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
     case IMMM:
       if (entry->flags & (IsEmu | IsM8)) {
         inst->oper = f->r8();
+        inst->operType = Opr::Imm8;
       } else {
         inst->oper = f->r16();
+        inst->operType = Opr::Imm16;
       }
-      inst->operType = Opr::Imm;
       break;
     case IMMX:
       if (entry->flags & (IsEmu | IsX8)) {
         inst->oper = f->r8();
+        inst->operType = Opr::Imm8;
       } else {
         inst->oper = f->r16();
+        inst->operType = Opr::Imm16;
       }
-      inst->operType = Opr::Imm;
       break;
     case IMMS:
       inst->oper = f->r16();
-      inst->operType = Opr::Imm;
+      inst->operType = Opr::Imm16;
       break;
     case ABS:
       inst->oper = f->r16();
@@ -260,75 +262,83 @@ std::string Disassembler::printInst(std::shared_ptr<Inst> inst) {
   switch (inst->operType) {
     case Opr::None:
       break;
-    case Opr::Imm:
-      args = "#" + hex(inst->oper, Value);
+    case Opr::Imm8:
+      args = "#" + hex(inst->oper, 2);
+      break;
+    case Opr::Imm16:
+      args = "#" + hex(inst->oper, 4);
       break;
     case Opr::Abs:
-      args = hex(inst->oper, Address);
+      args = hex(inst->oper, 6);
       break;
     case Opr::AbsB:
-      args = "B:" + hex(inst->oper, Value);
+      args = "B:" + hex(inst->oper, 4);
+      comment += lookup(inst->oper);
       break;
     case Opr::AbsD:
-      args = "D:" + hex(inst->oper, Value);
+      args = "D:" + hex(inst->oper, 2);
       break;
     case Opr::AbsX:
-      args = hex(inst->oper, Address) + ", x";
+      args = hex(inst->oper, 6) + ", x";
       break;
     case Opr::AbsXB:
-      args = "B:" + hex(inst->oper, Value) + ", x";
+      args = "B:" + hex(inst->oper, 4) + ", x";
+      comment += lookup(inst->oper);
       break;
     case Opr::AbsXD:
-      args = "D:" + hex(inst->oper, Value) + ", x";
+      args = "D:" + hex(inst->oper, 2) + ", x";
       break;
     case Opr::AbsY:
-      args = hex(inst->oper, Address) + ", y";
+      args = hex(inst->oper, 6) + ", y";
       break;
     case Opr::AbsYB:
-      args = "B:" + hex(inst->oper, Value) + ", y";
+      args = "B:" + hex(inst->oper, 4) + ", y";
+      comment += lookup(inst->oper);
       break;
     case Opr::AbsYD:
-      args = "D:" + hex(inst->oper, Value) + ", y";
+      args = "D:" + hex(inst->oper, 2) + ", y";
       break;
     case Opr::AbsS:
-      args = hex(inst->oper, Value) + ", s";
+      args = hex(inst->oper, 2) + ", s";
       break;
     case Opr::Ind:
-      args = "(" + hex(inst->oper, Address) + ")";
+      args = "(" + hex(inst->oper, 6) + ")";
       break;
     case Opr::IndB:
-      args = "(B:" + hex(inst->oper, Value) + ")";
+      args = "(B:" + hex(inst->oper, 4) + ")";
+      comment += lookup(inst->oper);
       break;
     case Opr::IndD:
-      args = "(D:" + hex(inst->oper, Value) + ")";
+      args = "(D:" + hex(inst->oper, 2) + ")";
       break;
     case Opr::IndX:
-      args = "(" + hex(inst->oper, Address) + ", x)";
+      args = "(" + hex(inst->oper, 6) + ", x)";
       break;
     case Opr::IndXB:
-      args = "(B:" + hex(inst->oper, Value) + ", x)";
+      args = "(B:" + hex(inst->oper, 4) + ", x)";
+      comment += lookup(inst->oper);
       break;
     case Opr::IndY:
-      args = "(" + hex(inst->oper, Address) + "), y";
+      args = "(" + hex(inst->oper, 6) + "), y";
       break;
     case Opr::IndL:
-      args = "[" + hex(inst->oper, Address) + "]";
+      args = "[" + hex(inst->oper, 6) + "]";
       break;
     case Opr::IndLY:
-      args = "[" + hex(inst->oper, Address) + "], y";
+      args = "[" + hex(inst->oper, 6) + "], y";
       break;
     case Opr::IndS:
-      args = "(" + hex(inst->oper, Value) + ", s), y";
+      args = "(" + hex(inst->oper, 2) + ", s), y";
       break;
     case Opr::Bank:
-      args = hex(inst->oper >> 8, Value) + ", " + hex(inst->oper & 0xff, Value);
+      args = hex(inst->oper >> 8, 2) + ", " + hex(inst->oper & 0xff, 2);
       break;
   }
   if (inst->flags & IsEmuChanged) {
     if (inst->flags & IsEmu) {
-      comment = " 8-bit mode";
+      comment += " 8-bit mode";
     } else {
-      comment = " 16-bit mode";
+      comment += " 16-bit mode";
     }
   }
   if (inst->flags & IsM8Changed) {
@@ -345,7 +355,11 @@ std::string Disassembler::printInst(std::shared_ptr<Inst> inst) {
       comment += " x.w";
     }
   }
-  std::string r = args;
+  std::string r = inst->name;
+  while (r.length() < 8) {
+    r += " ";
+  }
+  r += args;
   if (!comment.empty()) {
     while (r.length() < 20) {
       r += " ";
@@ -355,42 +369,28 @@ std::string Disassembler::printInst(std::shared_ptr<Inst> inst) {
   return r;
 }
 
-std::string Disassembler::hex(uint32_t val, HexType type) {
+std::string Disassembler::lookup(uint32_t val) {
+  return symbols[val];
+}
+
+std::string Disassembler::hex(uint32_t val, int width) {
+  static const char *digits = "0123456789abcdef";
   std::string ret;
-  int width = 0;
-  if (type == HexType::Address) {
+  if (width == 6) {
     ret = symbols[val];
-  }
-  if (ret.empty()) {
-    if ((val & ~0xff) == ~0xff) {
-      ret += "$-";
-      val = ~val + 1;
-      width = 2;
-    } else if ((val & ~0xff) == 0) {
-      ret += "$";
-      width = 2;
-    } else if ((val & ~0xffff) == ~0xffff) {
-      ret += "$-";
-      val = ~val + 1;
-      width = 4;
-    } else if ((val & ~0xffff) == 0) {
-      ret += "$";
-      width = 4;
-    } else if (val & 0x80000000) {
-      ret += "$-";
-      width = 8;
-    } else {
-      ret += "$";
-      width = 8;
+    if (!ret.empty()) {
+      return ret;
     }
-    for (int i = 0; i < width; i++) {
-      uint8_t ch = val >> (width - (i + 1)) * 4;
-      if (ch < 10) {
-        ret += static_cast<char>(ch + '0');
-      } else {
-        ret += static_cast<char>(ch - 10 + 'a');
-      }
+    ret = "$00/0000";
+    for (size_t i = 0, j = 5 << 2; i < 6; i++, j -= 4) {
+      ret[i < 2 ? i + 1 : i + 2] = digits[(val >> j) & 0xf];
     }
+    return ret;
   }
-  return ret;
+  ret = "$";
+  std::string h(width, '0');
+  for (int i = 0, j = (width - 1) << 2; i < width; i++, j -= 4) {
+    h[i] = digits[(val >> j) & 0xf];
+  }
+  return ret + h;
 }

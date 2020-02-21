@@ -31,14 +31,18 @@ struct Entry {
 
 class Map {
  public:
-  Map(const char *filename);
+  Map(const char *filename, uint32_t org);
+  void save();
   bool needsEntry();
   std::vector<Entry> getEntries();
   std::map<uint32_t, std::string> getSymbols();
   void addEntry(uint32_t entry, uint32_t flags);
+  void addSymbol(uint32_t org, std::string name);
   uint32_t org;
 
  private:
+  std::string mapname;
   std::vector<Entry> entryPoints;
   std::map<uint32_t, std::string> symbols;
+  std::string toAddress(uint32_t val);
 };

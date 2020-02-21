@@ -46,7 +46,7 @@ struct Argument {
 struct Function : public Symbol {
   std::vector<Argument> arguments;
   std::shared_ptr<Ref> returnType;
-  std::vector<uint32_t> signature;
+  std::vector<int32_t> signature;
 };
 
 struct Field {

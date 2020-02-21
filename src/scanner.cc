@@ -69,9 +69,9 @@ bool Scanner::trace(const Entry &start,
       }
       map[addr] = inst;
       if (inst->type == Jump || inst->type == Branch || inst->type == Call) {
-        if (inst->operType == Opr::Imm || inst->operType == Opr::Abs) {
+        if (inst->operType == Opr::Abs) {
           if (valid(inst->oper) && labels.find(inst->oper) == labels.end()) {
-            workList.push({state.flags, inst->oper});
+            workList.push({inst->oper, state.flags});
             labels[inst->oper] = inst->oper;
           }
         }
@@ -118,7 +118,7 @@ bool Scanner::basicBlocks() {
       block->length = branch->first - block->address;
       if (b->type != Return && b->type != Invalid) {
         // branch has a destination
-        if (b->operType == Opr::Imm || b->operType == Opr::Abs) {
+        if (b->operType == Opr::Abs) {
           if (valid(b->oper)) {
             auto next = getBlock(b->oper);
             next->preds.push_back(block);
@@ -171,8 +171,8 @@ bool Scanner::disassemble(std::ostream &f, uint32_t from, uint32_t to,
       auto count = 0;
       std::string preds;
       for (auto pred : b->preds) {
-        if (pred->address + pred->length != b->address && count++ < 4) {
-          preds += (pred->address < b->address) ? u8"\u2b9d" : u8"\u2b9f";
+        if (pred->address + pred->length != b->address && count++ < 7) {
+          preds += (pred->address < b->address) ? u8"\u2b06 " : u8"\u2b07 ";
           preds += hex(pred->address + pred->length - pred->branchLen, 6);
         }
       }
@@ -205,20 +205,30 @@ void Scanner::dumpHex(std::ostream &f, uint32_t from, uint32_t to) {
     for (int i = 0; i < len; i += 16) {
       f << hex(from, 6) << ": ";
       std::string ascii;
+      int skip = from & 0xf;
       int j = 0;
-      for (; j < 16 && !ptr->eof(); j++) {
-        uint8_t ch = ptr->r8();
-        f << hex(ch, 2) << " ";
-        ascii += isprint(ch) ? static_cast<char>(ch) : '.';
-        if (j == 7) {
+      for (; j < skip; j++) {
+        if (j == 8) {
           f << " ";
           ascii += " ";
         }
+        f << "   ";
+        ascii += " ";
+      }
+      for (; j < 16 && !ptr->eof(); j++) {
+        if (j == 8) {
+          f << " ";
+          ascii += " ";
+        }
+        uint8_t ch = ptr->r8();
+        f << hex(ch, 2) << " ";
+        ascii += isprint(ch) ? static_cast<char>(ch) : '.';
+        from++;
       }
       for (; j < 16; j++) {
         f << "   ";
       }
-      f << "|" << ascii << std::endl;
+      f << "| " << ascii << std::endl;
     }
   }
 }
@@ -259,6 +269,13 @@ std::shared_ptr<Block> Scanner::getBlock(uint32_t address) {
 
 std::string Scanner::hex(uint32_t value, size_t len) {
   static const char *digits = "0123456789abcdef";
+  if (len == 6) {
+    std::string ret="00/0000";
+    for (size_t i = 0, j = 5 << 2; i < 6; i++, j -= 4) {
+      ret[i < 2 ? i : i + 1] = digits[(value >> j) & 0xf];
+    }
+    return ret;
+  }
   std::string ret(len, '0');
   for (size_t i = 0, j = (len - 1) << 2; i < len; i++, j -= 4) {
     ret[i] = digits[(value >> j) & 0xf];

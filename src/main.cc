@@ -5,7 +5,7 @@
 #include "disasm.h"
 #include "omf.h"
 #include "api.h"
-#include "../iigs.c"
+#include "iigs.h"
 
 const char *argp_program_version = "regs 0.2";
 const char *argp_program_bug_address = "sean@seancode.com";
@@ -105,26 +105,30 @@ static struct argp argp = { options, parse_opt, args_doc, doc };
 int main(int argc, char **argv) {
   struct arguments arguments;
   arguments.filename = "";
-  arguments.org = 0x300;
+  arguments.org = 0;
   arguments.flags = 0;
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
   // load map if it exists
-  Map map(arguments.filename);
+  Map map(arguments.filename, arguments.org);
   OMF omf;
-  if (!omf.load(arguments.filename, arguments.org)) {
+  if (!omf.load(arguments.filename, map.org)) {
     std::cerr << "Failed to load " << arguments.filename << std::endl;
     return -1;
   }
   auto segments = omf.get();
   if (map.needsEntry()) {
     for (auto &s : segments) {
-      if ((s.kind & 0x1f) == 0) {  // code
+      if ((s.kind & 0x1f) == 0) {  // first code
         map.addEntry(s.mapped + s.entry, arguments.flags);
         break;
       }
     }
   }
+
+  // note that we save the map here.. before we add a bunch of symbols
+  // from the api
+  map.save();
 
   API api(iigs_dat, iigs_dat_len);
 
@@ -159,6 +163,8 @@ int main(int argc, char **argv) {
           sig7[3] = f->signature[2];
           prints->add(sig5, f->name, f->signature[1]);
           prints->add(sig7, f->name, f->signature[1]);
+        } else if (f->signature[0] == -4) {  // symbol
+          map.addSymbol(f->signature[1], f->name);
         }
       }
     }

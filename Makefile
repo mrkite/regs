@@ -1,18 +1,15 @@
 CC=clang
 CFLAGS=-Wall
 
-all: 2mg omf regs
+all: 2mg regs
 
 2mg: 2mg.o
 	$(CC) $(CFLAGS) -o $@ -largp $^
 
-omf: omf.o parser.o
-	$(CC) $(CFLAGS) -o $@ -largp $^
+regs: src/iigs.h
+	$(MAKE) -C src
 
-regs: regs.o map.o scan.o parser.o disasm.o iigs.o
-	$(CC) $(CFLAGS) -o $@ -largp $^
-
-iigs.c: iigs.dat
+src/iigs.h: iigs.dat
 	xxd -i $< $@
 
 iigs.dat: docmaker/docmaker iigs
@@ -25,4 +22,6 @@ docmaker/docmaker:
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 clean:
-	rm -f *.o 2mg omg regs
+	rm -f *.o 2mg regs
+	$(MAKE) -C docmaker clean
+	$(MAKE) -C src clean

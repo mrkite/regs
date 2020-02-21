@@ -26,14 +26,10 @@ enum InsType : uint16_t {
   Invalid = 0xff,
 };
 
-enum HexType {
-  Value = 0x01,
-  Address = 0x02,
-};
-
 enum class Opr {
-  None = 0, Imm, Abs, AbsB, AbsD, AbsX, AbsXB, AbsXD, AbsY, AbsYB, AbsYD, AbsS,
-  Ind, IndB, IndD, IndX, IndXB, IndY, IndL, IndLY, IndS, Bank,
+  None = 0, Imm8, Imm16, Abs, AbsB, AbsD, AbsX, AbsXB, AbsXD,
+  AbsY, AbsYB, AbsYD, AbsS, Ind, IndB, IndD, IndX, IndXB,
+  IndY, IndL, IndLY, IndS, Bank,
 };
 
 struct Inst {
@@ -56,7 +52,8 @@ class Disassembler {
   std::string printInst(std::shared_ptr<Inst> inst);
   std::shared_ptr<Inst> decodeInst(Handle f, Entry *entry);
   bool valid(uint32_t address);
-  std::string hex(uint32_t value, HexType type);
+  std::string hex(uint32_t value, int width);
+  std::string lookup(uint32_t value);
 
   std::map<uint32_t, std::string> symbols;
   std::shared_ptr<Fingerprints> fingerprints;

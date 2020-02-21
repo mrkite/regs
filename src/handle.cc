@@ -60,8 +60,8 @@ uint32_t TheHandle::r32() {
 
 uint32_t TheHandle::r24() {
   uint32_t r = *pos++;
-  r |= *pos << 8;
-  r |= *pos << 16;
+  r |= *pos++ << 8;
+  r |= *pos++ << 16;
   return r;
 }
 
