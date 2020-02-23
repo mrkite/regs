@@ -105,3 +105,7 @@ void TheHandle::seek(int64_t pos) {
 void TheHandle::skip(int64_t ofs) {
   pos += ofs;
 }
+
+void TheHandle::dump(int64_t length, std::ostream &f) {
+  f.write(reinterpret_cast<char*>(pos), length);
+}

@@ -1,6 +1,7 @@
 /** @copyright 2020 Sean Kasun */
 
 #include <iostream>
+#include <algorithm>
 #include "api.h"
 
 Fingerprints::Fingerprints() {
@@ -197,5 +198,153 @@ void API::setFunction(Handle h, std::shared_ptr<symbol::Symbol> s) {
   auto numSig = h->r32();
   for (uint32_t i = 0; i < numSig; i++) {
     f->signature.push_back(static_cast<int32_t>(h->r32()));
+  }
+}
+
+void API::search(std::string keyword, uint32_t org) {
+  for (auto &s : symbols) {
+    auto it = std::search(s.first.begin(), s.first.end(),
+                          keyword.begin(), keyword.end(),
+                          [](char a, char b) {
+                            return std::toupper(a) == std::toupper(b);
+                          });
+    if (it != s.first.end()) {
+      dumpSymbol(s.second, org);
+    }
+  }
+}
+
+void API::dumpRef(std::shared_ptr<symbol::Ref> ref) {
+  for (int i = 0; i < ref->pointer; i++) {
+    printf("^");
+  }
+  printf("%s", ref->symbol->name.c_str());
+  if (ref->array > 0) {
+    printf("[%d]", ref->array);
+  } else if (ref->array == 0) {
+    printf("[]");
+  }
+}
+
+void API::dumpSymbol(std::shared_ptr<symbol::Symbol> sym, uint32_t org) {
+  printf("%s: ", sym->name.c_str());
+  switch (sym->kind) {
+    case symbol::Kind::isIntrinsic:
+      switch (std::static_pointer_cast<symbol::Intrinsic>(sym)->type) {
+        case symbol::Intrinsic::U8:
+          printf("uint8");
+          break;
+        case symbol::Intrinsic::U16:
+          printf("uint16");
+          break;
+        case symbol::Intrinsic::U32:
+          printf("uint32");
+          break;
+        case symbol::Intrinsic::S8:
+          printf("int8");
+          break;
+        case symbol::Intrinsic::S16:
+          printf("int16");
+          break;
+        case symbol::Intrinsic::S32:
+          printf("int32");
+          break;
+      }
+      printf("\n");
+      break;
+    case symbol::Kind::isEnum:
+      {
+        auto e = std::static_pointer_cast<symbol::Enum>(sym);
+        printf("enum : %s {\n", e->type->name.c_str());
+        for (auto entry : e->entries) {
+          printf("  %s = $%x,\n", entry.first.c_str(), entry.second);
+        }
+        printf("}\n");
+      }
+      break;
+    case symbol::Kind::isAlias:
+    case symbol::Kind::isRef:
+      dumpRef(std::static_pointer_cast<symbol::Ref>(sym));
+      printf("\n");
+      break;
+    case symbol::Kind::isStruct:
+      {
+        auto s = std::static_pointer_cast<symbol::Struct>(sym);
+        printf("struct { // $%x bytes\n", sym->size);
+        for (auto &f : s->fields) {
+          printf("  %s: ", f.key.c_str());
+          switch (f.value->kind) {
+            case symbol::Kind::isRef:
+              dumpRef(std::static_pointer_cast<symbol::Ref>(f.value));
+              break;
+            default:
+              printf("%s", f.value->name.c_str());
+              break;
+          }
+          printf(" // $");
+          if (org > 0xffff) {
+            printf("%02x/%04x\n", org >> 16, org & 0xffff);
+          } else {
+            printf("%04x\n", org);
+          }
+          org += f.value->size;
+        }
+        printf("}\n");
+      }
+      break;
+    case symbol::Kind::isUnion:
+      {
+        auto s = std::static_pointer_cast<symbol::Struct>(sym);
+        printf("union { // $%x bytes\n", sym->size);
+        for (auto &f : s->fields) {
+          printf("  %s: ", f.key.c_str());
+          switch (f.value->kind) {
+            case symbol::Kind::isRef:
+              dumpRef(std::static_pointer_cast<symbol::Ref>(f.value));
+              break;
+            default:
+              printf("%s", f.value->name.c_str());
+              break;
+          }
+          printf(" // $");
+          if (org > 0xffff) {
+            printf("%02x/%04x\n", org >> 16, org & 0xffff);
+          } else {
+            printf("%04x\n", org);
+          }
+        }
+        printf("}\n");
+      }
+      break;
+    case symbol::Kind::isFunction:
+      {
+        auto f = std::static_pointer_cast<symbol::Function>(sym);
+        printf("(\n");
+        for (auto &a : f->arguments) {
+          printf("  %s: ", a.key.c_str());
+          dumpRef(a.ref);
+          printf(",\n");
+        }
+        if (f->returnType->symbol != nullptr) {
+          printf("): ");
+          dumpRef(f->returnType);
+        } else {
+          printf(")");
+        }
+        if (f->signature[0] >= 0) {  // tool
+          printf(" = TOOL $%02x:%02x\n", f->signature[0],
+                 f->signature[1]);
+        } else if (f->signature[0] == -1) {  // p16/gsos
+          printf(" = GSOS $%04x\n", f->signature[2]);
+        } else if (f->signature[0] == -2) {  // p8
+          printf(" = P8 $%02x\n", f->signature[2]);
+        } else if (f->signature[0] == -3) {  // smartport
+          printf(" = Smartport $%02x\n", f->signature[2]);
+        } else if (f->signature[0] == -4) {  // symbol
+          printf(" = $%02x/%04x\n", f->signature[1] >> 16,
+                 f->signature[1] & 0xffff);
+        }
+      }
+      break;
   }
 }

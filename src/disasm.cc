@@ -64,10 +64,10 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
   inst->type = opcodes[opcode].type;
   auto mode = opcodes[opcode].addressing;
   inst->length = sizes[mode];
-  if (mode == IMMM && (entry->flags & (IsEmu | IsM8))) {
+  if (mode == IMMM && (entry->flags & IsM8)) {
     inst->length--;
   }
-  if (mode == IMMX && (entry->flags & (IsEmu | IsX8))) {
+  if (mode == IMMX && (entry->flags & IsX8)) {
     inst->length--;
   }
   entry->org += inst->length;
@@ -86,15 +86,9 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
       } else if (opcode == 0xc2) {
         entry->flags &= ~inst->oper;
       }
-      if ((entry->flags ^ oldFlags) & IsX8) {
-        entry->flags |= IsX8Changed;
-      }
-      if ((entry->flags ^ oldFlags) & IsM8) {
-        entry->flags |= IsM8Changed;
-      }
       break;
     case IMMM:
-      if (entry->flags & (IsEmu | IsM8)) {
+      if (entry->flags & IsM8) {
         inst->oper = f->r8();
         inst->operType = Opr::Imm8;
       } else {
@@ -103,7 +97,7 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
       }
       break;
     case IMMX:
-      if (entry->flags & (IsEmu | IsX8)) {
+      if (entry->flags & IsX8) {
         inst->oper = f->r8();
         inst->operType = Opr::Imm8;
       } else {
@@ -194,7 +188,7 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
       break;
     case INX:
       inst->oper = f->r8();
-      inst->operType = Opr::IndX;
+      inst->operType = Opr::IndXD;
       break;
     case INY:
       inst->oper = f->r8();
@@ -235,18 +229,24 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
   }
   if (opcode == 0x18) {
     if (f->r8() == 0xfb) {  // clc xce
-      entry->flags &= 0xffffff ^ IsEmu;
+      entry->flags &= ~IsEmu;
     }
     f->skip(-1);
   }
   if (opcode == 0x38) {
     if (f->r8() == 0xfb) {  // sec xce
-      entry->flags |= IsEmu;
+      entry->flags |= IsEmu | IsM8 | IsX8;
     }
     f->skip(-1);
   }
   if ((entry->flags ^ oldFlags) & IsEmu) {
     entry->flags |= IsEmuChanged;
+  }
+  if ((entry->flags ^ oldFlags) & IsX8) {
+    entry->flags |= IsX8Changed;
+  }
+  if ((entry->flags ^ oldFlags) & IsM8) {
+    entry->flags |= IsM8Changed;
   }
   inst->flags = entry->flags;
   return inst;
@@ -318,14 +318,17 @@ std::string Disassembler::printInst(std::shared_ptr<Inst> inst) {
       args = "(B:" + hex(inst->oper, 4) + ", x)";
       comment += lookup(inst->oper);
       break;
+    case Opr::IndXD:
+      args = "(D:" + hex(inst->oper, 2) + ")";
+      break;
     case Opr::IndY:
-      args = "(" + hex(inst->oper, 6) + "), y";
+      args = "(D:" + hex(inst->oper, 2) + "), y";
       break;
     case Opr::IndL:
-      args = "[" + hex(inst->oper, 6) + "]";
+      args = "[D:" + hex(inst->oper, 2) + "]";
       break;
     case Opr::IndLY:
-      args = "[" + hex(inst->oper, 6) + "], y";
+      args = "[D:" + hex(inst->oper, 2) + "], y";
       break;
     case Opr::IndS:
       args = "(" + hex(inst->oper, 2) + ", s), y";

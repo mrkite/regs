@@ -2,6 +2,7 @@
 #pragma once
 
 #include "map.h"
+#include <functional>
 
 struct Block {
   explicit Block(uint32_t address) : address(address) {}

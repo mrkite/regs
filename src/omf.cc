@@ -22,6 +22,9 @@ static bool compareSegments(const Segment &a, const Segment &b) {
 
 bool OMF::load(const char *filename, uint32_t org) {
   handle = TheHandle::createFromFile(filename);
+  if (!handle->isOpen()) {
+    return false;
+  }
 
   if (!isOMF()) {
     Segment seg;
@@ -31,6 +34,7 @@ bool OMF::load(const char *filename, uint32_t org) {
     seg.mapped = org;
     seg.data = handle;
     seg.length = seg.bytecnt;
+    seg.segnum = 1;
     segments.push_back(seg);
   } else {
     if (!loadSegments()) {

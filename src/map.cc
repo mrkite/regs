@@ -2,6 +2,7 @@
 #include "map.h"
 #include <string>
 #include <fstream>
+#include <algorithm>
 
 struct Field {
   uint32_t org;
@@ -14,11 +15,13 @@ struct Field {
 Map::Map(const char *filename, uint32_t org) : org(org) {
   mapname = filename;
   mapname += ".regs";
+  usedMap = false;
   File file(mapname);
   if (!file.is_open()) {
     return;
   }
 
+  usedMap = true;
   while (!file.eof()) {
     uint32_t ofs = file.hex();
     if (file.check('!')) {
@@ -35,6 +38,8 @@ Map::Map(const char *filename, uint32_t org) : org(org) {
         switch (ch) {
           case 'e':
             entry.flags |= IsEmu;
+            entry.flags |= IsM8;
+            entry.flags |= IsX8;
             break;
           case 'm':
             entry.flags |= IsM8;
@@ -64,12 +69,13 @@ void Map::save() {
     fields[org].isEntry = true;
     if (entryPoint.flags & IsEmu) {
       fields[org].flags += 'e';
-    }
-    if (entryPoint.flags & IsM8) {
-      fields[org].flags += 'm';
-    }
-    if (entryPoint.flags & IsX8) {
-      fields[org].flags += 'x';
+    } else {  // only if not emu, otherwise its redundant
+      if (entryPoint.flags & IsM8) {
+        fields[org].flags += 'm';
+      }
+      if (entryPoint.flags & IsX8) {
+        fields[org].flags += 'x';
+      }
     }
   }
   for (auto sym : symbols) {
@@ -102,7 +108,7 @@ void Map::save() {
 }
 
 bool Map::needsEntry() {
-  return entryPoints.size() == 0;
+  return !usedMap;
 }
 
 std::vector<Entry> Map::getEntries() {

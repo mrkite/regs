@@ -24,6 +24,7 @@ class TheHandle {
   void skip(int64_t length);
   std::string read(int32_t length);
   std::vector<uint8_t> readBytes(int32_t length);
+  void dump(int64_t length, std::ostream &f);
 
   int64_t length;
 

@@ -3,11 +3,11 @@ CFLAGS=-Wall
 
 all: 2mg regs
 
-2mg: 2mg.o
-	$(CC) $(CFLAGS) -o $@ -largp $^
+2mg: FORCE
+	$(MAKE) -C src ../2mg
 
-regs: src/iigs.h
-	$(MAKE) -C src
+regs: FORCE src/iigs.h
+	$(MAKE) -C src ../regs
 
 src/iigs.h: iigs.dat
 	xxd -i $< $@
@@ -18,10 +18,9 @@ iigs.dat: docmaker/docmaker iigs
 docmaker/docmaker:
 	$(MAKE) -C docmaker
 
-%.o: %.c
-	$(CC) -c $(CFLAGS) -o $@ $<
+FORCE:
 
 clean:
-	rm -f *.o 2mg regs
+	rm -f *.o
 	$(MAKE) -C docmaker clean
 	$(MAKE) -C src clean

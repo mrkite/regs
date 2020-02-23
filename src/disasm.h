@@ -28,7 +28,7 @@ enum InsType : uint16_t {
 
 enum class Opr {
   None = 0, Imm8, Imm16, Abs, AbsB, AbsD, AbsX, AbsXB, AbsXD,
-  AbsY, AbsYB, AbsYD, AbsS, Ind, IndB, IndD, IndX, IndXB,
+  AbsY, AbsYB, AbsYD, AbsS, Ind, IndB, IndD, IndX, IndXB, IndXD,
   IndY, IndL, IndLY, IndS, Bank,
 };
 

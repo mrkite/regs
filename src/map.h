@@ -42,6 +42,7 @@ class Map {
 
  private:
   std::string mapname;
+  bool usedMap;
   std::vector<Entry> entryPoints;
   std::map<uint32_t, std::string> symbols;
   std::string toAddress(uint32_t val);

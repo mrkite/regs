@@ -16,6 +16,7 @@ static struct argp_option options[] = {
   {"m", 'm', 0, OPTION_ARG_OPTIONAL, "Start with 8-bit accumulator"},
   {"x", 'x', 0, OPTION_ARG_OPTIONAL, "Start with 8-bit indices"},
   {"e", 'e', 0, OPTION_ARG_OPTIONAL, "Start in emulation mode"},
+  {"l", 'l', "KEYWORD", 0, "Search API for KEYWORD"},
   { 0 },
 };
 
@@ -23,9 +24,11 @@ struct arguments {
   const char *filename;
   uint32_t org;
   uint32_t flags;
+  const char *keyword;
 };
 
 static inline uint32_t parseNum(const char *s) {
+  uint32_t bank = 0;
   uint32_t res = 0;
   while (isspace(*s)) {
     s++;
@@ -39,7 +42,13 @@ static inline uint32_t parseNum(const char *s) {
     ishex = true;
   }
   if (ishex) {
-    while (isxdigit(*s)) {
+    while (isxdigit(*s) || *s == '/') {
+      if (*s == '/') {
+        s++;
+        bank = res;
+        res = 0;
+        continue;
+      }
       res <<= 4;
       if (isdigit(*s)) {
         res |= *s - '0';
@@ -57,7 +66,7 @@ static inline uint32_t parseNum(const char *s) {
       s++;
     }
   }
-  return res;
+  return (bank << 16) | res;
 }
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -83,6 +92,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
         arguments->flags |= IsEmu;
       }
       break;
+    case 'l':
+      arguments->keyword = arg;
+      break;
     case ARGP_KEY_ARG:
       if (state->arg_num >= 1) {
         argp_usage(state);
@@ -90,7 +102,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
       arguments->filename = arg;
       break;
     case ARGP_KEY_END:
-      if (state->arg_num < 1) {
+      if (state->arg_num < 1 && !arguments->keyword) {
         argp_usage(state);
       }
       break;
@@ -103,11 +115,19 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 static struct argp argp = { options, parse_opt, args_doc, doc };
 
 int main(int argc, char **argv) {
+  API api(iigs_dat, iigs_dat_len);
+
   struct arguments arguments;
   arguments.filename = "";
+  arguments.keyword = nullptr;
   arguments.org = 0;
   arguments.flags = 0;
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
+
+  if (arguments.keyword) {
+    api.search(arguments.keyword, arguments.org);
+    return 0;
+  }
 
   // load map if it exists
   Map map(arguments.filename, arguments.org);
@@ -130,7 +150,6 @@ int main(int argc, char **argv) {
   // from the api
   map.save();
 
-  API api(iigs_dat, iigs_dat_len);
 
   auto prints = std::make_shared<Fingerprints>();
   for (auto s : api.symbols) {

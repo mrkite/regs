@@ -94,6 +94,9 @@ static bool compareBlocks(std::shared_ptr<Block> a, std::shared_ptr<Block> b) {
 }
 
 bool Scanner::basicBlocks() {
+  if (labels.empty()) {  // no blocks
+    return true;
+  }
   // always start at a label
   auto address = labels.lower_bound(0)->first;
   auto block = getBlock(address);
