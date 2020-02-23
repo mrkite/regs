@@ -1,0 +1,150 @@
+IntErr enum<int16> {
+  imBadInptParam = $0b01,
+  imIllegalChar = $0b02,
+  imOverflow = $0b03,
+  imStrOverflow = $0b04,
+}
+
+IntDivRecPtr = ^IntDivRec;
+IntDivRec struct {
+  quotient: int16;
+  remainder: int16;
+}
+
+LongDivRecPtr = ^LongDivRec;
+LongDivRec struct {
+  quotient: int32;
+  remainder: int32;
+}
+
+DivRecPtr = ^DivRec;
+DivRec = LongDivRec;
+
+LongMulRecPtr = ^LongMulRec;
+LongMulRec struct {
+  lsResult: int32;
+  msResult: int32;
+}
+
+WordDivRecPtr = ^WordDivRec;
+WordDivRec struct {
+  quotient: int16;
+  remainder: int16;
+}
+
+IMBootInit() {
+  $0b, $01
+}
+IMStartUp() {
+  $0b, $02
+}
+IMShutDown() {
+  $0b, $03
+}
+IMVersion(): int16 {
+  $0b, $04
+}
+IMReset() {
+  $0b, $05
+}
+IMStatus(): bool {
+  $0b, $06
+}
+Dec2Int(strPtr: Ptr, strLength: int16, signedFlag: bool): int16 {
+  $0b, $28
+}
+Dec2Long(strPtr: Ptr, strLength: int16, signedFlag: bool): int32 {
+  $0b, $29
+}
+Fix2Frac(fixedValue: Fixed): Frac {
+  $0b, $1c
+}
+Fix2Long(fixedValue: Fixed): int32 {
+  $0b, $1b
+}
+Fix2X(fixedValue: Fixed, extendPtr: ^Extended) {
+  $0b, $1e
+}
+FixATan2(input1: int32, input2: int32): Fixed {
+  $0b, $17
+}
+FixDiv(dividend: int32, divisor: int32): Fixed {
+  $0b, $11
+}
+FixMul(multiplcand: Fixed, multipler: Fixed): Fixed {
+  $0b, $0f
+}
+FixRatio(numerator: int16, denominatior: int16): Fixed {
+  $0b, $0e
+}
+FixRound(fixedValue: Fixed): int16 {
+  $0b, $13
+}
+Frac2Fix(fracValue: Frac): Fixed {
+  $0b, $1d
+}
+Frac2X(fracValue: Frac, extendPtr: ^Extended) {
+  $0b, $1f
+}
+FracCos(angle: Fixed): Frac {
+  $0b, $15
+}
+FracDiv(divided: int32, divisor: int32): Frac {
+  $0b, $12
+}
+FracMul(muliplicand: Frac, multiplier: Frac): Frac {
+  $0b, $10
+}
+FracSin(angle: Fixed): Frac {
+  $0b, $16
+}
+FracSqrt(fracValue:Frac): Frac {
+  $0b, $14
+}
+Hex2Int(strPtr: Ptr, strLength: int16): int16 {
+  $0b, $24
+}
+Hex2Long(strPtr: Ptr, strLength: int16): int32 {
+  $0b, $25
+}
+HexIt(intValue: int16): int32 {
+  $0b, $2a
+}
+HiWord(longValue: int32): int16 {
+  $0b, $18
+}
+Int2Dec(wordValue: int16, strPtr: Ptr, strLength: int16, signedFlag: bool) {
+  $0b, $26
+}
+Int2Hex(intValue: int16, strPtr: Ptr, strLength: int16) {
+  $0b, $22
+}
+Long2Dec(longValue: int32, strPtr: Ptr, strLength: int16, signedFlag: bool) {
+  $0b, $27
+}
+Long2Fix(longValue: int32): Fixed {
+  $0b, $1a
+}
+Long2Hex(longValue: int32, strPtr: Ptr, strLength: int16) {
+  $0b, $23
+}
+LongDivide(dividend: int32, divisor: int32): ^LongDivRec;
+LongMul(multiplicand: int32, multiplier: int32): ^LongMulRec;
+LoWord(longValue: int32): int16 {
+  $0b, $19
+}
+Multiply(multiplicand: int16, multiplier: int16): int32 {
+  $0b, $09
+}
+SDivide(divdiend: int16, divisor: int16): IntDivRec {
+  $0b, $0a
+}
+UDivide(dividend: int16, divisor: int16): WordDivRec {
+  $0b, $0b
+}
+X2Fix(extendPtr: ExtendedPtr): int32 {
+  $0b, $20
+}
+X2Frac(extendPtr: ExtendedPtr): int32 {
+  $0b, $21
+}

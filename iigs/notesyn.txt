@@ -1,0 +1,97 @@
+NSErr enum<int16> {
+  nsAlreadyInit = $1901,
+  nsSndNotInit = $1902,
+  nsNotAvail = $1921,
+  nsBadGenNum = $1922,
+  nsNotInit = $1923,
+  nsGenAlreadyOn = $1924,
+  soundWrongVer = $1925,
+}
+
+EnvelopeHndl = ^EnvelopePtr;
+EnvelopePtr = ^Envelope;
+Envelope struct {
+  st1BkPt: uint8;
+  st1Increment: int16;
+  st2BkPt: uint8;
+  st2Increment: int16;
+  st3BkPt: uint8;
+  st3Increment: int16;
+  st4BkPt: uint8;
+  st4Increment: int16;
+  st5BkPt: uint8;
+  st5Increment: int16;
+  st6BkPt: uint8;
+  st6Increment: int16;
+  st7BkPt: uint8;
+  st7Increment: int16;
+  st8BkPt: uint8;
+  st8Increment: int16;
+}
+
+WaveFormHndl = ^WaveFormPtr;
+WaveFormPtr = ^WaveForm;
+WaveForm struct {
+  wfTopKey: uint8;
+  wfWaveAddress: uint8;
+  wfWaveSize: uint8;
+  wfDocMode: uint8;
+  wfRelPitch: int16;
+}
+
+InstrumentHndl = ^InstrumentPtr;
+InstrumentPtr = ^Instrument;
+Instrument struct {
+  theEnvelope: Envelope;
+  releaseSegment: uint8;
+  priorityIncrement: uint8;
+  pitchBendRange: uint8;
+  vibratoDepth: uint8;
+  vibratoSpeed: uint8;
+  inSpare: uint8;
+  aWaveCount: uint8;
+  bWaveCount: uint8;
+  aWaveList: WaveForm[];
+  bWaveList: WaveForm[];
+}
+
+NSBootInit() {
+  $19, $01
+}
+NSStartUp(updateRate: int16, userUpdateRtnPtr: Ptr) {
+  $19, $02
+}
+NSShutDown() {
+  $19, $03
+}
+NSVersion(): int16 {
+  $19, $04
+}
+NSReset() {
+  $19, $05
+}
+NSStatus(): bool {
+  $19, $06
+}
+AllNotesOff() {
+  $19, $0d
+}
+AllocGen(requestPriority: int16): int16 {
+  $19, $09
+}
+DeallocGen(genNumber: int16) {
+  $19, $0a
+}
+NoteOff(genNumber: int16, semitone: int16) {
+  $19, $0c
+}
+NoteOn(genNumber: int16, semitone: int16, volume: int16,
+  instrumentPtr: ^Instrument) {
+  $19, $0b
+}
+NSSetUpdateRate(updateRate: int16) {
+  $19, $0e
+}
+NSSetUserUpdateRgn(updateRtn: VoidProcPtr): VoidProcPtr {
+  $19, $0f
+}

@@ -1,0 +1,60 @@
+ScrapErr enum<int16> {
+  badScrapType = $1610,
+}
+
+ScrapType enum<int16> {
+  textScrap = $0000,
+  picScrap = $0001,
+}
+
+ScrapBootInit() {
+  $16, $01
+}
+ScrapStartUp() {
+  $16, $02
+}
+ScrapShutDown() {
+  $16, $03
+}
+ScrapVersion(): int16 {
+  $16, $04
+}
+ScrapReset() {
+  $16, $05
+}
+ScrapStatus(): bool {
+  $16, $06
+}
+GetScrap(destHandle: Handle, scrapType: ScrapType) {
+  $16, $0d
+}
+GetScrapCount(): int16 {
+  $16, $12
+}
+GetScrapHandle(scrapType: ScrapType): Handle {
+  $16, $0e
+}
+GetScrapPath(): Ptr {
+  $16, $10
+}
+GetScrapSize(scrapType: ScrapType): int32 {
+  $16, $0f
+}
+GetScrapState(): int16 {
+  $16, $13
+}
+LoadScrap() {
+  $16, $0a
+}
+PutScrap(numBytes: int32, scrapType: ScrapType, srcPtr: Ptr) {
+  $16, $0c
+}
+SetScrapPath(path: ^Str255) {
+  $16, $11
+}
+UnloadScrap() {
+  $16, $09
+}
+ZeroScrap() {
+  $16, $0b
+}

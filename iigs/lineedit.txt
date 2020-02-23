@@ -1,0 +1,141 @@
+LineErr enum<int16> {
+  leDupStrtUpErr = $1401,
+  leResetErr = $1402,
+  leNotActiveErr = $1403,
+  leScrapErr = $1404,
+}
+
+Justification enum<uint16> {
+  leJustLeft = $0000,
+  leJustCenter = $0001,
+  leJustFill = $0002,
+  leJustRight = $ffff,
+}
+
+LERecHndl = ^LERecPtr;
+LERecPtr = ^LERec;
+LERec struct {
+  leLineHandle: Handle;
+  leLength: int16;
+  leMaxLength: int16;
+  leDestRect: Rect;
+  leViewRect: Rect;
+  lePort: GrafPortPtr;
+  leLineHite: int16;
+  leBaseHite: int16;
+  leSelStart: int16;
+  leSelEnd: int16;
+  leActFlg: int16;
+  leCarAct: int16;
+  leCarOn: int16;
+  leCarTime: int32;
+  leHiliteHook: VoidProcPtr;
+  leCaretHook: VoidProcPtr;
+  leJust: Justification;
+  lePWChar: int16;
+}
+
+LEBootInit() {
+  $14, $01
+}
+LEStartUp(userID: int16, dPageAddr: int16) {
+  $14, $02
+}
+LEShutDown() {
+  $14, $03
+}
+LEVersion(): int16 {
+  $14, $04
+}
+LEReset() {
+  $14, $05
+}
+LEStatus(): bool {
+  $14, $06
+}
+LEActivate(leRecHandle: LERecHndl) {
+  $14, $0f
+}
+LEClick(eventPtr: ^EventRecord, leRecHandle: LERecHndl) {
+  $14, $0d
+}
+LECopy(leRecHandle: LERecHndl) {
+  $14, $13
+}
+LECut(leRecHandle: LERecHndl) {
+  $14, $12
+}
+LEDeactivate(leRecHandle: LERecHndl) {
+  $14, $10
+}
+LEDelete(leRecHandle: LERecHndl) {
+  $14, $15
+}
+LEDispose(leRecHandle: LERecHndl) {
+  $14, $0a
+}
+LEFromScrap() {
+  $14, $19
+}
+LEGetScrapLen(): int16 {
+  $14, $1c
+}
+LEGetTextHand(leRecHandle: LERecHndl): Handle {
+  $14, $22
+}
+LEGetTextLen(leRecHandle: LERecHndl): int16 {
+  $14, $23
+}
+LEIdle(leRecHandle: LERecHndl) {
+  $14, $0c
+}
+LEInsert(textPtr: Ptr, textLength: int16, leRecHandle: LERecHndl) {
+  $14, $16
+}
+LEKey(theKey: int8, modifiers: int16, leRecHandle: LERecHndl) {
+  $14, $11
+}
+LENew(destRectPtr: ^Rect, viewRectPtr: ^Rect, maxTextLen: int16): LERecHndl {
+  $14, $09
+}
+LEPaste(leRecHandle: LERecHndl) {
+  $14, $14
+}
+LEScrapHandle(): Handle {
+  $14, $1b
+}
+LESetCaret(caretProcPtr: VoidProcPtr, leRecHandle: LERecHndl) {
+  $14, $1f
+}
+LESetHilite(hiliteProcPtr: VoidProcPtr, leRecHandle: LERecHndl) {
+  $14, $1e
+}
+LESetJust(just: Justification, leRecHandle: LERecHndl) {
+  $14, $21
+}
+LESetScrapLen(newLength: int16) {
+  $14, $1d
+}
+LESetSelect(selStart: int16, selEnd: int16, leRecHandle: LERecHndl) {
+  $14, $0e
+}
+LESetText(textPtr: Ptr, textLength: int16, leRecHandle: LERecHndl) {
+  $14, $0b
+}
+LETextBox(textPtr: Ptr, textLength: int16, rectPtr: ^Rect,
+  just: Justification) {
+  $14, $18
+}
+LETextBox2(textPtr: Ptr, textLength: int16, rectPtr: ^Rect,
+  just: Justification) {
+  $14, $20
+}
+LEToScrap() {
+  $14, $1a
+}
+LEUpdate(leRecHandle: LERecHndl) {
+  $14, $17
+}
+GetLEDefProc(): Ptr {
+  $14, $24
+}

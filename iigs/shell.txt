@@ -1,0 +1,62 @@
+GetLInfoPB struct {
+  sfile: ^int8;
+  dfile: ^int8;
+  parms: ^int8;
+  istring: ^int8;
+  merr: int8;
+  merrf: int8;
+  lops: int8;
+  kflag: int8;
+  mflags: uint32;
+  pflags: uint32;
+  org: uint32;
+}
+
+Shell_GET_LINFO(pb: ^GetLInfoPB) {
+  -1, 4, $101
+}
+Shell_SET_LINFO(pb: ^GetLInfoPB) {
+  -1, 4, $102
+}
+Shell_GET_LANG(): uint16 {
+  -1, 4, $103
+}
+Shell_SET_LANG(lang: uint16) {
+  -1, 4, $104
+}
+Shell_ERROR(errnum: uint16) {
+  -1, 4, $105
+}
+Shell_SET_VAR(varname: ^int8, value: ^int8) {
+  -1, 4, $106
+}
+Shell_VERSION(): uint32 {
+  -1, 4, $107
+}
+Shell_READ_INDEXED(varname: ^int8, value: ^int8, index: int16) {
+  -1, 4, $108
+}
+Shell_INIT_WILDCARD(file: ^int8, flags: int16) {
+  -1, 4, $109
+}
+Shell_NEXT_WILDCARD(nextfile: ^int8) {
+  -1, 4, $10a
+}
+Shell_GET_VAR(varname: ^int8, value: ^int8) {
+  -1, 4, $10b
+}
+Shell_EXECUTE(flag: int16, comm: ^int8) {
+  -1, 4, $10d
+}
+Shell_DIRECTION(device: int16, direct: ^int16) {
+  -1, 4, $10f
+}
+Shell_REDIRECT(device: int16, app: int16, file: ^int8) {
+  -1, 4, $110
+}
+Shell_STOP(): int16 {
+  -1, 4, $113
+}
+Shell_WRITE_CONSOLE(ochar: int16) {
+  -1, 4, $11a
+}

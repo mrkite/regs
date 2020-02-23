@@ -1,0 +1,60 @@
+Smartport_Status(unit: int8, statusList: uint16, code: uint8) {
+  -3, 2, $00
+}
+Smartport_ReadBlock(unit: int8, data: uint16, block: uint8[3]) {
+  -3, 2, $01
+}
+Smartport_WriteBlock(unit: int8, data: uint16, block: uint8[3]) {
+  -3, 2, $02
+}
+Smartport_Format(unit: int8) {
+  -3, 2, $03
+}
+Smartport_Control(unit: int8, controlList: uint16, code: uint8) {
+  -3, 2, $04
+}
+Smartport_Init(unit: int8) {
+  -3, 2, $05
+}
+Smartport_Open(unit: int8) {
+  -3, 2, $06
+}
+Smartport_Close(unit: int8) {
+  -3, 2, $07
+}
+Smartport_Read(unit: int8, data: uint16, count: uint16, addr: uint8[3]) {
+  -3, 2, $08
+}
+Smartport_Write(unit: int8, data: uint16, count: uint16, addr: uint8[3]) {
+  -3, 2, $09
+}
+Smartport_StatusExt(unit: int8, statusList: Ptr, code: uint8) {
+  -3, 4, $40
+}
+Smartport_ReadBlockExt(unit: int8, data: Ptr, block: uint32) {
+  -3, 4, $41
+}
+Smartport_WriteBlockExt(unit: int8, data: Ptr, block: uint32) {
+  -3, 4, $42
+}
+Smartport_FormatExt(unit: int8) {
+  -3, 4, $43
+}
+Smartport_ControlExt(unit: int8, controlList: Ptr, code: uint8) {
+  -3, 4, $44
+}
+Smartport_InitExt(unit: int8) {
+  -3, 4, $45
+}
+Smartport_OpenExt(unit: int8) {
+  -3, 4, $46
+}
+Smartport_CloseExt(unit: int8) {
+  -3, 4, $47
+}
+Smartport_ReadExt(unit: int8, data: Ptr, count: uint16, addr: Ptr) {
+  -3, 4, $48
+}
+Smartport_WriteExt(unit: int8, data: Ptr, count: uint16, addr: Ptr) {
+  -3, 4, $49
+}

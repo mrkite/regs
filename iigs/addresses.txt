@@ -1,0 +1,789 @@
+EnterBASIC() {
+  -4, $03d0
+}
+ReconnectDOS() {
+  -4, $03d2
+}
+CowSound() {
+  -4, $03d9
+}
+ReconnectIO() {
+  -4, $03ea
+}
+ControlResetVector() {
+  -4, $03f2
+}
+AmpersandVector() {
+  -4, $03f5
+}
+ControlYVector() {
+  -4, $03f8
+}
+KBD() {
+  -4, $c000
+}
+W80STOREON() {
+  -4, $c001
+}
+RDMAINRAM() {
+  -4, $c002
+}
+RDCARDRAM() {
+  -4, $c003
+}
+WRMAINRAM() {
+  -4, $c004
+}
+WRCARDRAM() {
+  -4, $c005
+}
+SETSLOTCXROM() {
+  -4, $c006
+}
+SETINTCXROM() {
+  -4, $c007
+}
+SETSTDZP() {
+  -4, $c008
+}
+SETALTZP() {
+  -4, $c009
+}
+SETINTC3ROM() {
+  -4, $c00a
+}
+SETSLOTC3ROM() {
+  -4, $c00b
+}
+CLR80VID() {
+  -4, $c00c
+}
+SET80VID() {
+  -4, $c00d
+}
+CLRALTCHAR() {
+  -4, $c00e
+}
+SETALTCHAR() {
+  -4, $c00f
+}
+KBDSTRB() {
+  -4, $c010
+}
+RDLCBNK2() {
+  -4, $c011
+}
+RDLCRAM() {
+  -4, $c012
+}
+RDRAMRD() {
+  -4, $c013
+}
+RDRAMWRT() {
+  -4, $c014
+}
+RDCXROM() {
+  -4, $c015
+}
+RDALTZP() {
+  -4, $c016
+}
+RDC3ROM() {
+  -4, $c017
+}
+RD80STORE() {
+  -4, $c018
+}
+RDVBL() {
+  -4, $c019
+}
+RDTEXT() {
+  -4, $c01a
+}
+RDMIXED() {
+  -4, $c01b
+}
+RDPAGE2() {
+  -4, $c01c
+}
+RDHIRES() {
+  -4, $c01d
+}
+RDALTCHAR() {
+  -4, $c01e
+}
+RD80VID() {
+  -4, $c01f
+}
+TAPEOUT() {
+  -4, $c020
+}
+MONOCOLOR() {
+  -4, $c021
+}
+TBCOLOR() {
+  -4, $c022
+}
+VGCINT() {
+  -4, $c023
+}
+MOUSEDATA() {
+  -4, $c024
+}
+KEYMODREG() {
+  -4, $c025
+}
+DATAREG() {
+  -4, $c026
+}
+KMSTATUS() {
+  -4, $c027
+}
+ROMBANK() {
+  -4, $c028
+}
+NEWVIDEO() {
+  -4, $c029
+}
+LANGSEL() {
+  -4, $c02b
+}
+CHARROM() {
+  -4, $c02c
+}
+SLTROMSEL() {
+  -4, $c02d
+}
+VERTCNT() {
+  -4, $c02e
+}
+HORIZCNT() {
+  -4, $c02f
+}
+SPKR() {
+  -4, $c030
+}
+DISKREG() {
+  -4, $c031
+}
+SCANINT() {
+  -4, $c032
+}
+CLOCKDATA() {
+  -4, $c033
+}
+CLOCKCTL() {
+  -4, $c034
+}
+SHADOW() {
+  -4, $c035
+}
+CYAREG() {
+  -4, $c036
+}
+DMAREG() {
+  -4, $c037
+}
+SCCBREG() {
+  -4, $c038
+}
+SCCAREG() {
+  -4, $c039
+}
+SCCBDATA() {
+  -4, $c03a
+}
+SCCADATA() {
+  -4, $c03b
+}
+SOUNDCTL() {
+  -4, $c03c
+}
+SOUNDDATA() {
+  -4, $c03d
+}
+SOUNDADRL() {
+  -4, $c03e
+}
+SOUNDADRH() {
+  -4, $c03f
+}
+STROBE() {
+  -4, $c040
+}
+INTEN() {
+  -4, $c041
+}
+MMDELTAX() {
+  -4, $c044
+}
+MMDELTAY() {
+  -4, $c045
+}
+DIAGTYPE() {
+  -4, $c046
+}
+CLRVBLINT() {
+  -4, $c047
+}
+CLRXYINT() {
+  -4, $c048
+}
+TXTCLR() {
+  -4, $c050
+}
+TXTSET() {
+  -4, $c051
+}
+MIXCLR() {
+  -4, $c052
+}
+MIXSET() {
+  -4, $c053
+}
+TXTPAGE1() {
+  -4, $c054
+}
+TXTPAGE2() {
+  -4, $c055
+}
+LORES() {
+  -4, $c056
+}
+HIRES() {
+  -4, $c057
+}
+CLRAN0() {
+  -4, $c058
+}
+SETAN0() {
+  -4, $c059
+}
+CLRAN1() {
+  -4, $c05a
+}
+SETAN1() {
+  -4, $c05b
+}
+CLRAN2() {
+  -4, $c05c
+}
+SETAN2() {
+  -4, $c05d
+}
+DHIRESON() {
+  -4, $c05e
+}
+DHIRESOFF() {
+  -4, $c05f
+}
+TAPEIN() {
+  -4, $c060
+}
+RDBTN0() {
+  -4, $c061
+}
+RDBTN1() {
+  -4, $c062
+}
+RDBTN2() {
+  -4, $c063
+}
+PADDL0() {
+  -4, $c064
+}
+PADDL1() {
+  -4, $c065
+}
+PADDL2() {
+  -4, $c066
+}
+PADDL3() {
+  -4, $c067
+}
+STATEREG() {
+  -4, $c068
+}
+TESTREG() {
+  -4, $c069
+}
+CLTRM() {
+  -4, $c06e
+}
+ENTM() {
+  -4, $c06f
+}
+PTRIG() {
+  -4, $c070
+}
+BANKSEL() {
+  -4, $c073
+}
+IOUDISON() {
+  -4, $c07e
+}
+IOUDISOFF() {
+  -4, $c07f
+}
+ROMIN() {
+  -4, $c081
+}
+LCBANK2() {
+  -4, $c083
+}
+LCBANK1() {
+  -4, $c08b
+}
+PH0_off() {
+  -4, $c0e0
+}
+PH0_on() {
+  -4, $c0e1
+}
+PH1_off() {
+  -4, $c0e2
+}
+PH1_on() {
+  -4, $c0e3
+}
+PH2_off() {
+  -4, $c0e4
+}
+PH2_on() {
+  -4, $c0e5
+}
+PH3_off() {
+  -4, $c0e6
+}
+PH3_on() {
+  -4, $c0e7
+}
+Motor_off() {
+  -4, $c0e8
+}
+Motor_on() {
+  -4, $c0e9
+}
+Drive_1() {
+  -4, $c0ea
+}
+Drive_2() {
+  -4, $c0eb
+}
+Q6_off() {
+  -4, $c0ec
+}
+Q6_on() {
+  -4, $c0ed
+}
+Q7_off() {
+  -4, $c0ee
+}
+Q7_on() {
+  -4, $c0ef
+}
+AUXMOVE() {
+  -4, $c311
+}
+XFER() {
+  -4, $c314
+}
+CLRROM() {
+  -4, $cfff
+}
+NEW() {
+  -4, $e5ad
+}
+RESUME() {
+  -4, $f317
+}
+HGR() {
+  -4, $f3de
+}
+PLOT() {
+  -4, $f800
+}
+PLOT1() {
+  -4, $f80e
+}
+HLINE() {
+  -4, $f819
+}
+VLINE() {
+  -4, $f828
+}
+CLRSCR() {
+  -4, $f832
+}
+CLRTOP() {
+  -4, $f836
+}
+GBASCALC() {
+  -4, $f847
+}
+NXTCOL() {
+  -4, $f85f
+}
+SETCOL() {
+  -4, $f864
+}
+SCRN() {
+  -4, $f871
+}
+INSDS1() {
+  -4, $f88c
+}
+INSDS2() {
+  -4, $f88e
+}
+GET816LEN() {
+  -4, $f890
+}
+INSTDSP() {
+  -4, $f8d0
+}
+PRNTYX() {
+  -4, $f940
+}
+PRNTAX() {
+  -4, $f941
+}
+PRNTX() {
+  -4, $f944
+}
+PRBLNK() {
+  -4, $f948
+}
+PRBL2() {
+  -4, $f94a
+}
+PCADJ() {
+  -4, $f953
+}
+TEXT2COPY() {
+  -4, $f962
+}
+OLDIRQ() {
+  -4, $fa40
+}
+BREAK() {
+  -4, $fa4c
+}
+OLDBRK() {
+  -4, $fa59
+}
+RESET() {
+  -4, $fa62
+}
+PWRUP() {
+  -4, $faa6
+}
+SLOOP() {
+  -4, $faba
+}
+REGDSP() {
+  -4, $fad7
+}
+RTBL() {
+  -4, $fb19
+}
+PREAD() {
+  -4, $fb1e
+}
+PREAD4() {
+  -4, $fb21
+}
+INIT() {
+  -4, $fb2f
+}
+SETTXT() {
+  -4, $fb39
+}
+SETGR() {
+  -4, $fb40
+}
+SETWND() {
+  -4, $fb4b
+}
+SETWND2() {
+  -4, $fb51
+}
+TABV() {
+  -4, $fb5b
+}
+APPLEII() {
+  -4, $fb60
+}
+SETPWRC() {
+  -4, $fb6f
+}
+VIDWAIT() {
+  -4, $fb78
+}
+KBDWAIT() {
+  -4, $fb88
+}
+VERSION() {
+  -4, $fbb3
+}
+ZIDBYTE2() {
+  -4, $fbbf
+}
+ZIDBYTE() {
+  -4, $fbc0
+}
+BASCALC() {
+  -4, $fbc1
+}
+BELL1() {
+  -4, $fbdd
+}
+BELL12() {
+  -4, $fbe2
+}
+BELL2() {
+  -4, $fbe4
+}
+STORADV() {
+  -4, $fbf0
+}
+ADVANCE() {
+  -4, $fbf4
+}
+VIDOUT() {
+  -4, $fbfd
+}
+BS() {
+  -4, $fc10
+}
+UP() {
+  -4, $fc1a
+}
+VTAB() {
+  -4, $fc22
+}
+VTABZ() {
+  -4, $fc24
+}
+ESC() {
+  -4, $fc2c
+}
+CLREOP() {
+  -4, $fc42
+}
+HOME() {
+  -4, $fc58
+}
+CR() {
+  -4, $fc62
+}
+LF() {
+  -4, $fc66
+}
+SCROLL() {
+  -4, $fc70
+}
+CLREOL() {
+  -4, $fc9c
+}
+CLREOLZ() {
+  -4, $fc9e
+}
+WAIT() {
+  -4, $fca8
+}
+NXTA4() {
+  -4, $fcb4
+}
+NXTA1() {
+  -4, $fcba
+}
+HEADR() {
+  -4, $fcc9
+}
+RDKEY() {
+  -4, $fd0c
+}
+FD10() {
+  -4, $fd10
+}
+RDKEY1() {
+  -4, $fd18
+}
+KEYIN() {
+  -4, $fd1b
+}
+RDCHAR() {
+  -4, $fd35
+}
+GETLNZ() {
+  -4, $fd67
+}
+GETLN() {
+  -4, $fd6a
+}
+GETLN0() {
+  -4, $fd6c
+}
+GETLN1() {
+  -4, $fd6f
+}
+CROUT1() {
+  -4, $fd8b
+}
+CROUT() {
+  -4, $fd6e
+}
+PRA1() {
+  -4, $fd92
+}
+PRBYTE() {
+  -4, $fdda
+}
+PRHEX() {
+  -4, $fde3
+}
+COUT() {
+  -4, $fded
+}
+COUT1() {
+  -4, $fdf0
+}
+COUTZ() {
+  -4, $fdf6
+}
+IDROUTINE() {
+  -4, $fe1f
+}
+MOVE() {
+  -4, $fe2c
+}
+LIST() {
+  -4, $fe5e
+}
+INVERSE() {
+  -4, $fe80
+}
+NORMAL() {
+  -4, $fe84
+}
+SETKBD() {
+  -4, $fe89
+}
+INPORT() {
+  -4, $fe8b
+}
+SETVID() {
+  -4, $fe93
+}
+OUTPORT() {
+  -4, $fe95
+}
+GO() {
+  -4, $feb6
+}
+WRITE() {
+  -4, $fecd
+}
+READ() {
+  -4, $fefd
+}
+PRERR() {
+  -4, $ff2d
+}
+BELL() {
+  -4, $ff3a
+}
+RESTORE() {
+  -4, $ff3f
+}
+RSTR1() {
+  -4, $ff44
+}
+SAVE() {
+  -4, $ff4a
+}
+SAV1() {
+  -4, $ff4c
+}
+IORTS() {
+  -4, $ff58
+}
+OLDRST() {
+  -4, $ff59
+}
+MON() {
+  -4, $ff65
+}
+MONZ() {
+  -4, $ff69
+}
+MONZ2() {
+  -4, $ff6c
+}
+MONZ4() {
+  -4, $ff70
+}
+DIG() {
+  -4, $ff8a
+}
+GETNUM() {
+  -4, $ffa7
+}
+NXTCHR() {
+  -4, $ffad
+}
+TOSUB() {
+  -4, $ffbe
+}
+ZMODE() {
+  -4, $ffc7
+}
+StdText() {
+  -4, $e01e04
+}
+StdLine() {
+  -4, $e01e08
+}
+StdRect() {
+  -4, $e01e0c
+}
+StdRRect() {
+  -4, $e01e10
+}
+StdOval() {
+  -4, $e01e14
+}
+StdArc() {
+  -4, $e01e18
+}
+StdPoly() {
+  -4, $e01e1c
+}
+StdRgn() {
+  -4, $e01e20
+}
+StdPixels() {
+  -4, $e01e24
+}
+StdComment() {
+  -4, $e01e28
+}
+StdTxMeas() {
+  -4, $e01e2c
+}
+StdTxBnds() {
+  -4, $e01e30
+}
+StdGetPic() {
+  -4, $e01e34
+}
+StdPutPic() {
+  -4, $e01e38
+}
+ShieldCursor() {
+  -4, $e01e98
+}
+UnshieldCursor() {
+  -4, $e01e9c
+}

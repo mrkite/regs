@@ -1,0 +1,278 @@
+DialogErr enum<int16> {
+  badItemType = $150a,
+  newItemFailed = $150b,
+  itemNotFound = $150c,
+  notModalDialog = $150d,
+}
+
+DialogCmd enum<int16> {
+  getInitView = $0001,
+  getInitTotal = $0002,
+  getInitValue = $0003,
+  scrollLineUp = $0004,
+  scrollLineDown = $0005,
+  scrollPageUp = $0006,
+  scrollPageDown = $0007,
+  scrollThumb = $0008,
+}
+
+DialogItemType enum<int16> {
+  buttonItem = $000a,
+  checkItem = $000b,
+  radioItem = $000c,
+  scrollBarItem = $000d,
+  userCtlItem = $000e,
+  statText = $000f,
+  longStatText = $0010,
+  editLine = $0011,
+  iconitem = $0012,
+  picItem = $0013,
+  userItem = $0014,
+  userCtlItem2 = $0015,
+  longStatText2 = $0016,
+  itemDisable = $8000,
+}
+
+DialogItemID enum<int16> {
+  ok = $0001,
+  cancel = $0002,
+}
+
+DialogPartCode enum<int16> {
+  inButton = $0002,
+  inCheckBox = $0003,
+  inRadioButton = $0004,
+  inUpArrow = $0005,
+  inDownArrow = $0006,
+  inPageUp = $0007,
+  inPageDown = $0008,
+  inStatText = $0009,
+  inGrow = $000a,
+  inEditLine = $000b,
+  inUserItem = $000c,
+  inLongStatText = $000d,
+  inIconItem = $000e,
+  inLongStatText2 = $000f,
+  inThumb = $0081,
+}
+
+StageBitVector enum<uint8> {
+  okDefault = $00,
+  cancelDefault = $40,
+  alertDrawn = $80,
+}
+
+DialogPtr = WindowPtr;
+ItemTempHndl = ^ItemTempPtr;
+ItemTempPtr = ^ItemTemplate;
+ItemTemplate struct {
+  itemID: DialogItemID;
+  itemRect: Rect;
+  itemType: DialogItemType;
+  itemDescr: Ptr;
+  itemValue: int16;
+  itemFlag: int16;
+  itemColor: Ptr;
+}
+
+AlertTempHndl = ^AlertTempPtr;
+AlertTempPtr = ^AlertTemplate;
+AlertTemplate struct {
+  atBoundsRect: Rect;
+  atAlertID: int16;
+  atStage1: StageBitVector;
+  atStage2: StageBitVector;
+  atStage3: StageBitVector;
+  atStage4: StageBitVector;
+  atItemsList: ItemTempPtr[5];
+}
+
+DlgTempHndl = ^DlgTempPtr;
+DlgTempPtr = ^DialogTemplate;
+DialogTemplate struct {
+  dtBoundsRect: Rect;
+  dtVisible: bool;
+  dtRefCon: int32;
+  dtItemList: ItemTempPtr[8];
+}
+
+IconRecordHndl = ^IconRecordPtr;
+IconRecordPtr = ^IconRecord;
+IconRecord struct {
+  iconRect: Rect;
+  iconImage: uint8[];
+}
+
+UserCtlItemPBHndl = ^UserCtlItemPBPtr;
+UserCtlItemPBPtr = ^UserCtlItemPB;
+UserCtlItemPB struct {
+  defProcParm: int32;
+  titleParm: Ptr;
+  param2: int16;
+  param1: int16;
+}
+
+DialogBootInit() {
+  $15, $01
+}
+DialogStartUp(userID: int16) {
+  $15, $02
+}
+DialogShutDown() {
+  $15, $03
+}
+DialogVersion(): int16 {
+  $15, $04
+}
+DialogReset() {
+  $15, $05
+}
+DialogStatus(): bool {
+  $15, $06
+}
+Alert(alertTemplatePtr: ^AlertTemplate, filterProcPtr: WordProcPtr): int16 {
+  $15, $17
+}
+CautionAlert(alertTemplatePtr: ^AlertTemplate,
+  filterProcPtr: WordProcPtr): int16 {
+  $15, $1a
+}
+CloseDialog(theDialogPtr: DialogPtr) {
+  $15, $0c
+}
+DefaultFilter(theDialogPtr: DialogPtr, theEventPtr: ^EventRecord,
+  itemHitPtr: IntPtr): bool {
+  $15, $36
+}
+DialogSelect(theEventPtr: ^EventRecord, resultPtr: ^WindowPtr,
+  itemHitPtr: ^int16): bool {
+  $15, $11
+}
+DisableDItem(theDialogPtr: DialogPtr, itemID: int16) {
+  $15, $39
+}
+DlgCopy(theDialogPtr: DialogPtr) {
+  $15, $13
+}
+DlgCut(theDialogPtr: DialogPtr) {
+  $15, $12
+}
+DlgDelete(theDialogPtr: DialogPtr) {
+  $15, $15
+}
+DlgPaste(theDialogPtr: DialogPtr) {
+  $15, $14
+}
+DrawDialog(theDialogPtr: DialogPtr) {
+  $15, $16
+}
+EnableDItem(theDialogPtr: DialogPtr, itemID: int16) {
+  $15, $3a
+}
+ErrorSound(soundProcPtr: VoidProcPtr) {
+  $15, $09
+}
+FindDItem(theDialogPtr: DialogPtr, thePoint: Point): DialogPartCode {
+  $15, $24
+}
+GetAlertStage(): int16 {
+  $15, $34
+}
+GetControlDItem(theDialogPtr: DialogPtr, itemID: int16): CtlRecHndl {
+  $15, $1e
+}
+GetDefButton(theDialogPtr: DialogPtr): int16 {
+  $15, $37
+}
+GetDItemBox(theDialogPtr: DialogPtr, itemID: int16, itemBoxPtr: ^Rect) {
+  $15, $28
+}
+GetDItemType(theDialogPtr: DialogPtr, itemID: int16): int16 {
+  $15, $26
+}
+GetDItemValue(theDialogPtr: DialogPtr, itemID: int16): int16 {
+  $15, $2e
+}
+GetFirstDItem(theDialogPtr: DialogPtr): int16 {
+  $15, $2a
+}
+GetIText(theDialogPtr: DialogPtr, itemID: int16, text: ^Str255) {
+  $15, $1f
+}
+GetNewDItem(theDialogPtr: DialogPtr, itemTemplatePtr: ^ItemTemplate) {
+  $15, $33
+}
+GetNewModalDialog(dialogTemplatePtr: DlgTempPtr): DialogPtr {
+  $15, $32
+}
+GetNextDItem(theDialogPtr: DialogPtr, itemID: int16): int16 {
+  $15, $2b
+}
+HideDItem(theDialogPtr: DialogPtr, itemID: int16) {
+  $15, $22
+}
+IsDialogEvent(theEventPtr: ^EventRecord): bool {
+  $15, $10
+}
+ModalDialog(filterProcPtr: WordProcPtr): int16 {
+  $15, $0f
+}
+ModalDialog2(filterProcPtr: WordProcPtr): DialogPartCode {
+  $15, $2c
+}
+NewDItem(theDialogPtr: DialogPtr, itemID: int16, itemRectPtr: ^Rect,
+  itemType: DialogItemType, itemDescr: Ptr, itemValue: int16, itemFlag: int16,
+  itemColorPtr: Ptr) {
+  $15, $0d
+}
+NewModalDialog(dBoundsRectPtr: ^Rect, dVisibleFlag: bool,
+  dRefCon: int32): DialogPtr {
+  $15, $0a
+}
+NewModelessDialog(dboundsRectPtr: ^Rect, dTitle: ^Str255, dBehindPtr: DialogPtr,
+  dFlag: int16, dRefCon: int32, dFullSizePtr: ^Rect): DialogPtr {
+  $15, $0b
+}
+NoteAlert(alertTemplatePtr: AlertTempPtr, filterProcPtr: WordProcPtr): int16 {
+  $15, $19
+}
+ParamText(param0: ^Str255, param1: ^Str255, param2: ^Str255, param3: ^Str255) {
+  $15, $1b
+}
+RemoveDItem(theDialogPtr: DialogPtr, itemID: int16) {
+  $15, $0e
+}
+ResetAlertStage() {
+  $15, $35
+}
+SelIText(theDialogPtr: DialogPtr, itemID: int16, startSel: int16,
+  endSel: int16) {
+  $15, $21
+}
+SetDAFont(fontHandle: FontHndl) {
+  $15, $1c
+}
+SetDefButton(defButtonID: int16, theDialogPtr: DialogPtr) {
+  $15, $38
+}
+SetDItemBox(theDialogPtr: DialogPtr, itemID: int16, itemBoxPtr: ^Rect) {
+  $15, $29
+}
+SetDItemType(itemType: DialogItemType, theDialogPtr: DialogPtr, itemID: int16) {
+  $15, $27
+}
+SetDItemValue(itemValue: int16, theDialogPtr: DialogPtr, itemID: int16) {
+  $15, $2f
+}
+SetIText(theDialogPtr: DialogPtr, itemID: int16, theString: ^Str255) {
+  $15, $20
+}
+ShowDItem(theDialogPtr: DialogPtr, itemID: int16) {
+  $15, $23
+}
+StopAlert(alertTemplatePtr: AlertTempPtr, filterProcPtr: WordProcPtr): int16 {
+  $15, $18
+}
+UpdateDialog(theDialogPtr: DialogPtr, updateRgnHandle: RgnHandle) {
+  $15, $25
+}

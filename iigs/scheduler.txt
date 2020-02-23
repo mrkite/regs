@@ -1,0 +1,24 @@
+SchBootInit() {
+  $07, $01
+}
+SchStartUp() {
+  $07, $02
+}
+SchShutDown() {
+  $07, $03
+}
+SchVersion(): int16 {
+  $07, $04
+}
+SchReset() {
+  $07, $05
+}
+SchStatus(): bool {
+  $07, $06
+}
+SchAddTask(taskPtr: VoidProcPtr): bool {
+  $07, $09
+}
+SchFlush() {
+  $07, $0a
+}

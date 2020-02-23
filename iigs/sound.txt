@@ -1,0 +1,150 @@
+SoundErr enum<int16> {
+  noDOCFndErr = $0810,
+  docAddrRngErr = $0811,
+  noSAppInitErr = $0812,
+  invalGenNumErr = $0813,
+  synthModeErr = $0814,
+  genBusyErr = $0815,
+  mstrIRQNotAssgnErr = $0817,
+  sndAlreadyStrtErr = $0818,
+  unclaimedSndIntErr = $08ff,
+}
+
+ChannelGenMode enum<int16> {
+  ffSynthMode = $0001,
+  noteSynthMode = $0002,
+}
+
+GenMask enum<int16> {
+  gen0off = $0001,
+  gen1off = $0002,
+  gen2off = $0004,
+  gen3off = $0008,
+  gen4off = $0010,
+  gen5off = $0020,
+  gen6off = $0040,
+  gen7off = $0080,
+  gen8off = $0100,
+  gen9off = $0200,
+  gen10off = $0400,
+  gen11off = $0800,
+  gen12off = $1000,
+  gen13off = $2000,
+  gen14off = $4000,
+}
+
+GenStatus enum<uint16> {
+  genAvail = $0000,
+  ffSynth = $0100,
+  noteSynth = $0200,
+  lastBlock = $8000,
+}
+
+JumpTable enum<uint8> {
+  smReadRegister = $00,
+  smWriteRegister = $04,
+  smReadRam = $08,
+  smWriteRam = $0c,
+  smReadNext = $10,
+  smWriteNext = $14,
+  smOscTable = $18,
+  smGenTable = $1c,
+  smGcbAddrTable = $20,
+  smDisableInc = $24,
+}
+
+SoundPBHndl = ^SoundPBPtr;
+SoundPBPtr = ^SoundParamBlock;
+SoundParamBlock struct {
+  waveStart: Ptr;
+  waveSize: int16;
+  freqOffset: int16;
+  docBuffer: int16;
+  bufferSize: int16;
+  nextWavePtr: SoundPBPtr;
+  volSetting: int16;
+}
+
+DocRegParamBlkPtr = ^DocRegParamBlk;
+DocRegParamBlk struct {
+  oscGenType: int16;
+  freqLow1: uint8;
+  freqHigh1: uint8;
+  vol1: uint8;
+  tablePtr1: uint8;
+  control1: uint8;
+  tableSize1: uint8;
+  freqLow2: uint8;
+  freqHigh2: uint8;
+  vol2: uint8;
+  tablePtr2: uint8;
+  control2: uint8;
+  tableSize2: uint8;
+}
+
+SoundBootInit() {
+  $08, $01
+}
+SoundStartUp(dPageAddr: int16) {
+  $08, $02
+}
+SoundShutDown() {
+  $08, $03
+}
+SoundVersion(): int16 {
+  $08, $04
+}
+SoundReset() {
+  $08, $05
+}
+SoundToolStatus(): bool {
+  $08, $06
+}
+FFGeneratorStatus(genNumber: int16): GenStatus {
+  $08, $11
+}
+FFSoundDoneStatus(genNumber: int16): bool {
+  $08, $14
+}
+FFSoundStatus(): int16 {
+  $08, $10
+}
+FFStartSound(genNumFFSynth: int16, pBlockPtr: SoundPBPtr) {
+  $08, $0e
+}
+FFStopSound(genMask: GenMask) {
+  $08, $0f
+}
+GetSoundVolume(genNumber: int16): int16 {
+  $08, $0c
+}
+GetTableAddress(): Ptr {
+  $08, $0b
+}
+ReadRamBlock(destPtr: Ptr, docStart: int16, byteCount: int16) {
+  $08, $0a
+}
+SetSoundMIRQV(sMasterIRQ: int32) {
+  $08, $12
+}
+SetSoundVolume(volume: int16, genNumber: int16) {
+  $08, $0d
+}
+SetUserSoundIRQV(userIRQVector: int32): Ptr {
+  $08, $13
+}
+WriteRamBlock(srcPtr: Ptr, docStart: int16, byteCount: int16) {
+  $08, $09
+}
+FFSetUpSound(channelGen: int16, paramBlockPtr: SoundPBPtr) {
+  $08, $15
+}
+FFStartPlaying(genWord: int16) {
+  $08, $16
+}
+SetDOCReg(pBlockPtr: ^DocRegParamBlk) {
+  $08, $17
+}
+ReadDOCReg(pBlockPtr: ^DocRegParamBlk) {
+  $08, $18
+}

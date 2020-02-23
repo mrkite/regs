@@ -1,0 +1,237 @@
+LogFlags enum<int16> {
+  resLogOut = $0,
+  resLogIn = $1,
+  resLogApp = $0,
+  resLogSys = $2,
+}
+
+ResErr enum<int16> {
+  resForkUsed = $1e01,
+  resBadFormat = $1e02,
+  resForkEmpty = $1e03,
+  resNoCurFile = $1e04,
+  resDupID = $1e05,
+  resNotFound = $1e06,
+  resFileNotFound = $1e07,
+  resBadAppID = $1e08,
+  resNoUniqueID = $1e09,
+  resBadAttr = $1e0a,
+  resHashGone = $1e0b,
+  resIndexRange = $1e0d,
+  resNoCurApp = $1e0e,
+}
+
+ResFlags enum<int16> {
+  resChanged = $0020,
+  resPreLoad = $0040,
+  resProtected = $0080,
+  resAbsLoad = $0400,
+  resConverter = $0800,
+  resMemAttr = $c3f1,
+  systemMap = $0001,
+  mapChanged = $0002,
+  romMap = $0004,
+}
+
+ResType enum<uint32> {
+  rIcon = $8001,
+  rPicture = $8002,
+  rControlList = $8003,
+  rControlTemplate = $8004,
+  rWindow = $8005,
+  rString = $8006,
+  rStringList = $8007,
+  rMenuBar = $8008,
+  rMenu = $8009,
+  rMenuItem = $800a,
+  rTextForLETextBox2 = $800b,
+  rCtlDefProc = $800c,
+  rCtlColorTbl = $800d,
+  rWindParam1 = $800e,
+  rWindParam2 = $800f,
+  rWindColor = $8010,
+  rResName = $8014,
+}
+
+ResID = int32;
+ResAttr = int32;
+
+ResHeaderRec struct {
+  rFileVersion: int32;
+  rFileToMap: int32;
+  rFileMapSize: int32;
+  rFileMemo: uint8[128];
+  rFileRecSize: int32;
+}
+
+FreeBlockRec struct {
+  blkOffset: int32;
+  blkSize: int32;
+}
+
+ResMapHandle = ^ResMapPtr;
+ResMapPtr = ^ResMap;
+ResMap struct {
+  mapNext: ResMapHandle;
+  mapFlag: int16;
+  mapOffset: int32;
+  mapSize: int32;
+  mapToIndex: int16;
+  mapFileNum: int16;
+  mapID: int16;
+  mapIndexSize: int32;
+  mapIndexUsed: int32;
+  mapFreeListSize: int16;
+  mapFreeListUsed: int16;
+  mapFreeList: FreeBlockRec[];
+}
+
+ResRefRecPtr = ^ResRefRec;
+ResRefRec struct {
+  fResType: ResType;
+  fResID: ResID;
+  fResOffset: int32;
+  fResAttr: ResAttr;
+  fResSize: int32;
+  fResHandle: Handle;
+}
+
+ResourceSpec struct {
+  resourceType: ResType;
+  resourceID: ResID;
+}
+
+ResNameEntryPtr = ^ResNameEntry;
+ResNameEntry struct {
+  namedResID: ResID;
+  resName: Str255;
+}
+
+ResNameRecordHandle = ^ResNameRecordPtr;
+ResNameRecordPtr = ^ResNameRecord;
+ResNameRecord struct {
+  version: int16;
+  nameCount: int32;
+  resNameEntries: ResNameEntry[];
+}
+
+ResourceBootInit() {
+  $1e, $01
+}
+ResourceStartup(userID: int16) {
+  $1e, $02
+}
+ResourceShutdown() {
+  $1e, $03
+}
+ResourceVersion(): int16 {
+  $1e, $04
+}
+ResourceReset() {
+  $1e, $05
+}
+ResourceStatus(): bool {
+  $1e, $06
+}
+AddResource(resourceHandle: Handle, resourceAtttr: ResAttr,
+  resourceType: ResType, resourceID: ResID) {
+  $1e, $0c
+}
+CloseResourceFile(fileID: int16) {
+  $1e, $0b
+}
+CountResources(resourceType: ResType): int32 {
+  $1e, $22
+}
+CountTypes(): int16 {
+  $1e, $20
+}
+CreateResourceFile(auxType: int32, fileType: int16, fileAccess: Access,
+  fileName: GSString255Ptr) {
+  $1e, $09
+}
+DetachResource(resourceType: ResType, resourceID: ResID) {
+  $1e, $18
+}
+GetCurResourceApp(): int16 {
+  $1e, $14
+}
+GetCurResourceFile(): int16 {
+  $1e, $12
+}
+GetIndResource(resourceType: ResType, resourceIndex: int32): ResID {
+  $1e, $23
+}
+GetIndType(typeIndex: int16): ResType {
+  $1e, $21
+}
+GetMapHandle(fileID: int16): ResMapHandle {
+  $1e, $26
+}
+GetOpenFileRefNum(fileID: int16): int16 {
+  $1e, $1f
+}
+GetResourceAttr(resourceType: ResType, resourceID: ResID): ResAttr {
+  $1e, $1b
+}
+GetResourceSize(resourceType: ResType, currentID: ResID): int32 {
+  $1e, $1d
+}
+HomeResourceFile(resourceType: ResType, resoruceID: ResID): int16 {
+  $1e, $15
+}
+LoadAbsResource(loadAddress: int32, maxSize: int32, resourceType: ResType,
+  resourceID: ResID): Handle {
+  $1e, $27
+}
+LoadResource(resourceType: ResType, resourceID: ResID): Handle {
+  $1e, $0e
+}
+MarkResourceChange(changeFlag: bool, resourceType: ResType, resourceID: ResID) {
+  $1e, $10
+}
+MatchResourceHandle(foundRec: Ptr, resourceHandle: Handle) {
+  $1e, $1e
+}
+OpenResourceFile(openAccess: Access, resourceMapPtr: ResMapPtr,
+  fileName: GSString255Ptr): int16 {
+  $1e, $0a
+}
+ReleaseResource(purgeLevel: int16, resourceType: ResType, resourceID: ResID) {
+  $1e, $17
+}
+RemoveResource(resourceType: ResType, resourceID: ResID) {
+  $1e, $0f
+}
+ResourceConverter(converterProc: ProcPtr, resourceType: ResType,
+  logFlags: LogFlags) {
+  $1e, $28
+}
+SetCurResourceApp(userID: int16) {
+  $1e, $13
+}
+SetCurResourceFile(fileID: int16) {
+  $1e, $11
+}
+SetResourceAttr(resourceAttr: ResAttr, resourceType: ResType,
+  currentID: ResID) {
+  $1e, $1c
+}
+SetResourceFileDepth(searchDepth: int16): int16 {
+  $1e, $25
+}
+SetResourceID(newID: ResID, resourceType: ResType, currentID: ResID) {
+  $1e, $1a
+}
+SetResourceLoad(readFlag: int16): int16 {
+  $1e, $24
+}
+UniqueResourceID(IDrange: int16, resourceType: ResType): ResID {
+  $1e, $19
+}
+UpdateResourceFile(fileID: int16) {
+  $1e, $0d
+}
+WriteResource(resourceType: ResType, resourceID: ResID) {
+  $1e, $16
+}

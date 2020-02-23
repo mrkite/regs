@@ -1,0 +1,97 @@
+P8_ALLOC_INTERRUPT(param_count: uint8, int_num: uint8, int_code: uint16) {
+  -2, 2, $40
+}
+P8_DEALLOC_INTERRUPT(param_count: uint8, int_num: uint8) {
+  -2, 2, $41
+}
+P8_AppleTalk(async: uint8, cmd: uint8, result: uint16) {
+  -2, 2, $42
+}
+P8_QUIT(param_count: uint8, type: uint8, rsvd: uint16, rsvd2: uint8,
+  rsvd3: uint16) {
+  -2, 2, $65
+}
+P8_READ_BLOCK(param_count: uint8, unit_num: uint8, data_buffer: uint16,
+  block_num: uint16) {
+  -2, 2, $80
+}
+P8_WRITE_BLOCK(param_count: uint8, unit_num: uint8, data_buffer: uint16,
+  block_num: uint16) {
+  -2, 2, $81
+}
+P8_GET_TIME() {
+  -2, 2, $82
+}
+P8_CREATE(param_count: uint8, pathname: uint16, access: uint8,
+  file_type: uint8, aux_type: uint16, storage_type: uint8,
+  create_date: uint16, create_time: uint16) {
+  -2, 2, $c0
+}
+P8_DESTROY(param_count: uint8, pathname: uint16) {
+  -2, 2, $c1
+}
+P8_RENAME(param_count: uint8, pathname: uint16, new_pathname: uint16) {
+  -2, 2, $c2
+}
+P8_SET_FILE_INFO(param_count: uint8, pathname: uint16, access: uint8,
+  file_type: uint8, aux_type: uint16, null_field: uint16, null_field2: uint8,
+  mod_date: uint16, mod_time: uint16) {
+  -2, 2, $c3
+}
+P8_GET_FILE_INFO(param_count: uint8, pathname: uint16, access: uint8,
+  file_type: uint8, aux_type: uint16, storage_type: uint8, blocks_used: uint16,
+  mod_date: uint16, mod_time: uint16, create_date: uint16,
+  create_time: uint16) {
+  -2, 2, $c4
+}
+P8_ON_LINE(param_count: uint8, unit_num: uint8, data_buffer: uint16) {
+  -2, 2, $c5
+}
+P8_SET_PREFIX(param_count: uint8, pathname: uint16) {
+  -2, 2, $c6
+}
+P8_GET_PREFIX(param_count: uint8, data_buffer: uint16) {
+  -2, 2, $c7
+}
+P8_OPEN(param_count: uint8, pathname: uint16, io_buffer: uint16,
+  ref_num: uint8) {
+  -2, 2, $c8
+}
+P8_NEWLINE(param_count: uint8, ref_num: uint8, enable_mask: uint8,
+  newline_char: uint8) {
+  -2, 2, $c9
+}
+P8_READ(param_count: uint8, ref_num: uint8, data_buffer: uint16,
+  request_count: uint16, trans_count: uint16) {
+  -2, 2, $ca
+}
+P8_WRITE(param_count: uint8, ref_num: uint8, data_buffer: uint16,
+  request_count: uint16, trans_count: uint16) {
+  -2, 2, $cb
+}
+P8_CLOSE(param_count: uint8, ref_num: uint8) {
+  -2, 2, $cc
+}
+P8_FLUSH(param_count: uint8, ref_num: uint8) {
+  -2, 2, $cd
+}
+P8_SET_MARK(param_count: uint8, ref_num: uint8, position: uint16,
+  positionhi: uint8) {
+  -2, 2, $ce
+}
+P8_GET_MARK(param_count: uint8, ref_num: uint8, position: uint16,
+  positionhi: uint8) {
+  -2, 2, $cf
+}
+P8_SET_EOF(param_count: uint8, ref_num: uint8, eof: uint16, eofhi: uint8) {
+  -2, 2, $d0
+}
+P8_GET_EOF(param_count: uint8, ref_num: uint8, eof: uint16, eofhi: uint8) {
+  -2, 2, $d1
+}
+P8_SET_BUF(param_count: uint8, ref_num: uint8, io_buffer: uint16) {
+  -2, 2, $d2
+}
+P8_GET_BUF(param_count: uint8, ref_num: uint8, io_buffer: uint16) {
+  -2, 2, $d3
+}

@@ -1,214 +1,214 @@
 # What is this?
 
-This is a set of command-line tools designed specifically to reverse engineer Apple IIgs software.  It is comprised of 3 separate tools; `2mg`, `omf`, and `regs`.
+This is a set of command-line tools designed specifically to reverse engineer Apple IIgs software.  It is comprised of 2 separate tools; `2mg` and `regs`.  The first is a simple tool to extract disk images, the second is a more complicated tool that disassembles executables and allows you to query API information.
 
+# 2mg
 
+`2mg` extracts .2mg and .po prodos disk images.  When you give it a disk image filename, it will create a folder with the name of the disk, and extract all the files into that folder with the proper hierarchy.
 
-## 2mg
+You can also use it to list the contents of the disk image with the `-l` or `--list` command line argument.  Listing out the files will also give you the metadata associated with each file, such as creation date and file type.
 
-`2mg` extracts .2mg and .po prodos disk images.  You can also just list the contents of the disk image with the `-l` or `--list` command line argument.  Otherwise, it will create a folder with the name of the disk and extract all the files into that folder.
+# regs
 
-Listing out the files will also give you the metadata associated with each
-file.  In particular, it will tell you the type and auxiliary type for
-the files.
+`regs` is a combination of a couple of disassembly tools.  It can disassemble raw binary files, it can disassemble OMF files (like sys16 or tool files), and it can be used to inspect the Apple IIgs API.
 
+Since it is a tracing disassembler, it will start disassembly at a given entrypoint and follow all possible paths.  Everything not disassembled will be assumed to be data and shown as a hex dump.
 
-## omf
+The first time `regs` is used to disassemble a specific file, it will create a `.regs` file with auto-detected information.
 
-`omf` is a rather complicated tool which is designed to extract relocatable segments from OMF files.  Apple IIgs executables  (.s16 files) and system tools (ex. SYSTEM/TOOLS/TOOL025) are in OMF format.
+## regs commandline arguments
 
-You first run this tool and pass it an OMF file and it will generate a .map file.  This map file is a simple text file that you may edit.  Each line is in the format:
+`regs` has a few flags that you can use to customize its disassembly.  If you are disassembling an OMF file, none of these flags do anything; the OMF file overrides this information.
 
-`segment:memory location`
+These flags are really only useful for the initial disassembly.  Once a `.regs` file is created, you should use that to customize all future disassembly of that particular file.
 
-The `segment`is the segment number from the OMF file, and `memory location` is where in memory to relocate that segment.
+For regular binary executables, you can specify where in memory they should be loaded with the `-o` or `--org` flag.  The passed address can be in decimal, or in hexadecimal if preceded with `$` or `0x`.  Be sure to wrap the argument in single-quotes if you use `$`, otherwise your shell will interpret it as a variable.  This address will also be used as the entrypoint of the executable.
 
-`omf` does its best to automatically pack all the relocatable segments into the smallest memory possible, starting at `$2/0000`.  You can change the starting memory address with the `-o` or `--org` argument.   If you wish to manually specify where each segment should go in memory, feel free to edit the .map file however you wish.
+You can force the disassembler to start in emulation mode with the `-e` flag. By default, the disassembler starts in native mode.  You can force the disassembler to use an 8-bit accumulator with '-m' and 8-bit indices with '-x'.  However, emulation mode assumes both of those flags already, just like on the actual hardware.
 
-The next step is to run `omf` again, this time specifying the map file with `-m` or `--map`. This will apply the .map to the OMF and output each segment along with a corresponding .map file.  `omf` will throw an error if the segments cannot be mapped as the .map file dictates (for example, you modified the map file so that the segments accidentally overlap).
+You'll notice there is also a `-l` flag, this is used for API queries, as described below.
 
-`omf` will modify each segment, applying the proper relocations before outputting the segment.  If you wish to change where a segment is in memory, you should modify the original .map file and re-run `omf`. The resulting output files will be hardcoded for those specific memory locations.
+## .regs files
 
-The segment outputs will be named `segX` and `segX.map`, where `X` is the segment number, in hex.  If you wish to change the prefix from `seg` use the `-p` or `--prefix` argument.
+As stated earlier, the first time you execute the disassembler, it creates a `.regs` file for that given executable.  The format of this file is fairly starightforward and lets you customize disassembly further.
 
-At this point, you can use the resulting segment files and map files as input to the `regs` tool.
+Each line in this file starts with an address.  This address is of the format `$bank/offset` where both the dollar sign `$` and bank divider `/` are optional.
 
+If the address is followed by an exclamation point `!`, it means this address is used as the point in memory the executable is loaded at.  (OMF files will ignore this). If more than one address is followed by an exclamation point, only the first address encountered will be used.
 
+If the address is followed by a colon `:`, it means this address is considered an entrypoint.  Disassembly will start at this address.  There can be as many entrypoints as you wish.  In fact, as you disassemble a file, you may notice that disassembly is halted by indirect jumps.  You can add entrypoints to the `.regs` file to continue disassembly at the destination of those jumps.
 
-## regs
+After the colon, you can optionally specify "e" "m", "x" or any combination of those characters to force the disassembler state when disassembly starts at that entry point.
 
-`regs`is my 65816 tracing disassembler.  It can be used in conjunction with the .map files created by `omf` or on its own.  Since it is a tracing disassembler, it will start disassembly at a given location, and keep disassembling, following all possible paths.  Everything not disassembled will be assumed to be data and shown in a hex view.
+Finally, if the address is followed by a angle-bracket `<`, then this address has a symbolic name.  The symbolic name should be terminated with a closing angle-bracket `>`.  If an address has a symbolic name, this name will be used in place of the address whenever it appears in disassembly.
 
-
-
-#### regs by itself
-
-You can call `regs` and simply pass it a binary file and it will attempt to disassemble it.   You can specify where in memory it should load the file before disassembly with the `-o` or `--org` argument.  You can also control whether or not the disassembler is in emulation mode or 16-bit mode with various command-line arguments.  Emulation mode is also useful for disassembling 8-bit Apple II software.  Use `-e` to start in emulation mode (default native mode), `-m` to start with an 8-bit accumulator (default 16-bit), and `-x` to start with 8-bit index registers (default 16-bit).
-
-
-
-#### regs with .map files
-
-`regs` with .map files is where the disassembler really shines.  You can call `regs` and pass it a .map file generated by `omf` and have real control over the disassembly.  The .map file is designed to be edited by hand.  The format is as follows:
+An address can be followed by any and all of the preceding markers.  For example, say you have an executable that is loaded at `$300`, which is also the entry point, and you want to start in emulation mode, and give the entrypoint a meaningful name.  This is a very common scenario and would result in a `.regs` file with a single line:
 
 ```
-gMAP "seg1"
-sORG $30000
-$30000:
-$30053:mx
-$31066:e
-$35440:d <myTable>
+$300!:e<start>
 ```
 
-The first line specifies the segment file that this map applies to.  The filename in the quotes should be relative to the current directory.
+Notice I left out the bank divider since it wasn't needed (the bank would naturally be 0), and also the 'm' and 'x' flags are always on in emulation mode, so I didn't need to include them.
 
-The next line specifies where the segment belongs in memory.  **Do not edit this** if the segment was created by `omf`, since it has also been hardcoded in the binary.
+The `.regs` file is actually rewritten every time you run the disassembler, so the format will be standardized and addresses will be sorted automatically for you.
 
-The next lines are a list of entry points to begin disassembly at.  If, when analyzing the disassembly you find a switch case encoded as an indirect jump, you can take that list of jumps and add them to the map file and re-run `regs` to disassemble the previously un-disassembled data.  As you work through a disassembly, you may end up with a map file with hundreds of entry points, that's normal.
+## Workflow
 
-The flags after the colon are optional, and specify whether emulation mode should be enabled, or 16-bit or 8-bit accumulator and index registers should be used.  It defaults to native mode with 16-bit registers.
+Since it may not be obvious if you're used to other disassemblers, the workflow for this disassembler is of constant iteration.  You run the disassembler on an executable, then tweak the `.regs` file to add entrypoints as necessary, and add symbols to memory addresses as you identify their purpose.  Then re-run the disassembler each time.  The end result is a disassembly that gets cleaner and clearer and easier to follow.
 
-After the flags, you may optionally give the address a symbol name.  Whenever
-this memory location is referenced in the code, the symbol name will appear as a
-comment.
+## Disassembly notation
 
-You can also use bank-separators if you wish.  `$3/1066` is the same as `$31066`.
+There are few things to note about the disassembly style of `regs`.  The first is that since we traced the code flow, branch destinations are preceded by a line that shows up to 7 source addresses and whether they are above or below the current line.  This will help you figure out code flow.
 
-The `d` flag is unique in that it identifies the address as a data location and
-not an entry point.  This is used to give variables symbol names.
+Next is that tool calls like `NewHandle` are shown as instructions.  This helps dramatically clean up the disassembly. Instead of showing the code that loads X with the tool number and then jumping to the tool dispatch address, we replace it all with just the name of the tool called.  This is controlled by the fingerprints in the iigs folder, described below.
 
+Finally, and most unusual, I include "B:" and "D:" flags when the addressing uses DBR and Direct modes.  This is because the IIgs can change the direct page and DBR register and thus those addresses cannot be depended to be accurate.
 
+If an address starts with "B:", then the current value of the DBR register should be added to the address.  If an address starts with "D:", then the current value of the Direct register should be added to the address.
 
-## Pascal folder
+Since they might be misleading, I also do not do symbol swapping on those addresses.  Instead any matching symbols are included as a comment on the same line.  That way if the IIgs is in a standard setup, then you know what those addresses represent, and if not, you can ignore the comment.
 
-You'll notice a pascal folder in this repository.  These are the original GS/OS pascal header files.  This is to make it easier for you to look up the arguments and structures of various tool calls you'll come across when disassembling.
+# Docmaker, the API, and the iigs folder
 
+You'll notice a iigs folder that contains a bunch of text files that contain structures and function definitions related to the Apple IIgs API.  These files are parsed and compiled into the `regs` program for two purposes.
+
+One, the functions have fingerprints attached to them that the disassembler can use to identify when the program is calling those functions and replace the system calls with actual function names.
+
+Two, you can query `regs` for any given structure or function and even have it calculate field offsets for you.  This will help with disassembly.
+
+Docmaker is the program that will read in the entire directory and generate a data file, which will get included when you compile `regs`.
+
+## Querying the API
+
+Querying the API is fairly simple, call `regs` with the `-l` flag, followed by a keyword.  No need to provide a file to disassemble when the `-l` flag is included.  Regs will then search the API for a data type or function that contains that keyword and output information about it.
+
+If you're querying a structure, you can also use the `-o` or `--org` flag to specify where in ram that structure should start, and it will include the calculated offsets for each field.
+
+For example, say the program you're disassembling calls `FrameRgn` and passes the value `$2/43a9` to the function.  You can do the following:
+
+```
+$ regs -l framergn
+FrameRgn: (
+  aRgnHandle: RgnHandle,
+)
+```
+
+This lets you know that it takes a single argument which is of type `RgnHandle`.  You can query on `RgnHandle` and find out it's a double pointer to `Region`.  Next you can do:
+
+```
+$ regs -l region -o '$2/43a9'
+Region: struct { // $a bytes
+  rgnSize: int16 // $02/43a9
+  rgnBBox: Rect // $02/43ab
+  data: int16[] // $02/43b3
+}
+```
+
+Now you know exactly what the variables at those memory addresses are and that might help with disassembly further down the line.  You might even want to add the fields back as symbols in the `.regs` file for future disassembly.
 
 
 # Examples
 
 The flexibility of these tools makes their use a little complicated.  So here are some examples of how to go about disassembling various things.
 
-### Disassembling an S16
+## Disassembling an S16
 
-I'll be using the S16 from Dream Zone as an example.
+I'll use the S16 from Dream Zone as an example.  Generate an initial map and first disassembly:
 
-Generate a basic map of your S16:
+`$ regs dream.sys16`
 
-`$ omf dream.s16`
+This will create a dream.sys16.regs file with an (unused) org address of `$00/0000`, and an entry point of `$01/0000`.  It will also create 5 files from `seg1` to `seg5`, this is the disassembly for each segment in the S16.
 
-This will create a file called `dream.s16.map`, which we could edit if we choose.  We'll leave it as it is.  Extract the segments of the OMF with:
+Looking at the seg1 disassembly, we notice that after calling a tool like `MMStartUp` or `NewHandle` the accumulator is stored at `$01/e4d0`.  I know from experience that this is the toolErr variable.  So let's add a symbol for it so we know what's happening if the code inspects it later.  Edit the dream.sys16.regs and add a line:
 
-`$ omf --map=dream.s16.map dream.s16 --prefix=dream`
+```
+$01/e4d0<toolErr>
+```
 
-This will create files `dream1`to `dream5` as well as `dream1.map` to `dream5.map`.
+Rerun `regs` and now the disassembly properly references toolErr!
 
-The program's entry point is always the beginning of the first segment, so we'll start there.
-
-`$ regs dream1.map > dream1.s`
-
-This will disassemble the entry point.  We can then modify the map to further refine the disassembly if we wish.
-
+In a real project, you'll be adding hundreds or thousands of symbols.  The tools are designed for that.
 
 
 ### Disassembling a Tool
 
 This works the same as disassembling an S16, but with an important difference.
 
-We'll start the same, generating a map and extracting it.
+We want to start without any entry points.  You can accomplish this by creating
+an empty `.regs` file.  Then run regs on the tool file.
 
 ```
-$ omf TOOL025
-$ omf --map=TOOL025.map TOOL025
+$ touch TOOL025.regs
+$ regs TOOL025
 ```
 
-Now, we'll remove all disassembly instructions from the map.  You'll see why in a second.  So we edit the map file to look like the following:
+Without any entrypoints, the entire file is just a hex dump.  However, it's a hex dump of the segment content, so it is missing all of the overhead and format information found in an OMF.  Thats why you can't just hex dump the original tool file for this.
+
+All tools start with a tool table.  The first dword specifies the number of tools in this file.  The next dwords contain return addresses of the various tool entry points.
+
+Let's say I want to disassemble `NoteOn`.  Running `regs -l noteon` shows me that it's tool $0b inside the $19 toolset.  Convert that to decimal to discover that's inside the TOOL025 file (the same file we already started using, how convenient). We can calculate the offset to tool $0b.
+
+`$0b * 4 + $1/0000 = $1/002c`
+
+We added `$1/0000` since that's where the toolset is disassembled, which we know from inspecting `seg1`.  Back to `seg1` at that offset, we see "99 02 01 00" which is little endian for the address `$1/299`.  Since these are return addresses, we need to increment that to get the actual entry point of `NoteOn`.
+
+Add that entrypoint to the `.regs` file.
 
 ```
-gMAP "seg1"
-sORG $20000
+$00/0000!
+$01/029a:
 ```
 
-That's it.. no disassembly instructions.  Now we run the disassembler:
-
-`$ regs seg1.map > seg1.s`
-
-This will just give us a hex dump of the segment.  That's actually what we want.  All tools start with a tool table.  The first dword specifies the number of tools in this toolset.  The next dwords all contain addresses (minus 1) of the various tool entry points.
-
-Let's say I want to disassemble NoteOn.  We check the pascal folder and discover that it's tool $0b inside the $19 toolset.  Which is the TOOL025 file we're working on (the tool numbers in the filenames are in decimal).  So we calculate the offset to that entry point.
-
-`$0b * 4 + $20000 = $2:002c`
-
-If we look at the hex dump at that location we'll discover the entry point of NoteOn: `$2:02dd`.  Well that's minus one, so we add the real entry point to the .map file:
-
-```
-gMAP "seg1"
-sORG $20000
-$2/02de:
-```
-
-And rerun the disassembler.
-
-`$ regs seg1.map > seg1.s`
-
-We have just disassembled the NoteOn function.
-
+and rerun regs.  Re-check seg1, and down at `$01/29a` we have the disassembly for the `NoteOn` function, awesome!
 
 
 ### Disassembling a Specific Tool Call in ROM
 
-Let's say I want to disassemble WriteRamBlock.  We discover it's in the sound toolset $08.  If you search, you'll discover that there isn't a TOOL008 anywhere, so we'll have to pull it from ROM.  I'll be using an older 128k ROM just because it's convenient.
+Let's say I want to disassemble WriteRamBlock.  `regs -l writeramblock` shows us that it's tool 9 in toolset 8.  If you search, you'll discover that there isn't a TOOL008 anywhere because it's a toolset that's never been patched.  Instead we'll need to disassemble it directly from ROM.  I'll be using the 128k ROM01 just because I'm more familiar with it.  You can use ROM00 or ROM03 instead, it's just the locations of things will be different.
 
-First thing I do, is actually hand make a `rom.map` file for the ROM.
+First thing I do, is actually handmake a `.regs` file for the ROM.
 
 ```
-gMAP "APPLE2GS.ROM"
-sORG $fe0000
-$fe/0000:
+$fe/0000!:
 ```
 
-and disassemble it.
+Because that's where a 128k ROM should be loaded into memory, and I happen to know that the tool bootstrap is also located at that address.  For ROM03, you'll want to load the ROM into `$fc/0000`.  The tool bootstrap initializes the dispatches in bank `$e1`.  We see that code copies 16 bytes from `$fe/0051` to `$e1/0000`, which is the main tool dispatch. Let's add that entrypoint and disassemble again:
 
-`$ regs rom.map > rom.s`
+```
+$fe/0051:
+```
 
-This is actually the bootstrap that initializes the `$e1/0000` tool call entrypoint.  I notice it copies over a block of memory from `$fe/0051` into `$e1/0000`.  So we add `$fe/0051` to the disassembly list of the map file, and disassemble it again.
+Stepping through this dispatch code, we see it first looks up your toolset from a table at `$fe/012f`.  Since we're after toolset $08, we calculate the offset: `$08 * 4 + $fe/012f = $fe/014f`.  We see at that location "00 3e ff 00" which is the little-endian representation of the address `$ff/3e00`.
 
-Following along with the disassembly, we discover that there's a toolset list starting at `$fe/012f`.  It starts with a dword with the number of toolsets in the ROM, followed by a list of offsets to the various toolsets.  We want toolset 8 for the sound toolset.
+The dispatch code then uses another table at that address to determine the return address of the entry point of the tool you want.  Since WriteRamBlock is tool 9, we calculate the offset into the new table: `$08 * 4 + $ff/3e00 = $ff/3e24`.
 
-`$8 * 4 + $fe012f = $fe014f`
+At that location is the value "a4 41 ff 00" which becomes `$ff/41a4` but since it's a return address, we should increment it before disassembling.
 
-Look up the dword in that location and I find that the toolset is located at `$ff/3e00`.  If you then jump to that location, you'll find this is in the exact same format as a tool on disk.  It starts with a tool table.  WriteRamBlock is tool 9.
+```
+$ff/41a5:
+```
 
-`$9 * 4 + $ff3e00 = $ff3e24`
-
-At that location, we discover the offset to the tool entry point is `$ff/41a4` so we'll add `$ff/41a5`to the map file and rerun the disassembly.
-
-Boom, we have just disassembled a specific tool call from ram.
+Boom, we have just disassembled a specific tool call found in rom.
 
 
 ### Disassembling a simple ProDOS executable
 
-ProDOS binaries aren't relocatable and don't have anything inside them that
-specifies where in RAM they should be loaded.  However, the filesystem
-itself does have that information.
+ProDOS binaries aren't relocatable and don't have anything inside them that specifies where in RAM they should be loaded.  However, the filesystem itself does have that information.
 
-Using `2mg` with the `-l` or `--list` argument will give a list of the
-files along with metadata associated with the files.  Let's use `BASIC.SYSTEM`
-as an example.
+Using `2mg` with the `-l` or `--list` argument will give a list of the files along with metadata associated with the files.  Let's use `BASIC.SYSTEM` as an example.
 
-You'll see that `BASIC.SYSTEM` has a type of `$ff` and auxtype of
-`$2000`, and `2mg` identifies it as a "sys/ProDOS System File".  This is
-indeed a simple executable.
+You'll see that `BASIC.SYSTEM` has a type of `$ff` and auxtype of `$2000`, and `2mg` identifies it as a "sys/ProDOS System File".  This is indeed a simple executable.
 
-The aux type specifies where in RAM to load this executable, in this
-case, it's `$2000`.
+The aux type specifies where in RAM to load this executable.  In this case, it's `$2000`.
 
-It is also important to note that these executables should start with 8-bit
-registers.
+It is also important to note that these executables should start disassembly in emulation mode, since they're actually 8-bit executables.
 
-So we can use all of that information to disassemble this file.
+We can use all of that information to disassemble this file.
 
-`$ regs --org=0x2000 -m -x BASIC.SYSTEM > basic.s`
+`$ regs --org=0x2000 -e BASIC.SYSTEM`
 
-This tells regs to start with 8-bit accumulator and indices, and load the
-file starting at `$2000` before disassembling it.
+This tells regs to start in emulation mode with 8-bit accumulator and indices, and load the file starting at `$2000` before disassembling it.
+
+Since it's not an OMF file, there will be only 1 output file, `seg1`.  Note, however, that we still have a `BASIC.SYSTEM.regs` file so we can add symbols and alternative entrypoints if we wish (remember to include the 'e' flag on any alternative entrypoints, since regs defaults to native mode unless told otherwise).
+
+The next time we want to disassemble this file, we don't have to pass any arguments since the flags and org are set properly in the `.regs` file.

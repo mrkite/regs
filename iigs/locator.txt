@@ -1,0 +1,119 @@
+LocatorErr enum<int16> {
+  toolNotFoundErr = $0001,
+  funcNotFoundErr = $0002,
+  toolVersionErr = $0110,
+  sysStrtMtErr = $0100,
+  messNotFoundErr = $0111,
+}
+
+MessageType enum<int16> {
+  fileInfoType = $0001,
+}
+
+MessageAction enum<int16> {
+  addMessage = $0001,
+  getMessage = $0002,
+  deleteMessage = $0003,
+}
+
+TLMountButton enum<int16> {
+  mvReturn = $0001,
+  mvEscape = $0002,
+}
+
+MessageRecHndl = ^MessageRecPtr;
+MessageRecPtr = ^MessageRec;
+MessageRec struct {
+  messageNext: MessageRecHndl;
+  messageType: MessageType;
+  messageData: int16;
+  fileNames: Str255[];
+}
+
+ToolSpec struct {
+  toolNumber: int16;
+  minVersion: int16;
+}
+
+StartStopRecordPtr = ^StartStopRecord;
+StartStopRecord struct {
+  flags: int16;
+  videoMode: int16;
+  resFileID: int16;
+  dPageHandle: Handle;
+  numTools: int16;
+}
+
+TLBootInit() {
+  $01, $01
+}
+TLStartUp() {
+  $01, $02
+}
+TLShutDown() {
+  $01, $03
+}
+TLVersion(): int16 {
+  $01, $04
+}
+TLReset() {
+  $01, $05
+}
+TlStatus(): bool {
+  $01, $06
+}
+GetFuncPtr(userOrSystem: int16, funcTSNum: int16): Ptr {
+  $01, $0b
+}
+GetTSPtr(userOrSystem: int16, tsNum: int16): Ptr {
+  $01, $09
+}
+GetWAP(userOrSystem: int16, tsNum: int16): Ptr {
+  $01, $0c
+}
+LoadOneTool(toolNumber: int16, minVersion: int16) {
+  $01, $0f
+}
+LoadTools(toolTablePtr: Ptr) {
+  $01, $0e
+}
+MessageCenter(action: MessageAction, messageType: MessageType,
+  messageHandle: MessageRecHndl) {
+  $01, $15
+}
+RestoreTextState(stateHandle: Handle) {
+  $01, $14
+}
+SaveTextState(): Handle {
+  $01, $13
+}
+SetDefaultTPT() {
+  $01, $16
+}
+SetTSPtr(userOrSystem: int16, tsNum: int16, fpTablePtr: FPTPtr) {
+  $01, $0a
+}
+SetWAP(userOrSystem: int16, tsNum: int16, waptPtr: Ptr) {
+  $01, $0d
+}
+TLMountVolume(whereX: int16, whereY: int16, line1: ^Str255, line2: ^Str255,
+  but1: ^Str255, but2: ^Str255): TLMountButton {
+  $01, $11
+}
+TLTextMountVolume(line1: ^Str255, line2: ^Str255, but1: ^Str255,
+  but2: ^Str255): TLMountButton {
+  $01, $12
+}
+UnloadOneTool(toolNumber: int16) {
+  $01, $10
+}
+StartUpTools(userID: int16, startStopRefDesc: RefDescriptor,
+  startStopRef: Ref): Ref {
+  $01, $18
+}
+ShutDownTools(startStopDesc: RefDescriptor, startStopRef: Ref) {
+  $01, $19
+}
+MessageByName(createItFlag: bool, recordPtr: Ptr): int32 {
+  $01, $17
+}

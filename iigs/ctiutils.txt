@@ -1,0 +1,12 @@
+Int2String(i: int16): ^Str255;
+LongInt2String(l: int32): ^Str255;
+Real2String(r: Real): ^Str255;
+String2Int(str: ^Str255): int16;
+String2LongInt(str: ^Str255): int32;
+String2Real(str: ^Str255): Real;
+P2GSstring(pString: ^Str255, gsString: ^GSString255);
+GS2Pstring(gsString: ^GSString255, pString: ^Str255);
+StuffHex(dest: Ptr, Str: ^Str255);
+CallCode(proc: Ptr, xValue: int16, err: ^int16, nBytesIn: int16,
+    BytesIn: Ptr, nBytesOut: int16, BytesOut: Ptr);
+
