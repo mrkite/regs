@@ -188,7 +188,19 @@ bool Scanner::disassemble(std::ostream &f, uint32_t from, uint32_t to,
       if (!sym.empty()) {
         f << sym << std::endl;
       }
-      f << hex(address, 6) << ": " << printInst(map[address]) << std::endl;
+      f << hex(address, 6) << ": ";
+      auto ptr = getAddress(address);
+      if (map[address]->length > 4) {
+        f << ".. .. .. .. ";
+      } else {
+        for (int i = 0; i < map[address]->length; i++) {
+          f << hex(ptr->r8(), 2) << " ";
+        }
+        for (int i = map[address]->length; i < 4; i++) {
+          f << "   ";
+        }
+      }
+      f << printInst(map[address]) << std::endl;
       address += map[address]->length;
     }
     if (address < b->address + b->length) {
@@ -218,7 +230,7 @@ void Scanner::dumpHex(std::ostream &f, uint32_t from, uint32_t to) {
         f << "   ";
         ascii += " ";
       }
-      for (; j < 16 && !ptr->eof(); j++) {
+      for (; j < 16 && !ptr->eof() && i + j - skip < len; j++) {
         if (j == 8) {
           f << " ";
           ascii += " ";

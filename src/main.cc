@@ -7,7 +7,7 @@
 #include "api.h"
 #include "iigs.h"
 
-const char *argp_program_version = "regs 0.2";
+const char *argp_program_version = "regs 1.1";
 const char *argp_program_bug_address = "sean@seancode.com";
 static char doc[] = "Disassemble Apple IIgs software";
 static char args_doc[] = "FILE";
