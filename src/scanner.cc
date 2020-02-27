@@ -216,8 +216,7 @@ bool Scanner::disassemble(std::ostream &f, uint32_t from, uint32_t to,
 void Scanner::dumpHex(std::ostream &f, uint32_t from, uint32_t to) {
   auto ptr = getAddress(from);
   if (ptr != nullptr) {
-    auto len = std::min<uint32_t>(to - from, ptr->length - ptr->tell());
-    for (int i = 0; i < len; i += 16) {
+    for (int i = 0; !ptr->eof() && from < to; i += 16) {
       f << hex(from, 6) << ": ";
       std::string ascii;
       int skip = from & 0xf;
