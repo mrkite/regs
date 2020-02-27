@@ -230,7 +230,7 @@ void Scanner::dumpHex(std::ostream &f, uint32_t from, uint32_t to) {
         f << "   ";
         ascii += " ";
       }
-      for (; j < 16 && !ptr->eof() && i + j - skip < len; j++) {
+      for (; j < 16 && !ptr->eof() && from < to; j++) {
         if (j == 8) {
           f << " ";
           ascii += " ";

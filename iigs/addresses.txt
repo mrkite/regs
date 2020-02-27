@@ -787,3 +787,6 @@ ShieldCursor() {
 UnshieldCursor() {
   -4, $e01e9c
 }
+SystemVolume() {
+  -4, $e100ca
+}
