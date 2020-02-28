@@ -101,8 +101,12 @@ bool OMF::loadSegments() {
         seg.lablen = 0xa;
       }
     }
-    handle->seek(ofs + dispname + seg.lablen);  // skip past load name
+    // check if load name is valid
+    handle->seek(ofs + dispname);
     seg.name = handle->read(seg.lablen);
+    if (seg.name[0] == 0 || seg.name[0] == ' ') {  // invalid name use segname
+      seg.name = handle->read(seg.lablen);
+    }
     seg.offset = ofs + dispdata;
     if (version == 1) {  // convert to v2
       seg.bytecnt *= 512;
