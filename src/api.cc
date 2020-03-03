@@ -210,6 +210,7 @@ void API::search(std::string keyword, uint32_t org) {
                           });
     if (it != s.first.end()) {
       dumpSymbol(s.second, org);
+      printf("\n");
     }
   }
 }
@@ -226,7 +227,14 @@ void API::dumpRef(std::shared_ptr<symbol::Ref> ref) {
   }
 }
 
-void API::dumpSymbol(std::shared_ptr<symbol::Symbol> sym, uint32_t org) {
+static void indent(int depth) {
+  for (int i = 0; i < depth; i++) {
+    printf("  ");
+  }
+}
+
+void API::dumpSymbol(std::shared_ptr<symbol::Symbol> sym, uint32_t org, int depth) {
+  indent(depth);
   printf("%s: ", sym->name.c_str());
   switch (sym->kind) {
     case symbol::Kind::isIntrinsic:
@@ -250,7 +258,6 @@ void API::dumpSymbol(std::shared_ptr<symbol::Symbol> sym, uint32_t org) {
           printf("int32");
           break;
       }
-      printf("\n");
       break;
     case symbol::Kind::isEnum:
       {
@@ -259,23 +266,29 @@ void API::dumpSymbol(std::shared_ptr<symbol::Symbol> sym, uint32_t org) {
         for (auto entry : e->entries) {
           printf("  %s = $%x,\n", entry.first.c_str(), entry.second);
         }
-        printf("}\n");
+        printf("}");
       }
       break;
     case symbol::Kind::isAlias:
     case symbol::Kind::isRef:
       dumpRef(std::static_pointer_cast<symbol::Ref>(sym));
-      printf("\n");
       break;
     case symbol::Kind::isStruct:
       {
         auto s = std::static_pointer_cast<symbol::Struct>(sym);
         printf("struct { // $%x bytes\n", sym->size);
         for (auto &f : s->fields) {
+          indent(depth);
           printf("  %s: ", f.key.c_str());
           switch (f.value->kind) {
             case symbol::Kind::isRef:
               dumpRef(std::static_pointer_cast<symbol::Ref>(f.value));
+              break;
+            case symbol::Kind::isStruct:
+              dumpSymbol(f.value, org, depth + 1);
+              break;
+            case symbol::Kind::isUnion:
+              dumpSymbol(f.value, org, depth + 1);
               break;
             default:
               printf("%s", f.value->name.c_str());
@@ -289,7 +302,8 @@ void API::dumpSymbol(std::shared_ptr<symbol::Symbol> sym, uint32_t org) {
           }
           org += f.value->size;
         }
-        printf("}\n");
+        indent(depth);
+        printf("}");
       }
       break;
     case symbol::Kind::isUnion:
@@ -302,6 +316,12 @@ void API::dumpSymbol(std::shared_ptr<symbol::Symbol> sym, uint32_t org) {
             case symbol::Kind::isRef:
               dumpRef(std::static_pointer_cast<symbol::Ref>(f.value));
               break;
+            case symbol::Kind::isUnion:
+              dumpSymbol(f.value, org, depth + 1);
+              break;
+            case symbol::Kind::isStruct:
+              dumpSymbol(f.value, org, depth + 1);
+              break;
             default:
               printf("%s", f.value->name.c_str());
               break;
@@ -313,7 +333,8 @@ void API::dumpSymbol(std::shared_ptr<symbol::Symbol> sym, uint32_t org) {
             printf("%04x\n", org);
           }
         }
-        printf("}\n");
+        indent(depth);
+        printf("}");
       }
       break;
     case symbol::Kind::isFunction:

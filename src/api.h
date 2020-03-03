@@ -74,7 +74,7 @@ class API {
   API(unsigned char *dat, unsigned int len);
   std::map<std::string, std::shared_ptr<symbol::Symbol>> symbols;
   void search(std::string keyword, uint32_t org);
-  void dumpSymbol(std::shared_ptr<symbol::Symbol> symbol, uint32_t org);
+  void dumpSymbol(std::shared_ptr<symbol::Symbol> symbol, uint32_t org, int depth = 0);
   void dumpRef(std::shared_ptr<symbol::Ref> ref);
 
  private:
