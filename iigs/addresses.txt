@@ -787,6 +787,105 @@ ShieldCursor() {
 UnshieldCursor() {
   -4, $e01e9c
 }
+IRQSCAN() {
+  -4, $e10028
+}
+IRQSOUND() {
+  -4, $e1002c
+}
+IRQVBL() {
+  -4, $e10030
+}
+IRQMOUSE() {
+  -4, $e10034
+}
+IRQQTR() {
+  -4, $e10038
+}
+IRQKBD() {
+  -4, $e1003c
+}
+IRQRESPONSE() {
+  -4, $e10040
+}
+IRQSRQ() {
+  -4, $e10044
+}
+IRQDSKACC() {
+  -4, $e10048
+}
+IRQFLUSH() {
+  -4, $e1004c
+}
+IRQMICRO() {
+  -4, $e10050
+}
+IRQ1SEC() {
+  -4, $e10054
+}
+IRQEXT() {
+  -4, $e10058
+}
+IRQOTHER() {
+  -4, $e1005c
+}
+CUPDATE() {
+  -4, $e10060
+}
+INCBUSYFLG() {
+  -4, $e10064
+}
+DECBUSYFLG() {
+  -4, $e10068
+}
+BELLVECTOR() {
+  -4, $e1006c
+}
+BREAKVECTOR() {
+  -4, $e10070
+}
+TRACEVECTOR() {
+  -4, $e10074
+}
+STEPVECTOR() {
+  -4, $e10078
+}
+TOWRITEBR() {
+  -4, $e10080
+}
+TOREADBR() {
+  -4, $e10084
+}
+TOWRITETIME() {
+  -4, $e10088
+}
+TOREADTIME() {
+  -4, $e1008c
+}
+TOCTRLPANEL() {
+  -4, $e10090
+}
+TOBRAMSETUP() {
+  -4, $e10094
+}
+TOPRINTMSG8() {
+  -4, $e10098
+}
+TOPRINTMSG16() {
+  -4, $e1009c
+}
+CTRLYVECTOR() {
+  -4, $e100a0
+}
+TOTEXTPG2DA() {
+  -4, $e100a4
+}
+PRO16MLI() {
+  -4, $e100a8
+}
+MSGPOINTER() {
+  -4, $e100c0
+}
 SystemVolume() {
   -4, $e100ca
 }

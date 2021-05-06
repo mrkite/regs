@@ -175,7 +175,7 @@ bool Scanner::disassemble(std::ostream &f, uint32_t from, uint32_t to,
       std::string preds;
       for (auto pred : b->preds) {
         if (pred->address + pred->length != b->address && count++ < 7) {
-          preds += (pred->address < b->address) ? u8"\u2b06 " : u8"\u2b07 ";
+          preds += (pred->address < b->address) ? u8"\u25b2 " : u8"\u25bc ";
           preds += hex(pred->address + pred->length - pred->branchLen, 6);
         }
       }

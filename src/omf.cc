@@ -125,13 +125,13 @@ bool OMF::mapSegments() {
   for (auto &seg : segments) {
     if (seg.org) {  // segment wants to be somewhere specific, no direct map
       canDirectMap = false;
-    } else if (seg.length > 0xffff) {  // segment too long for a single bank
+    } else if (seg.length > 0xfffff) {  // segment too long for a single bank
       canDirectMap = false;
     }
   }
   if (canDirectMap) {
     for (auto &seg : segments) {
-      seg.mapped = seg.segnum << 16;
+      seg.mapped = seg.segnum << 20;
     }
     return true;
   }

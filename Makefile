@@ -1,10 +1,13 @@
 CC=clang
 CFLAGS=-Wall
 
-all: 2mg regs
+all: 2mg regs dsk
 
 2mg: FORCE
 	$(MAKE) -C src ../2mg
+
+dsk: FORCE
+	$(MAKE) -C src ../dsk
 
 regs: FORCE src/iigs.h
 	$(MAKE) -C src ../regs

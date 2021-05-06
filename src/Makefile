@@ -1,5 +1,6 @@
 OBJS = main.o omf.o handle.o map.o disasm.o api.o scanner.o
 OBJS2mg = 2mg.o handle.o
+OBJSdsk = dsk.o handle.o
 CXX = clang++
 CXXFLAGS = -g -Wall -std=c++11
 
@@ -8,7 +9,10 @@ ifeq ($(UNAME), Darwin)
 	LDFLAGS = -largp
 endif
 
-all: ../regs ../2mg
+all: ../regs ../2mg ../dsk
+
+../dsk: $(OBJSdsk)
+	$(CXX) $(CXXFLAGS) $(LIBS) -o $@ $(LDFLAGS) $^
 
 ../2mg: $(OBJS2mg)
 	$(CXX) $(CXXFLAGS) $(LIBS) -o $@ $(LDFLAGS) $^
@@ -20,4 +24,4 @@ all: ../regs ../2mg
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 clean:
-	rm -f ../regs ../2mg $(OBJS) $(OBJS2mg)
+	rm -f ../regs ../2mg ../dsk $(OBJS) $(OBJS2mg) $(OBJSdsk)
