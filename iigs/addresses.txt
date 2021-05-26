@@ -739,6 +739,9 @@ TOSUB() {
 ZMODE() {
   -4, $ffc7
 }
+ToSlab() {
+  -4, $e01e00
+}
 StdText() {
   -4, $e01e04
 }
@@ -781,11 +784,326 @@ StdGetPic() {
 StdPutPic() {
   -4, $e01e38
 }
+PortLoc2ZP() {
+  -4, $e01e3c
+}
+UserPat2ZP() {
+  -4, $e01e40
+}
+GetPenPReady() {
+  -4, $e01e44
+}
+GetBackPReady() {
+  -4, $e01e48
+}
+Pen2ZP() {
+  -4, $e01e4c
+}
+Back2ZP() {
+  -4, $e01e50
+}
+RotatePat() {
+  -4, $e01e54
+}
+GetMaskReady() {
+  -4, $e01e58
+}
+Mask2ZP() {
+  -4, $e01e5c
+}
+ExpandMask() {
+  -4, $e01e60
+}
+RotateMask() {
+  -4, $e01e64
+}
+RotateLong() {
+  -4, $e01e68
+}
+PreDraw() {
+  -4, $e01e6c
+}
+XSetup() {
+  -4, $e01e70
+}
+DrawRectB() {
+  -4, $e01e74
+}
+DrawRect() {
+  -4, $e01e78
+}
+SliceSetup() {
+  -4, $e01e7c
+}
+vShiftState() {
+  -4, $e01e80
+}
+vXShiftStay() {
+  -4, $e01e84
+}
+vShiftOut() {
+  -4, $e01e88
+}
+vXShiftOut() {
+  -4, $e01e8c
+}
+BMakeMinRect() {
+  -4, $e01e90
+}
+MakeMinRect() {
+  -4, $e01e94
+}
 ShieldCursor() {
   -4, $e01e98
 }
 UnshieldCursor() {
   -4, $e01e9c
+}
+SetUpPortRegions() {
+  -4, $e01ea0
+}
+SetUpScanPtrs() {
+  -4, $e01ea4
+}
+FreePortRegions() {
+  -4, $e01ea8
+}
+Free1Region() {
+  -4, $e01eac
+}
+Free2Regions() {
+  -4, $e01eb0
+}
+Free3Regions() {
+  -4, $e01eb4
+}
+UnlockBufferHandle() {
+  -4, $e01eb8
+}
+Init1Region() {
+  -4, $e01ebc
+}
+Init2Regions() {
+  -4, $e01ec0
+}
+Init3Regions() {
+  -4, $e01ec4
+}
+Seek1Region() {
+  -4, $e01ec8
+}
+Seek2Regions() {
+  -4, $e01ecc
+}
+Seek3Regions() {
+  -4, $e01ed0
+}
+InitRgn() {
+  -4, $e01ed4
+}
+SeekRgn() {
+  -4, $e01ed8
+}
+Join1Buffer() {
+  -4, $e01edc
+}
+Join2Buffers() {
+  -4, $e01ee0
+}
+Join3Buffers() {
+  -4, $e01ee4
+}
+SetSlabAdr() {
+  -4, $e01ee8
+}
+SetSliceAdr() {
+  -4, $e01eec
+}
+SetStuffAdr() {
+  -4, $e01ef0
+}
+BlowItUp() {
+  -4, $e01ef4
+}
+PutPictStuff() {
+  -4, $e01ef8
+}
+AddToPoly() {
+  -4, $e01efc
+}
+GimmeVersion() {
+  -4, $e01f14
+}
+v_FrRgn() {
+  -4, $e01f18
+}
+v_PRgn() {
+  -4, $e01f1c
+}
+v_ERgn() {
+  -4, $e01f20
+}
+v_IRgn() {
+  -4, $e01f24
+}
+v_FRgn() {
+  -4, $e01f28
+}
+v_FrRect() {
+  -4, $e01f2c
+}
+v_PRect() {
+  -4, $e01f30
+}
+v_ERect() {
+  -4, $e01f34
+}
+v_IRect() {
+  -4, $e01f38
+}
+v_FREct() {
+  -4, $e01f3c
+}
+DChar() {
+  -4, $e01f40
+}
+DText() {
+  -4, $e01f44
+}
+BChar() {
+  -4, $e01f48
+}
+BText() {
+  -4, $e01f4c
+}
+ValidChar() {
+  -4, $e01f50
+}
+GetNextChar() {
+  -4, $e01f54
+}
+CalcDrawStatus() {
+  -4, $e01f58
+}
+TextAndMinRect() {
+  -4, $e01f5c
+}
+CalcTextBounds() {
+  -4, $e01f60
+}
+SetUpFontInfo() {
+  -4, $e01f64
+}
+SetUpBufInfo() {
+  -4, $e01f68
+}
+GetTextHandle() {
+  -4, $e01f6c
+}
+ClearBufPart() {
+  -4, $e01f70
+}
+PutChar() {
+  -4, $e01f74
+}
+BumpPen() {
+  -4, $e01f78
+}
+CleanUpBuffer() {
+  -4, $e01f7c
+}
+PutLine() {
+  -4, $e01f80
+}
+PutRgn() {
+  -4, $e01f84
+}
+PutRect() {
+  -4, $e01f88
+}
+CullPoint() {
+  -4, $e01f8c
+}
+SortPoints() {
+  -4, $e01f90
+}
+PackRgn() {
+  -4, $e01f94
+}
+RgnOp() {
+  -4, $e01f98
+}
+PutOval() {
+  -4, $e01f9c
+}
+BumpOval() {
+  -4, $e01fa0
+}
+InitOval() {
+  -4, $e01fa4
+}
+SetTB() {
+  -4, $e01fa8
+}
+ResetTB() {
+  -4, $e01fac
+}
+StyleText() {
+  -4, $e01fb0
+}
+StyleExtents() {
+  -4, $e01fb4
+}
+DoBold() {
+  -4, $e01fb8
+}
+DoUnderline() {
+  -4, $e01fbc
+}
+StdConic() {
+  -4, $e01fc0
+}
+vDrawConic() {
+  -4, $e01fc4
+}
+vSetScaleAndMap() {
+  -4, $e01fc8
+}
+DrawCursor() {
+  -4, $e01fcc
+}
+UndrawCursor() {
+  -4, $e01fd0
+}
+vAngleFromSlope() {
+  -4, $e01fd4
+}
+vSlopeFromAngle() {
+  -4, $e01fd8
+}
+RgnBlt() {
+  -4, $e01fdc
+}
+SharedMRSetup() {
+  -4, $e01fe0
+}
+ShareShieldStuff() {
+  -4, $e01fe4
+}
+GetCharVals() {
+  -4, $e01fe8
+}
+DoFntFlgMods() {
+  -4, $e01fec
+}
+AddExtras() {
+  -4, $e01ff0
+}
+CalcSlop() {
+  -4, $e01ff4
+}
+GetFntInf() {
+  -4, $e01ff8
 }
 IRQSCAN() {
   -4, $e10028
