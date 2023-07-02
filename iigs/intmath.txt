@@ -128,8 +128,12 @@ Long2Fix(longValue: int32): Fixed {
 Long2Hex(longValue: int32, strPtr: Ptr, strLength: int16) {
   $0b, $23
 }
-LongDivide(dividend: int32, divisor: int32): ^LongDivRec;
-LongMul(multiplicand: int32, multiplier: int32): ^LongMulRec;
+LongDivide(dividend: int32, divisor: int32): ^LongDivRec {
+  $0b, $0d
+}
+LongMul(multiplicand: int32, multiplier: int32): ^LongMulRec {
+  $0b, $0c
+}
 LoWord(longValue: int32): int16 {
   $0b, $19
 }

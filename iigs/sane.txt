@@ -33,6 +33,15 @@ SANEReset() {
 SANEStatus(): bool {
   $0a, $06
 }
+SANEFP816() {
+  $0a, $09
+}
+SANEDecStr816() {
+  $0a, $0a
+}
+SANEElems816() {
+  $0a, $0b
+}
 Num2Integer(x: Extended): int16;
 Num2Longint(x: Extended): int32;
 Num2Real(x: Extended): Single;

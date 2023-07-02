@@ -336,15 +336,21 @@ DelHeartBeat(taskPtr: Ptr) {
   $03, $13
 }
 FWEntry(aRegValue: int16, xRegValue: int16, yRegValue: int16,
-  eModeEntryPt: int16): ^FWRec;
-GetAbsClamp(): ^ClampRec;
+  eModeEntryPt: int16): ^FWRec {
+  $03, $24
+}
+GetAbsClamp(): ^ClampRec {
+  $03, $2b
+}
 GetAddr(refNum: int16) {
   $03, $16
 }
 GetIRQEnable(): int16 {
   $03, $29
 }
-GetMouseClamp(): ^ClampRec;
+GetMouseClamp(): ^ClampRec {
+  $03, $1d
+}
 GetNewID(idTag: int16) {
   $03, $20
 }
@@ -383,13 +389,19 @@ ReadBParam(paramRefNum: BatteryParam): int16 {
 ReadBRam(bufferPtr: Ptr) {
   $03, $0a
 }
-ReadMouse(): ^MouseRec;
-ReadTimeHex(): ^TimeRec;
+ReadMouse(): ^MouseRec {
+  $03, $17
+}
+ReadTimeHex(): ^TimeRec {
+  $03, $0d
+}
 ServeMouse(): int16 {
   $03, $1f
 }
 SetAbsClamp(xMinClamp: int16, xMaxClamp: int16, yMinClamp: int16,
-  yMaxClamp: int16);
+  yMaxClamp: int16) {
+  $03, $2a
+}
 SetHeartBeat(taskPtr: Ptr) {
   $03, $12
 }
@@ -419,7 +431,9 @@ WriteBRam(bufferPtr: Ptr) {
   $03, $09
 }
 WriteTimeHex(month: uint8, day: uint8, curYear: uint8, hour: uint8,
-  minute: uint8, second: uint8);
+  minute: uint8, second: uint8) {
+  $03, $0e
+}
 AddToQueue(newEntryPtr: Ptr, headerPtr: Ptr) {
   $03, $2e
 }

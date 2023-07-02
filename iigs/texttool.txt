@@ -88,15 +88,21 @@ ErrWriteString(str: ^Str255) {
 GetErrGlobals(): TxtMaskRec {
   $0c, $0e
 }
-GetErrorDevice(): ^DeviceRec;
+GetErrorDevice(): ^DeviceRec {
+  $0c, $14
+}
 GetInGlobals(): TxtMaskRec {
   $0c, $0c
 }
-GetInputDevice(): ^DeviceRec;
+GetInputDevice(): ^DeviceRec {
+  $0c, $12
+}
 GetOutGlobals(): TxtMaskRec {
   $0c, $0d
 }
-GetOutputDevice(): ^DeviceRec;
+GetOutputDevice(): ^DeviceRec {
+  $0c, $13
+}
 InitTextDev(deviceNum: int16) {
   $0c, $15
 }

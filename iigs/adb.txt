@@ -92,7 +92,7 @@ AbsOff() {
 AbsOn() {
   $09, $0f
 }
-AsynchADBReceive(compPtr: Ptr) {
+AsyncADBReceive(compPtr: Ptr) {
   $09, $0d
 }
 ClearSRQTable() {

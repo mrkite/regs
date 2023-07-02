@@ -423,7 +423,7 @@ WindDragRect(actionProcPtr: VoidProcPtr, dragPatternPtr: ^Pattern,
 WindNewRes() {
   $0e, $25
 }
-WindowGlboal(windowGlobalMask: int16): int16 {
+WindowGlobal(windowGlobalMask: int16): int16 {
   $0e, $56
 }
 ZoomWindow(theWindowPtr: WindowPtr) {

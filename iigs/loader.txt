@@ -68,7 +68,9 @@ GetUserID2(pathNamePtr: Ptr): int16 {
   $11, $21
 }
 InitialLoad(userID: int16, loadFileNamePtr: Ptr,
-  spMemFlag: bool): ^InitialLoadOutputRec;
+  spMemFlag: bool): ^InitialLoadOutputRec {
+  $11, $09
+}
 InitialLoad2(userID: int16, loadFileNamePtr: Ptr, spMemFlag: bool,
   inputType: int16): ^InitialLoadOutputRec;
 GetPathname(userID: int16, fileNumber: int16): Ptr {
@@ -81,12 +83,18 @@ RenamePathname(oldPathname: Ptr, newPathname: Ptr) {
   $11, $13
 }
 LoadSegName(userID: int16, loadFileNamePtr: Ptr,
-  loadSegNamePtr: Ptr): ^LoadSegNameOut;
+  loadSegNamePtr: Ptr): ^LoadSegNameOut {
+  $11, $0d
+}
 LoadSegNum(userID: int16, loadFileNum: int16, loadSegNum: int16): Ptr {
   $11, $0b
 }
-Restart(userID: int16): ^RestartOutRec;
-UnloadSeg(segmentPtr: Ptr): ^UnloadSegOutRec;
+Restart(userID: int16): ^RestartOutRec {
+  $11, $0a
+}
+UnloadSeg(segmentPtr: Ptr): ^UnloadSegOutRec {
+  $11, $0e
+}
 UnloadSegNum(userID: int16, loadFileNum: int16, loadSegNum: int16) {
   $11, $0c
 }

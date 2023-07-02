@@ -73,7 +73,9 @@ SeqAllNotesOff() {
 ClearIncr() {
   $1a, $0a
 }
-GetLoc(): ^LocRec;
+GetLoc(): ^LocRec {
+  $1a, $0c
+}
 GetTimer(): int16 {
   $1a, $0b
 }
