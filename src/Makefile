@@ -6,7 +6,8 @@ CXXFLAGS = -g -Wall -std=c++11
 
 UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
-	LDFLAGS = -largp
+	CXXFLAGS += -I/opt/homebrew/Cellar/argp-standalone/1.3/include
+	LDFLAGS = -L/opt/homebrew/Cellar/argp-standalone/1.3/lib -largp
 endif
 
 all: ../regs ../2mg ../dsk
