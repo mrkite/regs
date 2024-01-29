@@ -1,0 +1,180 @@
+Measure struct {
+  measure: int16;
+  beat: int16;
+  remainder: int16;
+}
+
+MIDIInstrument struct {
+  gen1Envelope: MIDIEnvelope;
+  gen1Waves: WaveList[8];
+  gen2Envelope: MIDIEnvelope;
+  gen2Waves: WaveList[8];
+}
+
+CallBackTable struct {
+  usend: Ptr;
+  mupdate: ProcPtr;
+  mstart: uint32;
+  mstop: uint32;
+  mpin: uint32;
+  sevent: uint32;
+  sx: uint32;
+  mpout: uint32;
+  pchg: uint32;
+  mcont: uint32;
+  smark: uint32;
+  rbfull: uint32;
+}
+
+MIDIEnvelope struct {
+  attackLevel: uint8;
+  attackRate: uint8;
+  decay1Level: uint8;
+  decay1Rate: uint8;
+  decay2Level: uint8;
+  decay2Rate: uint8;
+  sustainLevel: uint8;
+  decay3Rate: uint8;
+  release1Level: uint8;
+  release1Rate: uint8;
+  release2Level: uint8;
+  release2Rate: uint8;
+  release3Rate: uint8;
+  decayGain: uint8;
+  velocityGain: uint8;
+  pitchBend: uint8;
+}
+
+WaveList struct {
+  topKey: uint8;
+  configuration: uint8;
+  channel: uint8;
+  detune: uint8;
+  waveAddressA: uint8;
+  waveSizeA: uint8;
+  volumeA: uint8;
+  octaveA: uint8;
+  semitoneA: uint8;
+  fineToneA: uint8;
+  waveAddressB: uint8;
+  waveSizeB: uint8;
+  volumeB: uint8;
+  octaveB: uint8;
+  semitoneB: uint8;
+  fineTuneB: uint8;
+}
+
+MSBootInit() {
+  $23, $01
+}
+MSStartUp() {
+  $23, $02
+}
+MSShutDown() {
+  $23, $03
+}
+MSVersion() {
+  $23, $04
+}
+MSReset() {
+  $23, $05
+}
+MSStatus() {
+  $23, $06
+}
+SetMidiChan(channel: int16) {
+  $23, $09
+}
+SetMidiMode(mode: int16) {
+  $23, $0a
+}
+MidiNoteOn(channel: int16, key: int16, volume: int16) {
+  $23, $0b
+}
+MidiNoteOff(channel: int16, key: int16) {
+  $23, $0c
+}
+MidiAllNotesOff() {
+  $23, $0d
+}
+SetRecTrack(track: int16) {
+  $23, $0e
+}
+SetPlayTrack(track: int16, mode: int16) {
+  $23, $0f
+}
+TrackToChannel(track: int16, channel: int16) {
+  $23, $10
+}
+Locate(time: int32, buffer: Ptr): int32 {
+  $23, $11
+}
+SetVelComp(offset: int16) {
+  $23, $12
+}
+SetMIDIPort(inport: int16, outport: int16) {
+  $23, $13
+}
+DefineInst(inst: ^MIDIInstrument, num: int16) {
+  $23, $14
+}
+SynthPlayer(seqData: Ptr) {
+  $23, $15
+}
+SetTempo(tempo: int16) {
+  $23, $16
+}
+SetUserCallBack(callbackTable: ^CallBackTable) {
+  $23, $17
+}
+SysExOut(data: Ptr, delay: int16, callback: Ptr) {
+  $23, $18
+}
+SetBeat(beat: int16) {
+  $23, $19
+}
+MIDICmd(path: int16, bytes: int16, cmd: int16, data1: int16, data2: int16) {
+  $23, $1a
+}
+LocateEnd(buffer: Ptr): Ptr {
+  $23, $1b
+}
+Merge(buffer1: Ptr, buffer2: Ptr) {
+  $23, $1c
+}
+DeleteTrack(track: int16, buffer: Ptr) {
+  $23, $1d
+}
+SetMetro(volume: int16, freq: int16, wave: Ptr) {
+  $23, $1e
+}
+GetMSData(): Ptr {
+  $23, $1f
+}
+CalcTime(ticksPerBeat: int16, bpm: int16, beat: int16, measure: int16): int32 {
+  $23, $20
+}
+CalcMeasure(ticksPerBeat: int16, bpm: int16, time: int32): ^Measure {
+  $23, $21
+}
+MSSuspend() {
+  $23, $22
+}
+MSResume() {
+  $23, $23
+}
+SetTuningTable(table: Ptr) {
+  $23, $24
+}
+GetTuningTable(table: Ptr) {
+  $23, $25
+}
+SeTrackOut(track: int16, state: int16) {
+  $23, $26
+}
+StartMIDIDriver(slot: int16, ctype: int16, id: int16, addr: Ptr) {
+  $23, $27
+}
+StopMIDIDriver() {
+  $23, $28
+}
