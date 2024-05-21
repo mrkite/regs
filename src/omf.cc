@@ -94,19 +94,22 @@ bool OMF::loadSegments() {
     seg.entry = handle->r32();
     auto dispname = handle->r16();
     auto dispdata = handle->r16();
+    auto skip = 0;
     if (seg.lablen == 0) {
+      skip = 1;
       handle->seek(ofs + dispname + 0xa);
       seg.lablen = handle->r8();
       if (seg.lablen == 0) {
         seg.lablen = 0xa;
       }
     }
+    // there are 2 names, one is always 10 bytes at dispname,
+    // this is the "loadname" and it specifies the name by the linker
+    // it is followed by the segname, which is the actual segment name.
+
     // check if load name is valid
-    handle->seek(ofs + dispname);
+    handle->seek(ofs + dispname + 0xa + skip);
     seg.name = handle->read(seg.lablen);
-    if (seg.name[0] == 0 || seg.name[0] == ' ') {  // invalid name use segname
-      seg.name = handle->read(seg.lablen);
-    }
     seg.offset = ofs + dispdata;
     if (version == 1) {  // convert to v2
       seg.bytecnt *= 512;
