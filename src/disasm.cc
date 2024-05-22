@@ -12,8 +12,8 @@ namespace ph = std::placeholders;
 static std::map<Addressing, int> sizes;
 
 Disassembler::Disassembler(std::shared_ptr<Fingerprints> prints,
-                           std::map<uint32_t, std::string> symbols)
-  : symbols(symbols), fingerprints(prints) {
+                           std::map<uint32_t, std::string> symbols, uint8_t b)
+  : symbols(symbols), fingerprints(prints), b(b) {
     for (int i = 0; i < numAddressSizes; i++) {
       sizes[addressSizes[i].mode] = addressSizes[i].length;
     }
@@ -372,8 +372,9 @@ std::string Disassembler::printInst(std::shared_ptr<Inst> inst) {
   return r;
 }
 
-std::string Disassembler::lookup(uint32_t val) {
-  return symbols[val];
+std::string Disassembler::lookup(uint16_t val) {
+  uint32_t addr = (b << 16) + val;
+  return symbols[addr];
 }
 
 std::string Disassembler::hex(uint32_t val, int width) {

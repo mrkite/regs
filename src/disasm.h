@@ -44,7 +44,7 @@ struct Inst {
 class Disassembler {
  public:
   Disassembler(std::shared_ptr<Fingerprints> prints,
-               std::map<uint32_t, std::string> symbols);
+               std::map<uint32_t, std::string> symbols, uint8_t b);
   bool disassemble(std::vector<struct Segment> segments,
                    std::vector<struct Entry> entries);
 
@@ -53,8 +53,9 @@ class Disassembler {
   std::shared_ptr<Inst> decodeInst(Handle f, Entry *entry);
   bool valid(uint32_t address);
   std::string hex(uint32_t value, int width);
-  std::string lookup(uint32_t value);
+  std::string lookup(uint16_t value);
 
   std::map<uint32_t, std::string> symbols;
   std::shared_ptr<Fingerprints> fingerprints;
+  uint8_t b;
 };

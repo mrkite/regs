@@ -36,6 +36,9 @@ Each line in this file starts with an address.  This address is of the format `$
 
 If the address is followed by an exclamation point `!`, it means this address is used as the point in memory the executable is loaded at.  (OMF files will ignore this). If more than one address is followed by an exclamation point, only the first address encountered will be used.
 
+If the address is followed by an asterisk `*`, it means this *bank* is used for
+B address lookups.
+
 If the address is followed by a colon `:`, it means this address is considered an entrypoint.  Disassembly will start at this address.  There can be as many entrypoints as you wish.  In fact, as you disassemble a file, you may notice that disassembly is halted by indirect jumps.  You can add entrypoints to the `.regs` file to continue disassembly at the destination of those jumps.
 
 After the colon, you can optionally specify "e" "m", "x" or any combination of those characters to force the disassembler state when disassembly starts at that entry point.

@@ -189,6 +189,6 @@ int main(int argc, char **argv) {
     }
   }
 
-  Disassembler d(prints, map.getSymbols());
+  Disassembler d(prints, map.getSymbols(), map.b);
   d.disassemble(segments, map.getEntries());
 }

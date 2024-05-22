@@ -5,10 +5,11 @@
 #include <algorithm>
 
 struct Field {
-  uint32_t org;
+  uint32_t org = 0;
   std::string flags;
-  bool isEntry;
-  bool isOrg;
+  bool isEntry = false;
+  bool isOrg = false;
+  bool isB = false;
   std::string symbol;
 };
 
@@ -28,6 +29,9 @@ Map::Map(const char *filename, uint32_t org) : org(org) {
       if (!this->org) {  // commandline overrides
         this->org = ofs;
       }
+    }
+    if (file.check('*')) {
+      this->b = ofs >> 16;
     }
     if (file.check(':')) {
       Entry entry;
@@ -64,6 +68,9 @@ static bool compareFields(const Field &a, const Field &b) {
 void Map::save() {
   std::map<uint32_t, Field> fields;
   fields[this->org].isOrg = true;
+  if (b) {
+    fields[b << 16].isB = true;
+  }
   for (auto & entryPoint : entryPoints) {
     auto org = entryPoint.org;
     fields[org].isEntry = true;
@@ -92,6 +99,9 @@ void Map::save() {
     f << toAddress(field.org);
     if (field.isOrg) {
       f << "!";
+    }
+    if (field.isB) {
+      f << "*";
     }
     if (field.isEntry) {
       f << ":";
