@@ -32,6 +32,9 @@ bool Segment::isDPS() {
   return (kind & 0x1f) == 0x12;
 }
 
+bool Segment::isJump() {
+  return (kind & 0x1f) == 0x02;
+}
 
 bool OMF::load(const char *filename, uint32_t org) {
   handle = TheHandle::createFromFile(filename);
@@ -380,6 +383,20 @@ bool OMF::relocSegments() {
             return false;
           }
           break;
+      }
+    }
+    if (seg.isJump()) {  // patch jumptable
+      for (int i = 8; i < seg.length; i += 14) {
+        uint16_t segnum = data[i + 4] | (data[i + 5] << 8);
+        int32_t subOffset = data[i + 6] | (data[i + 7] << 8) |
+            (data[i + 8] << 16) | (data[i + 9] << 24);
+        for (auto &sub : segments) {
+          if (sub.segnum == segnum) {
+            subOffset += sub.mapped;
+            break;
+          }
+        }
+        patch(data, i + 11, 3, subOffset);
       }
     }
     seg.data = TheHandle::createFromArray(data);

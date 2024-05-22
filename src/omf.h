@@ -26,6 +26,7 @@ struct Segment {
   bool map(std::vector<uint32_t> &memory, bool force);
   void initDPS();
   bool isDPS();
+  bool isJump();
 };
 
 class OMF {
