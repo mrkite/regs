@@ -22,6 +22,10 @@ struct Segment {
   int64_t offset;
   Handle data;
   int32_t mapped;
+
+  bool map(std::vector<uint32_t> &memory, bool force);
+  void initDPS();
+  bool isDPS();
 };
 
 class OMF {

@@ -20,6 +20,19 @@ static bool compareSegments(const Segment &a, const Segment &b) {
   return a.mapped < b.mapped;
 }
 
+void Segment::initDPS() {
+  kind = 0x12;
+  length = 1024;
+  resspc = 1024;
+  bytecnt = 0;
+  name = "Direct";
+}
+
+bool Segment::isDPS() {
+  return (kind & 0x1f) == 0x12;
+}
+
+
 bool OMF::load(const char *filename, uint32_t org) {
   handle = TheHandle::createFromFile(filename);
   if (!handle->isOpen()) {
@@ -123,86 +136,88 @@ bool OMF::loadSegments() {
 }
 
 bool OMF::mapSegments() {
-  // for ease of disassembly, first attempt to map each segment to a bank.
-  auto canDirectMap = true;
-  for (auto &seg : segments) {
-    if (seg.org) {  // segment wants to be somewhere specific, no direct map
-      canDirectMap = false;
-    } else if (seg.length > 0xfffff) {  // segment too long for a single bank
-      canDirectMap = false;
-    }
-  }
-  if (canDirectMap) {
-    for (auto &seg : segments) {
-      seg.mapped = seg.segnum << 20;
-    }
-    return true;
-  }
   // use a memory map that denotes runs of available ram
   std::vector<uint32_t> memory;
-  memory.push_back(0x10000);  // min
+  memory.push_back(0x300);  // min
   memory.push_back(0x7f0000);  // max
   // first map any segments that know where they belong
   for (auto &seg : segments) {
-    if (seg.org) {
-      if ((seg.kind & 0x1f) == 0x11) {  // absolute bank
-        seg.mapped = seg.org << 16;
-      } else {
-        seg.mapped = seg.org;
-      }
-      bool collision = false;
-      // verify we aren't overlapping anything
-      for (auto it = memory.begin(); it != memory.end(); it++) {
-        if (seg.mapped < *it && seg.mapped + seg.length > *it) {
-          collision = true;
-        }
-      }
-      if (collision) {
-        fprintf(stderr, "Segment $%x (%s) collides with another segment\n",
-                seg.segnum, seg.name.c_str());
-        return false;
-      }
-      memory.push_back(seg.mapped);
-      memory.push_back(seg.mapped + seg.length);
-      if (seg.mapped < memory[0]) {  // below the minimum
-        memory[0] = seg.mapped;  // new min
-      }
-      std::sort(memory.begin(), memory.end());
-    }
+    seg.map(memory, false);
+    std::sort(memory.begin(), memory.end());
   }
 
   // now map everything else by first fit
+  for (auto &seg : segments) {  // map.true
+    seg.map(memory, true);
+    std::sort(memory.begin(), memory.end());
+  }
+  // create direct-page if it doesn't exist
+  bool found = false;
   for (auto &seg : segments) {
-    if (seg.mapped == 0) {
-      for (auto it = memory.begin(); it != memory.end(); it++) {
-        auto base = *it;
-        if (seg.align && (base & (seg.align - 1))) {
-          base += seg.align;
-          base &= ~(seg.align - 1);
-        }
-        if (seg.banksize && (((base & (seg.banksize - 1)) + seg.length) &
-                             ~(seg.banksize - 1))) {  // crosses bank
-          base += seg.banksize;
-          base &= ~(seg.banksize - 1);
-        }
-        // does it fit?
-        it++;
-        if (base < *it && *it - base >= seg.length) {
-          seg.mapped = base;
-          memory.push_back(seg.mapped);
-          memory.push_back(seg.mapped + seg.length);
-          std::sort(memory.begin(), memory.end());
-          break;
-        }
-      }
-      if (seg.mapped == 0) {
-        fprintf(stderr, "Failed to map Segment #$%x (%s), no room\n",
-                seg.segnum, seg.name.c_str());
+    if (seg.isDPS()) {
+      found = true;
+    }
+  }
+  if (!found) {
+    Segment seg;
+    seg.initDPS();
+    seg.map(memory, true);
+    segments.push_back(seg);
+  }
+  return true;
+}
+
+bool Segment::map(std::vector<uint32_t> &memory, bool force) {
+  if (mapped) {
+    return false;
+  }
+  if (org && ((org & 0xffff) != 0 || (kind & 0x800) == 0)) {
+    mapped = org;
+    // verif we're not overlapping
+    for (auto m : memory) {
+      if (mapped < m && mapped + length > m) {
+        fprintf(stderr, "Segment %d (%s) collides with another segment!\n", segnum, name.c_str());
         return false;
       }
     }
+    memory.push_back(mapped);
+    memory.push_back(mapped + length);
+    if (mapped < memory[0]) {  // below the min?
+      memory[0] = mapped;
+    }
+    return true;
   }
-  return true;
+  if (force) {
+    for (auto it = memory.begin(); it != memory.end(); it++) {
+      auto base = *it;
+      // skip special?
+      if ((kind & 0x1f) != 0x12 && (base & 0xff0000) == 0) {
+        base += 0x10000;  // not in bank 0
+      }
+      // are we aligned?
+      if (align != 0 && (base & (align - 1)) != 0) {
+        base += align;
+        base &= ~(align - 1);
+      }
+      // does it cross bank boundaries?
+      if (banksize != 0 &&
+          (((base & (banksize - 1)) + length) & ~(banksize - 1)) != 0) {
+        base += banksize;
+        base &= ~(banksize - 1);
+      }
+      // does it fit?!
+      it++;
+      uint32_t end = *it;
+      if (base < end && end - base >= length) {
+        mapped = base;
+        memory.push_back(mapped);
+        memory.push_back(mapped + length);
+        return true;
+      }
+    }
+    fprintf(stderr, "Segment %d (%s) doesn't fit in memory\n", segnum, name.c_str());
+  }
+  return false;
 }
 
 bool OMF::relocSegments() {
