@@ -301,6 +301,13 @@ InterruptStateRec struct {
   irq_mslot: uint8;
 }
 
+Heartbeat struct {
+  nextHB: uint32;
+  vblsBetweenCalls: uint16;
+  taskSig: uint16;
+  code: uint8[];
+}
+
 MTBootInit() {
   $03, $01
 }
@@ -402,7 +409,7 @@ SetAbsClamp(xMinClamp: int16, xMaxClamp: int16, yMinClamp: int16,
   yMaxClamp: int16) {
   $03, $2a
 }
-SetHeartBeat(taskPtr: Ptr) {
+SetHeartBeat(taskPtr: ^Heartbeat) {
   $03, $12
 }
 SetMouse(mouseMode: MouseMode) {
