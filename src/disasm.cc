@@ -74,6 +74,8 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
   uint32_t addr = entry->org;
   entry->flags &= IsFlags;  // clear changed flags
   uint32_t oldFlags = entry->flags;
+  inst->prevWord = entry->prevWord;
+  entry->prevWord = 0;
   switch (mode) {
     case IMP:
       inst->operType = Opr::None;
@@ -94,6 +96,7 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
       } else {
         inst->oper = f->r16();
         inst->operType = Opr::Imm16;
+        entry->prevWord = inst->oper;
       }
       break;
     case IMMX:
@@ -103,11 +106,13 @@ std::shared_ptr<Inst> Disassembler::decodeInst(Handle f, Entry *entry) {
       } else {
         inst->oper = f->r16();
         inst->operType = Opr::Imm16;
+        entry->prevWord = inst->oper;
       }
       break;
     case IMMS:
       inst->oper = f->r16();
       inst->operType = Opr::Imm16;
+      entry->prevWord = inst->oper;
       break;
     case ABS:
       inst->oper = f->r16();
@@ -267,6 +272,9 @@ std::string Disassembler::printInst(std::shared_ptr<Inst> inst) {
       break;
     case Opr::Imm16:
       args = "#" + hex(inst->oper, 4);
+      if (inst->prevWord && inst->oper) {
+        comment = checkDW(inst->oper, inst->prevWord);
+      }
       break;
     case Opr::Abs:
       args = hex(inst->oper, 6);
@@ -375,6 +383,16 @@ std::string Disassembler::printInst(std::shared_ptr<Inst> inst) {
 std::string Disassembler::lookup(uint16_t val) {
   uint32_t addr = (b << 16) + val;
   return symbols[addr];
+}
+
+std::string Disassembler::checkDW(uint16_t cur, uint16_t prev) {
+  uint32_t addr = (cur << 16) + prev;
+  std::string ret = symbols[addr];
+  if (ret.empty()) {
+    addr = (prev << 16) + cur;
+    ret = symbols[addr];
+  }
+  return ret;
 }
 
 std::string Disassembler::hex(uint32_t val, int width) {

@@ -27,6 +27,7 @@ class File {
 struct Entry {
   uint32_t org;
   uint32_t flags;
+  uint16_t prevWord;
 };
 
 class Map {

@@ -39,6 +39,7 @@ struct Inst {
   Opr operType;
   uint32_t oper;
   uint32_t flags;
+  uint16_t prevWord;
 };
 
 class Disassembler {
@@ -54,6 +55,7 @@ class Disassembler {
   bool valid(uint32_t address);
   std::string hex(uint32_t value, int width);
   std::string lookup(uint16_t value);
+  std::string checkDW(uint16_t val, uint16_t prev);
 
   std::map<uint32_t, std::string> symbols;
   std::shared_ptr<Fingerprints> fingerprints;
