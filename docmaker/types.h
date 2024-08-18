@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <cstdint>
 
 enum Intrinsic {
   U8, U16, U32, S8, S16, S32
