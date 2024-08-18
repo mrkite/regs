@@ -386,7 +386,7 @@ bool OMF::relocSegments() {
       }
     }
     if (seg.isJump()) {  // patch jumptable
-      for (int i = 8; i < seg.length; i += 14) {
+      for (int i = 8; i < seg.length - 14; i += 14) {
         uint16_t segnum = data[i + 4] | (data[i + 5] << 8);
         int32_t subOffset = data[i + 6] | (data[i + 7] << 8) |
             (data[i + 8] << 16) | (data[i + 9] << 24);

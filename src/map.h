@@ -40,7 +40,7 @@ class Map {
   void addEntry(uint32_t entry, uint32_t flags);
   void addSymbol(uint32_t org, std::string name);
   uint32_t org;
-  uint8_t b;
+  uint8_t b = 0;
 
  private:
   std::string mapname;
