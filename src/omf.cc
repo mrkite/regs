@@ -110,12 +110,13 @@ bool OMF::loadSegments() {
     seg.entry = handle->r32();
     auto dispname = handle->r16();
     auto dispdata = handle->r16();
-    auto skip = 0;
+    auto skip = 0xa;
     if (seg.lablen == 0) {
-      skip = 1;
+      skip = 0xb;
       handle->seek(ofs + dispname + 0xa);
       seg.lablen = handle->r8();
       if (seg.lablen == 0) {
+        skip = 0;
         seg.lablen = 0xa;
       }
     }
@@ -124,7 +125,7 @@ bool OMF::loadSegments() {
     // it is followed by the segname, which is the actual segment name.
 
     // check if load name is valid
-    handle->seek(ofs + dispname + 0xa + skip);
+    handle->seek(ofs + dispname + skip);
     seg.name = handle->read(seg.lablen);
     seg.offset = ofs + dispdata;
     if (version == 1) {  // convert to v2

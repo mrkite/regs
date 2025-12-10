@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <cstdint>
 
 typedef std::shared_ptr<class TheHandle> Handle;
 

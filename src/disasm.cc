@@ -5,7 +5,6 @@
 #include "scanner.h"
 #include <fstream>
 #include <iostream>
-#include <stack>
 
 namespace ph = std::placeholders;
 

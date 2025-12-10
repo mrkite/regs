@@ -132,6 +132,9 @@ bool Scanner::basicBlocks() {
       if (b->type == Jump || b->type == Return || b->type == Invalid) {
         // branch doesn't continue
         auto next = labels.upper_bound(branch->second);
+        while (next != labels.end() && next->second == address) {  // endless loop!
+          next = labels.upper_bound(branch->first);
+        }
         if (next == labels.end()) {
           done = true;
         } else {
