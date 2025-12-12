@@ -91,7 +91,7 @@ bool OMF::isOMF() {
 bool OMF::loadSegments() {
   handle->seek(0);
   for (uint64_t ofs = 0; ofs < handle->length;) {
-    Segment seg;
+    Segment seg = {0};
     handle->seek(ofs);
     seg.bytecnt = handle->r32();
     seg.resspc = handle->r32();
@@ -163,7 +163,7 @@ bool OMF::mapSegments() {
     }
   }
   if (!found) {
-    Segment seg;
+    Segment seg = {0};
     seg.initDPS();
     seg.map(memory, true);
     segments.push_back(seg);
