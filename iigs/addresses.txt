@@ -1198,12 +1198,78 @@ CTRLYVECTOR() {
 TOTEXTPG2DA() {
   -4, $e100a4
 }
-PRO16MLI() {
+OS_Entry() {
   -4, $e100a8
+}
+OS_StackEntry() {
+  -4, $e100b0
+}
+OS_Kind() {
+  -4, $e100bc
+}
+OS_Boot() {
+  -4, $e100bd
+}
+OS_Flag() {
+  -4, $e100be
 }
 MSGPOINTER() {
   -4, $e100c0
 }
 SystemVolume() {
   -4, $e100ca
+}
+SIOFLAG() {
+  -4, $e100cf
+}
+InSlot() {
+  -4, $e100d0
+}
+InOr() {
+  -4, $e100d1
+}
+InAnd() {
+  -4, $e100d2
+}
+OutSlot() {
+  -4, $e100d3
+}
+OutOr() {
+  -4, $e100d4
+}
+OutAnd() {
+  -4, $e100d5
+}
+DOCFlag() {
+  -4, $e100d6
+}
+IrqMouseVBL() {
+  -4, $e100d7
+}
+HBPtr() {
+  -4, $e100d8
+}
+TickCnt() {
+  -4, $e100dc
+}
+MouseSlot() {
+  -4, $e100e0
+}
+EvMgrData() {
+  -4, $e100e1
+}
+JournalPtr() {
+  -4, $e100e3
+}
+EMBStat() {
+  -4, $e100e7
+}
+EMXPos() {
+  -4, $e100e9
+}
+EMYPos() {
+  -4, $e100ea
+}
+TaskHead() {
+  -4, $e100ec
 }

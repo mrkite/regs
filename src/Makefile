@@ -18,6 +18,8 @@ all: ../regs ../2mg ../dsk
 ../2mg: $(OBJS2mg)
 	$(CXX) $(CXXFLAGS) $(LIBS) -o $@ $(LDFLAGS) $^
 
+main.o: iigs.h
+
 ../regs: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LIBS) -o $@ $(LDFLAGS) $^
 
