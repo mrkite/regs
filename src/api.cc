@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <algorithm>
+#include <memory>
+#include <utility>
 #include "api.h"
 
 Fingerprints::Fingerprints() {
@@ -262,8 +264,15 @@ void API::dumpSymbol(std::shared_ptr<symbol::Symbol> sym, uint32_t org, int dept
     case symbol::Kind::isEnum:
       {
         auto e = std::static_pointer_cast<symbol::Enum>(sym);
+        std::vector<std::pair<std::string, uint32_t>> kvs;
+        for (auto itr = e->entries.begin(); itr != e->entries.end(); itr++) {
+          kvs.push_back(*itr);
+        }
+        std::sort(kvs.begin(), kvs.end(), [=](std::pair<std::string, uint32_t> &a, std::pair<std::string, uint32_t> &b) {
+                  return a.second < b.second;
+                });
         printf("enum : %s {\n", e->type->name.c_str());
-        for (auto entry : e->entries) {
+        for (auto entry : kvs) {
           printf("  %s = $%x,\n", entry.first.c_str(), entry.second);
         }
         printf("}");
@@ -282,7 +291,14 @@ void API::dumpSymbol(std::shared_ptr<symbol::Symbol> sym, uint32_t org, int dept
           printf("  %s: ", f.key.c_str());
           switch (f.value->kind) {
             case symbol::Kind::isRef:
-              dumpRef(std::static_pointer_cast<symbol::Ref>(f.value));
+              {
+                auto ref = std::static_pointer_cast<symbol::Ref>(f.value);
+                if (ref->pointer == 0 && ref->array < 0 && ref->symbol->kind == symbol::Kind::isStruct) {
+                  dumpSymbol(ref->symbol, org, depth + 1);
+                } else {
+                  dumpRef(ref);
+                }
+              }
               break;
             case symbol::Kind::isStruct:
               dumpSymbol(f.value, org, depth + 1);
